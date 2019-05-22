@@ -1,7 +1,6 @@
-module GameBoard exposing (BoardPosition(..), GameBoard, House, Row, SowingInfo, SowingState(..), Store, createRow, getRowForPlayer, getStoreForPlayer, initalBoard, isRowEmpty, nextPosition, numberOfHouses, numberOfSeeds, numberOfSeedsInHouse, pickSeeds, setRowForPlayer, setStoreForPlayer, sowAtPosition, sowNextSeed, sowSeedToHouse, startSowingSeeds)
+module GameBoard exposing (BoardPosition(..), GameBoard, House, Player(..), Row, SowingInfo, SowingState(..), Store, createRow, getRowForPlayer, getStoreForPlayer, initalBoard, isRowEmpty, nextPosition, numberOfHouses, numberOfSeeds, numberOfSeedsInHouse, pickSeeds, setRowForPlayer, setStoreForPlayer, sowAtPosition, sowNextSeed, sowSeedToHouse, startSowingSeeds, togglePlayer)
 
 import Html.Attributes exposing (placeholder, rows)
-import Kalaha exposing (Player(..), togglePlayer)
 import List exposing (take)
 import Lists exposing (setElementAt)
 
@@ -122,17 +121,41 @@ sowNextSeed board =
                     -- sow seed at current house
                     tmpBoard =
                         sowAtPosition board sowingInfo.position
+
+                    seedsToSowNext =
+                        sowingInfo.seedsToSow - 1
                 in
                 -- call function recursively with one seed less and next position
-                sowNextSeed
-                    { tmpBoard
-                        | sowingState =
-                            Sowing
-                                { sowingInfo
-                                    | seedsToSow = sowingInfo.seedsToSow - 1
-                                    , position = nextPosition sowingInfo.playerSowing sowingInfo.position
-                                }
-                    }
+                if seedsToSowNext == 0 then
+                    case sowingInfo.position of
+                        RowPos player posInRow ->
+                            if
+                                player
+                                    == sowingInfo.playerSowing
+                                    && numberOfSeedsInHouse (getRowForPlayer board player) posInRow
+                                    == 1
+                            then
+                                --TODO übertrage seeds in store
+                                { tmpBoard | sowingState = NotSowing }
+
+                            else
+                                --TODO nichts
+                                { tmpBoard | sowingState = NotSowing }
+
+                        StorePos player ->
+                            --TODO player ist nochmal dran
+                            { tmpBoard | sowingState = NotSowing }
+
+                else
+                    sowNextSeed
+                        { tmpBoard
+                            | sowingState =
+                                Sowing
+                                    { sowingInfo
+                                        | seedsToSow = seedsToSowNext
+                                        , position = nextPosition sowingInfo.playerSowing sowingInfo.position
+                                    }
+                        }
 
 
 sowAtPosition : GameBoard -> BoardPosition -> GameBoard
@@ -212,3 +235,18 @@ pickSeeds board player pos =
 isRowEmpty : Row -> Bool
 isRowEmpty row =
     not (Lists.any (\x -> not (x == 0)) row)
+
+
+type Player
+    = One
+    | Two
+
+
+togglePlayer : Player -> Player
+togglePlayer player =
+    case player of
+        One ->
+            Two
+
+        Two ->
+            One
