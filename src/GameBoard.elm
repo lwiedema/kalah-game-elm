@@ -123,7 +123,9 @@ startSowingSeeds game player position =
             pickSeeds player position game.board
     in
     -- starting recursion
-    sowNextSeed { game | board = { newBoard | sowingState = tmpSowingState } }
+    -- sowNextSeed { game | board = { newBoard | sowingState = tmpSowingState } }
+    -- without recursion
+    { game | board = { newBoard | sowingState = tmpSowingState } }
 
 
 findWinner : Game -> Winner
@@ -204,18 +206,18 @@ sowNextSeed game =
             in
             -- call function recursively with one seed less and next position
             if seedsToSowNext > 0 then
-                sowNextSeed
-                    { game
-                        | board =
-                            { boardAfterSowing
-                                | sowingState =
-                                    Sowing
-                                        { sowingInfo
-                                            | seedsToSow = seedsToSowNext
-                                            , position = nextPosition sowingInfo.playerSowing sowingInfo.position
-                                        }
-                            }
-                    }
+                --  sowNextSeed
+                { game
+                    | board =
+                        { boardAfterSowing
+                            | sowingState =
+                                Sowing
+                                    { sowingInfo
+                                        | seedsToSow = seedsToSowNext
+                                        , position = nextPosition sowingInfo.playerSowing sowingInfo.position
+                                    }
+                        }
+                }
 
             else
                 case sowingInfo.position of
@@ -231,24 +233,24 @@ sowNextSeed game =
                                 boardAfter =
                                     handleSeedInEmptyHouse boardAfterSowing player posInRow
                             in
-                            sowNextSeed
-                                { game
-                                    | board = { boardAfter | sowingState = SowingFinished sowingInfo.playerSowing }
-                                    , state = Turn (togglePlayer sowingInfo.playerSowing)
-                                }
+                            --  sowNextSeed
+                            { game
+                                | board = { boardAfter | sowingState = SowingFinished sowingInfo.playerSowing }
+                                , state = Turn (togglePlayer sowingInfo.playerSowing)
+                            }
 
                         else
                             -- anderer Spieler ist dran
-                            sowNextSeed
-                                { game
-                                    | state = Turn (togglePlayer sowingInfo.playerSowing)
-                                    , board = { boardAfterSowing | sowingState = SowingFinished sowingInfo.playerSowing }
-                                }
+                            --  sowNextSeed
+                            { game
+                                | state = Turn (togglePlayer sowingInfo.playerSowing)
+                                , board = { boardAfterSowing | sowingState = SowingFinished sowingInfo.playerSowing }
+                            }
 
                     StorePos player ->
                         -- player ist nochmal dran
-                        sowNextSeed
-                            { game | board = { boardAfterSowing | sowingState = SowingFinished sowingInfo.playerSowing } }
+                        --  sowNextSeed
+                        { game | board = { boardAfterSowing | sowingState = SowingFinished sowingInfo.playerSowing } }
 
 
 sowAtPosition : GameBoard -> BoardPosition -> GameBoard

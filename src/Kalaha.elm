@@ -7,6 +7,7 @@ import Html.Attributes exposing (disabled, height, start, style, width)
 import Html.Events exposing (onClick)
 import Platform.Sub
 import String exposing (fromInt)
+import Time
 
 
 main : Program () Model Msg
@@ -15,8 +16,21 @@ main =
         { init = \_ -> ( initalModel, Cmd.none )
         , view = view
         , update = update
-        , subscriptions = \_ -> Sub.none
+        , subscriptions = subscriptions
         }
+
+
+subscriptions : Model -> Sub Msg
+subscriptions model =
+    case model.board.sowingState of
+        Sowing _ ->
+            Time.every 1000 (\_ -> SowNext)
+
+        SowingFinished _ ->
+            Time.every 1000 (\_ -> AfterSow)
+
+        _ ->
+            Sub.none
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -26,6 +40,12 @@ update msg model =
             ( startSowingSeeds model player int
             , Cmd.none
             )
+
+        SowNext ->
+            ( sowNextSeed model, Cmd.none )
+
+        AfterSow ->
+            ( sowNextSeed model, Cmd.none )
 
         Other ->
             ( model
@@ -131,4 +151,6 @@ type alias Model =
 
 type Msg
     = Click Player Int
+    | SowNext
+    | AfterSow
     | Other
