@@ -13,12 +13,30 @@ import String exposing (fromInt)
 import Time
 
 
+type alias Model =
+    Game
+
+
+initalModel : Model
+initalModel =
+    { state = Turn One
+    , board = GameBoard.initalBoard
+    , settings = Settings.defaultSettings
+    }
+
+
+type Msg
+    = Click Player Int
+    | NextSowingStep
+    | Other
+
+
 main : Program () Model Msg
 main =
     Browser.element
         { init = \_ -> ( initalModel, Cmd.none )
         , view = view
-        , update = update
+        , update = \msg model -> ( update msg model, Cmd.none )
         , subscriptions = subscriptions
         }
 
@@ -33,21 +51,17 @@ subscriptions model =
             Time.every 500 (\_ -> NextSowingStep)
 
 
-update : Msg -> Model -> ( Model, Cmd Msg )
+update : Msg -> Model -> Model
 update msg model =
     case msg of
         Click player int ->
-            ( Game.startSowingSeeds model player int
-            , Cmd.none
-            )
+            Game.startSowingSeeds model player int
 
         NextSowingStep ->
-            ( Game.nextSowingStep model, Cmd.none )
+            Game.nextSowingStep model
 
         Other ->
-            ( model
-            , Cmd.none
-            )
+            model
 
 
 view : Model -> Html Msg
@@ -56,12 +70,7 @@ view model =
         [ Html.text
             (case model.state of
                 Turn p ->
-                    case p of
-                        One ->
-                            "Spieler 1 ist am Zug"
-
-                        Two ->
-                            "Spieler 2 ist am Zug"
+                    "Spieler " ++ Player.toString p ++ " ist am Zug."
 
                 End winner ->
                     "Spiel beendet. "
@@ -69,11 +78,8 @@ view model =
                                 Drawn ->
                                     "Es ist unentschieden."
 
-                                Winner One ->
-                                    "Es gewinnt Spieler 1."
-
-                                Winner Two ->
-                                    "Es gewinnt Spieler 2."
+                                Winner w ->
+                                    "Es gewinnt Spieler " ++ Player.toString w ++ "."
                            )
             )
         , div
@@ -135,21 +141,3 @@ view model =
                 [ Html.text (fromInt (Tuple.first model.board.stores)) ]
             ]
         ]
-
-
-initalModel : Model
-initalModel =
-    { state = Turn One
-    , board = GameBoard.initalBoard
-    , settings = Settings.defaultSettings
-    }
-
-
-type alias Model =
-    Game
-
-
-type Msg
-    = Click Player Int
-    | NextSowingStep
-    | Other

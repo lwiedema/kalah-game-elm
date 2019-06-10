@@ -1,4 +1,4 @@
-module Player exposing (Player(..), Winner(..), togglePlayer)
+module Player exposing (Player(..), Winner(..), toString, togglePlayer)
 
 
 type Player
@@ -19,3 +19,13 @@ togglePlayer player =
 
         Two ->
             One
+
+
+toString : Player -> String
+toString player =
+    case player of
+        One ->
+            "1"
+
+        Two ->
+            "2"
