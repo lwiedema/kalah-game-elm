@@ -23,6 +23,7 @@ type SowingState
     = NotSowing
     | Sowing SowingInfo
     | SowingFinished Player
+    | HandleLastSeedInEmptyHouse Player Int
 
 
 type alias SowingInfo =

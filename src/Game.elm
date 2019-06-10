@@ -76,6 +76,16 @@ nextSowingStep game =
                 in
                 { game | board = { b | sowingState = NotSowing } }
 
+        HandleLastSeedInEmptyHouse player pos ->
+            let
+                boardAfter =
+                    handleSeedInEmptyHouse game.board game.settings player pos
+            in
+            { game
+                | state = Turn (togglePlayer player)
+                , board = { boardAfter | sowingState = SowingFinished player }
+            }
+
         Sowing sowingInfo ->
             let
                 -- sow seed at current house
@@ -85,7 +95,6 @@ nextSowingStep game =
                 seedsToSowNext =
                     sowingInfo.seedsToSow - 1
             in
-            -- call function recursively with one seed less and next position
             if seedsToSowNext > 0 then
                 --  sowNextSeed
                 { game
@@ -104,19 +113,14 @@ nextSowingStep game =
                 case sowingInfo.position of
                     RowPos player posInRow ->
                         if
-                            -- player
-                            --     == sowingInfo.playerSowing
-                            -- &&
-                            numberOfSeedsInHouse (getRowForPlayer boardAfterSowing player) posInRow == 1
+                            player
+                                == sowingInfo.playerSowing
+                                && numberOfSeedsInHouse (getRowForPlayer boardAfterSowing player) posInRow
+                                == 1
+                            -- last seed sown to empty house
                         then
-                            --TODO übertrage seeds in store
-                            let
-                                boardAfter =
-                                    handleSeedInEmptyHouse boardAfterSowing game.settings player posInRow
-                            in
-                            --  sowNextSeed
                             { game
-                                | board = { boardAfter | sowingState = SowingFinished sowingInfo.playerSowing }
+                                | board = { boardAfterSowing | sowingState = HandleLastSeedInEmptyHouse player posInRow }
                                 , state = Turn (togglePlayer sowingInfo.playerSowing)
                             }
 

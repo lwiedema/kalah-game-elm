@@ -26,14 +26,11 @@ main =
 subscriptions : Model -> Sub Msg
 subscriptions model =
     case model.board.sowingState of
-        Sowing _ ->
-            Time.every 500 (\_ -> NextSowingStep)
-
-        SowingFinished _ ->
-            Time.every 500 (\_ -> NextSowingStep)
+        NotSowing ->
+            Sub.none
 
         _ ->
-            Sub.none
+            Time.every 500 (\_ -> NextSowingStep)
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
