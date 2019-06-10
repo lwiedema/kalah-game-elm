@@ -111,26 +111,14 @@ view model =
                         , style "height" "45%"
                         , style "display" "inline-block"
                         ]
-                        [ button [ onClick (Click Two 5), disabled (not (model.state == Turn Two)) ] [ Html.text (fromInt (GameBoard.numberOfSeedsInHouse (Tuple.second model.board.rows) 5)) ]
-                        , button [ onClick (Click Two 4), disabled (not (model.state == Turn Two)) ] [ Html.text (fromInt (GameBoard.numberOfSeedsInHouse (Tuple.second model.board.rows) 4)) ]
-                        , button [ onClick (Click Two 3), disabled (not (model.state == Turn Two)) ] [ Html.text (fromInt (GameBoard.numberOfSeedsInHouse (Tuple.second model.board.rows) 3)) ]
-                        , button [ onClick (Click Two 2), disabled (not (model.state == Turn Two)) ] [ Html.text (fromInt (GameBoard.numberOfSeedsInHouse (Tuple.second model.board.rows) 2)) ]
-                        , button [ onClick (Click Two 1), disabled (not (model.state == Turn Two)) ] [ Html.text (fromInt (GameBoard.numberOfSeedsInHouse (Tuple.second model.board.rows) 1)) ]
-                        , button [ onClick (Click Two 0), disabled (not (model.state == Turn Two)) ] [ Html.text (fromInt (GameBoard.numberOfSeedsInHouse (Tuple.second model.board.rows) 0)) ]
-                        ]
+                        (rowView model Two)
                     , div
                         [ style "background-color" "yellow"
                         , style "width" "100%"
                         , style "height" "45%"
                         , style "display" "inline-block"
                         ]
-                        [ button [ onClick (Click One 0), disabled (not (model.state == Turn One)) ] [ Html.text (fromInt (GameBoard.numberOfSeedsInHouse (Tuple.first model.board.rows) 0)) ]
-                        , button [ onClick (Click One 1), disabled (not (model.state == Turn One)) ] [ Html.text (fromInt (GameBoard.numberOfSeedsInHouse (Tuple.first model.board.rows) 1)) ]
-                        , button [ onClick (Click One 2), disabled (not (model.state == Turn One)) ] [ Html.text (fromInt (GameBoard.numberOfSeedsInHouse (Tuple.first model.board.rows) 2)) ]
-                        , button [ onClick (Click One 3), disabled (not (model.state == Turn One)) ] [ Html.text (fromInt (GameBoard.numberOfSeedsInHouse (Tuple.first model.board.rows) 3)) ]
-                        , button [ onClick (Click One 4), disabled (not (model.state == Turn One)) ] [ Html.text (fromInt (GameBoard.numberOfSeedsInHouse (Tuple.first model.board.rows) 4)) ]
-                        , button [ onClick (Click One 5), disabled (not (model.state == Turn One)) ] [ Html.text (fromInt (GameBoard.numberOfSeedsInHouse (Tuple.first model.board.rows) 5)) ]
-                        ]
+                        (rowView model One)
                     ]
                 ]
             , div
@@ -141,3 +129,28 @@ view model =
                 [ Html.text (fromInt (Tuple.first model.board.stores)) ]
             ]
         ]
+
+
+rowView : Model -> Player -> List (Html Msg)
+rowView model player =
+    case player of
+        One ->
+            List.foldl (::) [] (rowViewHelper model player model.settings.numberOfHouses)
+
+        Two ->
+            rowViewHelper model player model.settings.numberOfHouses
+
+
+rowViewHelper : Model -> Player -> Int -> List (Html Msg)
+rowViewHelper model player rowsToCreate =
+    case rowsToCreate of
+        1 ->
+            houseView model player (model.settings.numberOfHouses - rowsToCreate) :: []
+
+        _ ->
+            rowViewHelper model player (rowsToCreate - 1) ++ [ houseView model player (model.settings.numberOfHouses - rowsToCreate) ]
+
+
+houseView : Model -> Player -> Int -> Html Msg
+houseView model player pos =
+    button [ onClick (Click player pos), disabled (not (model.state == Turn player)) ] [ Html.text (fromInt (GameBoard.numberOfSeedsInHouse (GameBoard.getRowForPlayer model.board player) pos)) ]
