@@ -55,7 +55,16 @@ update : Msg -> Model -> Model
 update msg model =
     case msg of
         Click player int ->
-            Game.startSowingSeeds model player int
+            case model.state of
+                Turn onTurn ->
+                    if onTurn == player then
+                        Game.startSowingSeeds model player int
+
+                    else
+                        model
+
+                _ ->
+                    model
 
         NextSowingStep ->
             Game.nextSowingStep model
@@ -153,4 +162,8 @@ rowViewHelper model player rowsToCreate =
 
 houseView : Model -> Player -> Int -> Html Msg
 houseView model player pos =
-    button [ onClick (Click player pos), disabled (not (model.state == Turn player)) ] [ Html.text (fromInt (GameBoard.numberOfSeedsInHouse (GameBoard.getRowForPlayer model.board player) pos)) ]
+    let
+        numberOfSeeds =
+            GameBoard.numberOfSeedsInHouse (GameBoard.getRowForPlayer model.board player) pos
+    in
+    button [ onClick (Click player pos), disabled (not (model.state == Turn player)) ] [ Html.text (fromInt numberOfSeeds) ]
