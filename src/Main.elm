@@ -1,11 +1,14 @@
-module Kalaha exposing (Model, Msg(..), initalModel, main, update, view)
+module Main exposing (Model, Msg(..), initalModel, main, subscriptions, update, view)
 
 import Browser
+import Game exposing (Game, State(..))
 import GameBoard exposing (..)
 import Html exposing (Html, button, div, text)
 import Html.Attributes exposing (disabled, height, start, style, width)
 import Html.Events exposing (onClick)
 import Platform.Sub
+import Player exposing (Player(..), Winner(..))
+import Settings
 import String exposing (fromInt)
 import Time
 
@@ -24,10 +27,10 @@ subscriptions : Model -> Sub Msg
 subscriptions model =
     case model.board.sowingState of
         Sowing _ ->
-            Time.every 1000 (\_ -> SowNext)
+            Time.every 500 (\_ -> SowNext)
 
         SowingFinished _ ->
-            Time.every 1000 (\_ -> AfterSow)
+            Time.every 500 (\_ -> AfterSow)
 
         _ ->
             Sub.none
@@ -37,15 +40,15 @@ update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
         Click player int ->
-            ( startSowingSeeds model player int
+            ( Game.startSowingSeeds model player int
             , Cmd.none
             )
 
         SowNext ->
-            ( sowNextSeed model, Cmd.none )
+            ( Game.sowNextSeed model, Cmd.none )
 
         AfterSow ->
-            ( sowNextSeed model, Cmd.none )
+            ( Game.handleAfterSowingFinished model, Cmd.none )
 
         Other ->
             ( model
@@ -142,7 +145,10 @@ view model =
 
 initalModel : Model
 initalModel =
-    { state = Turn One, board = GameBoard.initalBoard }
+    { state = Turn One
+    , board = GameBoard.initalBoard
+    , settings = Settings.defaultSettings
+    }
 
 
 type alias Model =
