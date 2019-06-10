@@ -121,7 +121,6 @@ nextSowingStep game =
                         then
                             { game
                                 | board = { boardAfterSowing | sowingState = HandleLastSeedInEmptyHouse player posInRow }
-                                , state = Turn (Player.togglePlayer sowingInfo.playerSowing)
                             }
 
                         else
