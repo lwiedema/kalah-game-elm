@@ -27,10 +27,10 @@ subscriptions : Model -> Sub Msg
 subscriptions model =
     case model.board.sowingState of
         Sowing _ ->
-            Time.every 500 (\_ -> SowNext)
+            Time.every 500 (\_ -> NextSowingStep)
 
         SowingFinished _ ->
-            Time.every 500 (\_ -> AfterSow)
+            Time.every 500 (\_ -> NextSowingStep)
 
         _ ->
             Sub.none
@@ -44,11 +44,8 @@ update msg model =
             , Cmd.none
             )
 
-        SowNext ->
-            ( Game.sowNextSeed model, Cmd.none )
-
-        AfterSow ->
-            ( Game.handleAfterSowingFinished model, Cmd.none )
+        NextSowingStep ->
+            ( Game.nextSowingStep model, Cmd.none )
 
         Other ->
             ( model
@@ -157,6 +154,5 @@ type alias Model =
 
 type Msg
     = Click Player Int
-    | SowNext
-    | AfterSow
+    | NextSowingStep
     | Other

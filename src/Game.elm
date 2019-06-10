@@ -1,4 +1,4 @@
-module Game exposing (Game, State(..), findWinner, handleAfterSowingFinished, sowNextSeed, startSowingSeeds)
+module Game exposing (Game, State(..), findWinner, nextSowingStep, startSowingSeeds)
 
 import GameBoard exposing (..)
 import Player exposing (..)
@@ -51,11 +51,12 @@ startSowingSeeds game player position =
             { game | board = { newBoard | sowingState = tmpSowingState } }
 
         _ ->
+            -- should never get to this point
             game
 
 
-handleAfterSowingFinished : Game -> Game
-handleAfterSowingFinished game =
+nextSowingStep : Game -> Game
+nextSowingStep game =
     case game.board.sowingState of
         SowingFinished player ->
             let
@@ -75,13 +76,6 @@ handleAfterSowingFinished game =
                 in
                 { game | board = { b | sowingState = NotSowing } }
 
-        _ ->
-            game
-
-
-sowNextSeed : Game -> Game
-sowNextSeed game =
-    case game.board.sowingState of
         Sowing sowingInfo ->
             let
                 -- sow seed at current house
@@ -140,4 +134,5 @@ sowNextSeed game =
                         { game | board = { boardAfterSowing | sowingState = SowingFinished sowingInfo.playerSowing } }
 
         _ ->
+            -- should never get to this point
             game
