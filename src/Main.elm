@@ -2,7 +2,7 @@ module Main exposing (Model, Msg(..), initalModel, main, subscriptions, update, 
 
 import Browser
 import Game exposing (Game, State(..))
-import GameBoard exposing (..)
+import GameBoard exposing (SowingState(..))
 import Html exposing (Html, button, div, text)
 import Html.Attributes exposing (disabled, height, start, style, width)
 import Html.Events exposing (onClick)
@@ -105,12 +105,12 @@ view model =
                         , style "height" "45%"
                         , style "display" "inline-block"
                         ]
-                        [ button [ onClick (Click Two 5), disabled (not (model.state == Turn Two)) ] [ Html.text (fromInt (numberOfSeedsInHouse (Tuple.second model.board.rows) 5)) ]
-                        , button [ onClick (Click Two 4), disabled (not (model.state == Turn Two)) ] [ Html.text (fromInt (numberOfSeedsInHouse (Tuple.second model.board.rows) 4)) ]
-                        , button [ onClick (Click Two 3), disabled (not (model.state == Turn Two)) ] [ Html.text (fromInt (numberOfSeedsInHouse (Tuple.second model.board.rows) 3)) ]
-                        , button [ onClick (Click Two 2), disabled (not (model.state == Turn Two)) ] [ Html.text (fromInt (numberOfSeedsInHouse (Tuple.second model.board.rows) 2)) ]
-                        , button [ onClick (Click Two 1), disabled (not (model.state == Turn Two)) ] [ Html.text (fromInt (numberOfSeedsInHouse (Tuple.second model.board.rows) 1)) ]
-                        , button [ onClick (Click Two 0), disabled (not (model.state == Turn Two)) ] [ Html.text (fromInt (numberOfSeedsInHouse (Tuple.second model.board.rows) 0)) ]
+                        [ button [ onClick (Click Two 5), disabled (not (model.state == Turn Two)) ] [ Html.text (fromInt (GameBoard.numberOfSeedsInHouse (Tuple.second model.board.rows) 5)) ]
+                        , button [ onClick (Click Two 4), disabled (not (model.state == Turn Two)) ] [ Html.text (fromInt (GameBoard.numberOfSeedsInHouse (Tuple.second model.board.rows) 4)) ]
+                        , button [ onClick (Click Two 3), disabled (not (model.state == Turn Two)) ] [ Html.text (fromInt (GameBoard.numberOfSeedsInHouse (Tuple.second model.board.rows) 3)) ]
+                        , button [ onClick (Click Two 2), disabled (not (model.state == Turn Two)) ] [ Html.text (fromInt (GameBoard.numberOfSeedsInHouse (Tuple.second model.board.rows) 2)) ]
+                        , button [ onClick (Click Two 1), disabled (not (model.state == Turn Two)) ] [ Html.text (fromInt (GameBoard.numberOfSeedsInHouse (Tuple.second model.board.rows) 1)) ]
+                        , button [ onClick (Click Two 0), disabled (not (model.state == Turn Two)) ] [ Html.text (fromInt (GameBoard.numberOfSeedsInHouse (Tuple.second model.board.rows) 0)) ]
                         ]
                     , div
                         [ style "background-color" "yellow"
@@ -118,12 +118,12 @@ view model =
                         , style "height" "45%"
                         , style "display" "inline-block"
                         ]
-                        [ button [ onClick (Click One 0), disabled (not (model.state == Turn One)) ] [ Html.text (fromInt (numberOfSeedsInHouse (Tuple.first model.board.rows) 0)) ]
-                        , button [ onClick (Click One 1), disabled (not (model.state == Turn One)) ] [ Html.text (fromInt (numberOfSeedsInHouse (Tuple.first model.board.rows) 1)) ]
-                        , button [ onClick (Click One 2), disabled (not (model.state == Turn One)) ] [ Html.text (fromInt (numberOfSeedsInHouse (Tuple.first model.board.rows) 2)) ]
-                        , button [ onClick (Click One 3), disabled (not (model.state == Turn One)) ] [ Html.text (fromInt (numberOfSeedsInHouse (Tuple.first model.board.rows) 3)) ]
-                        , button [ onClick (Click One 4), disabled (not (model.state == Turn One)) ] [ Html.text (fromInt (numberOfSeedsInHouse (Tuple.first model.board.rows) 4)) ]
-                        , button [ onClick (Click One 5), disabled (not (model.state == Turn One)) ] [ Html.text (fromInt (numberOfSeedsInHouse (Tuple.first model.board.rows) 5)) ]
+                        [ button [ onClick (Click One 0), disabled (not (model.state == Turn One)) ] [ Html.text (fromInt (GameBoard.numberOfSeedsInHouse (Tuple.first model.board.rows) 0)) ]
+                        , button [ onClick (Click One 1), disabled (not (model.state == Turn One)) ] [ Html.text (fromInt (GameBoard.numberOfSeedsInHouse (Tuple.first model.board.rows) 1)) ]
+                        , button [ onClick (Click One 2), disabled (not (model.state == Turn One)) ] [ Html.text (fromInt (GameBoard.numberOfSeedsInHouse (Tuple.first model.board.rows) 2)) ]
+                        , button [ onClick (Click One 3), disabled (not (model.state == Turn One)) ] [ Html.text (fromInt (GameBoard.numberOfSeedsInHouse (Tuple.first model.board.rows) 3)) ]
+                        , button [ onClick (Click One 4), disabled (not (model.state == Turn One)) ] [ Html.text (fromInt (GameBoard.numberOfSeedsInHouse (Tuple.first model.board.rows) 4)) ]
+                        , button [ onClick (Click One 5), disabled (not (model.state == Turn One)) ] [ Html.text (fromInt (GameBoard.numberOfSeedsInHouse (Tuple.first model.board.rows) 5)) ]
                         ]
                     ]
                 ]

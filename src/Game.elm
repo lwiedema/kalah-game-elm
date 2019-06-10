@@ -1,7 +1,7 @@
 module Game exposing (Game, State(..), findWinner, nextSowingStep, startSowingSeeds)
 
-import GameBoard exposing (..)
-import Player exposing (..)
+import GameBoard exposing (BoardPosition(..), GameBoard, SowingState(..))
+import Player exposing (Player(..), Winner(..))
 import Settings exposing (Settings)
 
 
@@ -19,10 +19,10 @@ type State
 
 findWinner : Game -> Winner
 findWinner game =
-    if getStoreForPlayer game.board One == getStoreForPlayer game.board Two then
+    if GameBoard.getStoreForPlayer game.board One == GameBoard.getStoreForPlayer game.board Two then
         Drawn
 
-    else if getStoreForPlayer game.board One > getStoreForPlayer game.board Two then
+    else if GameBoard.getStoreForPlayer game.board One > GameBoard.getStoreForPlayer game.board Two then
         Winner One
 
     else
@@ -39,13 +39,13 @@ startSowingSeeds game player position =
                 tmpSowingState =
                     Sowing
                         { playerSowing = player
-                        , seedsToSow = numberOfSeedsInHouse (getRowForPlayer game.board player) position
-                        , position = nextPosition game.settings player (RowPos player position)
+                        , seedsToSow = GameBoard.numberOfSeedsInHouse (GameBoard.getRowForPlayer game.board player) position
+                        , position = GameBoard.nextPosition game.settings player (RowPos player position)
                         }
 
                 -- picking up seeds from house
                 newBoard =
-                    pickSeeds player position game.board
+                    GameBoard.pickSeeds player position game.board
             in
             -- return changed game
             { game | board = { newBoard | sowingState = tmpSowingState } }
@@ -61,13 +61,13 @@ nextSowingStep game =
         SowingFinished player ->
             let
                 lastSowingPlayersRow =
-                    getRowForPlayer game.board player
+                    GameBoard.getRowForPlayer game.board player
 
                 otherPlayersRow =
-                    getRowForPlayer game.board (togglePlayer player)
+                    GameBoard.getRowForPlayer game.board (Player.togglePlayer player)
             in
-            if isRowEmpty lastSowingPlayersRow || isRowEmpty otherPlayersRow then
-                { game | board = addAllRemainingSeedsToStore game.board game.settings, state = End (findWinner game) }
+            if GameBoard.isRowEmpty lastSowingPlayersRow || GameBoard.isRowEmpty otherPlayersRow then
+                { game | board = GameBoard.addAllRemainingSeedsToStore game.board game.settings, state = End (findWinner game) }
 
             else
                 let
@@ -79,10 +79,10 @@ nextSowingStep game =
         HandleLastSeedInEmptyHouse player pos ->
             let
                 boardAfter =
-                    handleSeedInEmptyHouse game.board game.settings player pos
+                    GameBoard.handleSeedInEmptyHouse game.board game.settings player pos
             in
             { game
-                | state = Turn (togglePlayer player)
+                | state = Turn (Player.togglePlayer player)
                 , board = { boardAfter | sowingState = SowingFinished player }
             }
 
@@ -90,7 +90,7 @@ nextSowingStep game =
             let
                 -- sow seed at current house
                 boardAfterSowing =
-                    sowAtPosition game.board sowingInfo.position
+                    GameBoard.sowAtPosition game.board sowingInfo.position
 
                 seedsToSowNext =
                     sowingInfo.seedsToSow - 1
@@ -104,7 +104,7 @@ nextSowingStep game =
                                 Sowing
                                     { sowingInfo
                                         | seedsToSow = seedsToSowNext
-                                        , position = nextPosition game.settings sowingInfo.playerSowing sowingInfo.position
+                                        , position = GameBoard.nextPosition game.settings sowingInfo.playerSowing sowingInfo.position
                                     }
                         }
                 }
@@ -115,20 +115,20 @@ nextSowingStep game =
                         if
                             player
                                 == sowingInfo.playerSowing
-                                && numberOfSeedsInHouse (getRowForPlayer boardAfterSowing player) posInRow
+                                && GameBoard.numberOfSeedsInHouse (GameBoard.getRowForPlayer boardAfterSowing player) posInRow
                                 == 1
                             -- last seed sown to empty house
                         then
                             { game
                                 | board = { boardAfterSowing | sowingState = HandleLastSeedInEmptyHouse player posInRow }
-                                , state = Turn (togglePlayer sowingInfo.playerSowing)
+                                , state = Turn (Player.togglePlayer sowingInfo.playerSowing)
                             }
 
                         else
                             -- anderer Spieler ist dran
                             --  sowNextSeed
                             { game
-                                | state = Turn (togglePlayer sowingInfo.playerSowing)
+                                | state = Turn (Player.togglePlayer sowingInfo.playerSowing)
                                 , board = { boardAfterSowing | sowingState = SowingFinished sowingInfo.playerSowing }
                             }
 
