@@ -3,7 +3,7 @@ module KalahaMain exposing (Model, Msg(..), initalModel, main, subscriptions, up
 import Browser
 import Game exposing (Game, State(..))
 import GameBoard exposing (SowingState(..))
-import Html exposing (Html, button, div, text)
+import Html exposing (Attribute, Html, button, div, text)
 import Html.Attributes exposing (disabled, height, start, style, width)
 import Html.Events exposing (onClick)
 import Platform.Sub
@@ -76,36 +76,20 @@ update msg model =
 view : Model -> Html Msg
 view model =
     div []
-        [ Html.text
-            (case model.state of
-                Turn p ->
-                    "Spieler " ++ Player.toString p ++ " ist am Zug."
-
-                End winner ->
-                    "Spiel beendet. "
-                        ++ (case winner of
-                                Drawn ->
-                                    "Es ist unentschieden."
-
-                                Winner w ->
-                                    "Es gewinnt Spieler " ++ Player.toString w ++ "."
-                           )
-            )
-        , div
-            [ style "display" "flex"
+        [ div
+            [ style "width" "900px"
+            , style "height" "400px"
+            , grayBackground
             ]
             [ div
-                [ style "width" "200px"
-                , style "height" "400px"
-                , style "background-color" "red"
-                ]
-                [ Html.text (fromInt (Tuple.second model.board.stores)) ]
+                (upsideDown :: storeStyle)
+                [ storeView model Two ]
             , div
-                [ style "width" "800px"
-                , style "height" "400px"
-                , style "background-color" "blue"
+                [ style "width" "60%"
+                , style "height" "100%"
                 , style "text-align" "center"
                 , style "position" "relative"
+                , style "float" "left"
                 ]
                 [ div
                     [ style "position" "absolute"
@@ -115,39 +99,25 @@ view model =
                     , style "left" "5px"
                     ]
                     [ div
-                        [ style "background-color" "yellow"
-                        , style "width" "100%"
-                        , style "height" "45%"
-                        , style "display" "inline-block"
-                        ]
+                        (upsideDown :: rowStyle)
                         (rowView model Two)
+                    , div [ style "height" "20%" ]
+                        [ infoView model ]
                     , div
-                        [ style "background-color" "yellow"
-                        , style "width" "100%"
-                        , style "height" "45%"
-                        , style "display" "inline-block"
-                        ]
+                        rowStyle
                         (rowView model One)
                     ]
                 ]
             , div
-                [ style "width" "200px"
-                , style "height" "400px"
-                , style "background-color" "red"
-                ]
-                [ Html.text (fromInt (Tuple.first model.board.stores)) ]
+                storeStyle
+                [ storeView model One ]
             ]
         ]
 
 
 rowView : Model -> Player -> List (Html Msg)
 rowView model player =
-    case player of
-        One ->
-            List.foldl (::) [] (rowViewHelper model player model.settings.numberOfHouses)
-
-        Two ->
-            rowViewHelper model player model.settings.numberOfHouses
+    List.foldl (::) [] (rowViewHelper model player model.settings.numberOfHouses)
 
 
 rowViewHelper : Model -> Player -> Int -> List (Html Msg)
@@ -167,3 +137,58 @@ houseView model player pos =
             GameBoard.numberOfSeedsInHouse (GameBoard.getRowForPlayer model.board player) pos
     in
     button [ onClick (Click player pos), disabled (not (model.state == Turn player)) ] [ Html.text (fromInt numberOfSeeds) ]
+
+
+storeView : Model -> Player -> Html Msg
+storeView model player =
+    Html.text (fromInt (GameBoard.getStoreForPlayer model.board player))
+
+
+infoView : Model -> Html Msg
+infoView model =
+    Html.text
+        (case model.state of
+            Turn p ->
+                "Spieler " ++ Player.toString p ++ " ist am Zug."
+
+            End winner ->
+                "Spiel beendet. "
+                    ++ (case winner of
+                            Drawn ->
+                                "Es ist unentschieden."
+
+                            Winner w ->
+                                "Es gewinnt Spieler " ++ Player.toString w ++ "."
+                       )
+        )
+
+
+
+-- Attributes
+
+
+storeStyle : List (Attribute Msg)
+storeStyle =
+    [ style "width" "20%"
+    , style "height" "100%"
+    , style "float" "left"
+    ]
+
+
+rowStyle : List (Attribute Msg)
+rowStyle =
+    [ style "background-color" "yellow"
+    , style "width" "100%"
+    , style "height" "40%"
+    , style "display" "inline-block"
+    ]
+
+
+upsideDown : Attribute Msg
+upsideDown =
+    style "transform" "rotate(180deg)"
+
+
+grayBackground : Attribute Msg
+grayBackground =
+    style "background-color" "#4a4a4a"
