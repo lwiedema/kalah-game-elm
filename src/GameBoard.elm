@@ -206,6 +206,7 @@ resetAllJustSown board =
             ( resetSownStateInStore (getStoreForPlayer board One)
             , resetSownStateInStore (getStoreForPlayer board Two)
             )
+        , sowingState = NotSowing
     }
 
 
