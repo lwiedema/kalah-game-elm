@@ -49,7 +49,7 @@ subscriptions model =
             Sub.none
 
         _ ->
-            Time.every 500 (\_ -> NextSowingStep)
+            Time.every (Settings.speedInMilliseconds model.settings.sowingSpeed) (\_ -> NextSowingStep)
 
 
 update : Msg -> Model -> Model
