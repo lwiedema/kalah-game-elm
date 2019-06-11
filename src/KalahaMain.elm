@@ -179,8 +179,13 @@ infoView model =
                             Drawn ->
                                 "Es ist unentschieden."
 
-                            Winner w ->
-                                "Es gewinnt Spieler " ++ Player.toString w ++ "."
+                            Winner w finalScore ->
+                                "Es gewinnt Spieler "
+                                    ++ Player.toString w
+                                    ++ ". Endstand: "
+                                    ++ String.fromInt (Tuple.first finalScore)
+                                    ++ ":"
+                                    ++ String.fromInt (Tuple.second finalScore)
                        )
         )
 

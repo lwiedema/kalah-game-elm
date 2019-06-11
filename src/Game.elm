@@ -20,20 +20,17 @@ type State
 findWinner : Game -> Winner
 findWinner game =
     let
-        storeOne =
-            GameBoard.getStoreForPlayer game.board One
-
-        storeTwo =
-            GameBoard.getStoreForPlayer game.board Two
+        finalScore =
+            GameBoard.getFinalScore game.board game.settings
     in
-    if storeOne.seeds == storeTwo.seeds then
+    if Tuple.first finalScore == Tuple.second finalScore then
         Drawn
 
-    else if storeOne.seeds > storeTwo.seeds then
-        Winner One
+    else if Tuple.first finalScore > Tuple.second finalScore then
+        Winner One finalScore
 
     else
-        Winner Two
+        Winner Two finalScore
 
 
 startSowingSeeds : Game -> Player -> Int -> Game
@@ -74,7 +71,7 @@ nextSowingStep game =
                     GameBoard.getRowForPlayer game.board (Player.togglePlayer player)
             in
             if GameBoard.isRowEmpty lastSowingPlayersRow || GameBoard.isRowEmpty otherPlayersRow then
-                { game | board = resetAllJustSown (GameBoard.addAllRemainingSeedsToStore game.board game.settings), state = End (findWinner game) }
+                { game | board = resetAllJustSown game.board, state = End (findWinner game) }
 
             else
                 let

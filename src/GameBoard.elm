@@ -1,4 +1,4 @@
-module GameBoard exposing (BoardPosition(..), GameBoard, SowingState(..), addAllRemainingSeedsToStore, addAllSeedsInRow, getRowForPlayer, getStoreForPlayer, handleSeedInEmptyHouse, initalBoard, isRowEmpty, nextPosition, numberOfSeedsInHouse, pickSeeds, resetAllJustSown, sowAtPosition)
+module GameBoard exposing (BoardPosition(..), GameBoard, SowingState(..), addAllSeedsInRow, getFinalScore, getRowForPlayer, getStoreForPlayer, handleSeedInEmptyHouse, initalBoard, isRowEmpty, nextPosition, numberOfSeedsInHouse, pickSeeds, resetAllJustSown, sowAtPosition)
 
 import Html.Attributes exposing (placeholder, rows)
 import List exposing (take)
@@ -99,8 +99,8 @@ addAllSeedsInRow row seeds =
             h.seeds + addAllSeedsInRow hs seeds
 
 
-addAllRemainingSeedsToStore : GameBoard -> Settings -> GameBoard
-addAllRemainingSeedsToStore board settings =
+getFinalScore : GameBoard -> Settings -> ( Int, Int )
+getFinalScore board settings =
     let
         seedsInRowOne =
             addAllSeedsInRow (getRowForPlayer board One) 0
@@ -117,17 +117,32 @@ addAllRemainingSeedsToStore board settings =
 
             else
                 Two
+
+        seedsInStoreOne =
+            (getStoreForPlayer board One).seeds
+
+        seedsInStoreTwo =
+            (getStoreForPlayer board Two).seeds
     in
-    board
-        |> addSeedsToStore playerGettingSeeds seedsInRowOne
-        |> addSeedsToStore playerGettingSeeds seedsInRowTwo
-        |> removeAllSeedsFromHouses
+    case playerGettingSeeds of
+        One ->
+            ( seedsInStoreOne + seedsInRowOne + seedsInRowTwo, seedsInStoreTwo )
+
+        Two ->
+            ( seedsInStoreOne, seedsInStoreTwo + seedsInRowOne + seedsInRowTwo )
 
 
 removeAllSeedsFromHouses : GameBoard -> GameBoard
 removeAllSeedsFromHouses gameBoard =
     { gameBoard
-        | rows = ( List.map (\house -> { house | seeds = 0 }) (getRowForPlayer gameBoard One), List.map (\house -> { house | seeds = 0 }) (getRowForPlayer gameBoard Two) )
+        | rows =
+            ( List.map
+                (\house -> { house | seeds = 0 })
+                (getRowForPlayer gameBoard One)
+            , List.map
+                (\house -> { house | seeds = 0 })
+                (getRowForPlayer gameBoard Two)
+            )
     }
 
 
@@ -183,18 +198,24 @@ sowSeedToHouse pos row =
 resetAllJustSown : GameBoard -> GameBoard
 resetAllJustSown board =
     { board
-        | rows = ( resetRow (getRowForPlayer board One), resetRow (getRowForPlayer board Two) )
-        , stores = ( resetStore (getStoreForPlayer board One), resetStore (getStoreForPlayer board Two) )
+        | rows =
+            ( resetSownStateInRow (getRowForPlayer board One)
+            , resetSownStateInRow (getRowForPlayer board Two)
+            )
+        , stores =
+            ( resetSownStateInStore (getStoreForPlayer board One)
+            , resetSownStateInStore (getStoreForPlayer board Two)
+            )
     }
 
 
-resetStore : Store -> Store
-resetStore store =
+resetSownStateInStore : Store -> Store
+resetSownStateInStore store =
     { store | justSownTo = False }
 
 
-resetRow : Row -> Row
-resetRow row =
+resetSownStateInRow : Row -> Row
+resetSownStateInRow row =
     List.map (\house -> { house | justSownTo = False }) row
 
 

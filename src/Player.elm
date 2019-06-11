@@ -7,7 +7,7 @@ type Player
 
 
 type Winner
-    = Winner Player
+    = Winner Player ( Int, Int )
     | Drawn
 
 
