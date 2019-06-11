@@ -1,7 +1,7 @@
 module Game exposing (Game, State(..), findWinner, nextSowingStep, startSowingSeeds)
 
-import GameBoard exposing (BoardPosition(..), GameBoard, SowingState(..))
-import Player exposing (Player(..), Winner(..))
+import GameBoard exposing (BoardPosition(..), GameBoard, SowingState(..), resetAllJustSown)
+import Player exposing (Player(..), Winner(..), togglePlayer)
 import Settings exposing (Settings)
 
 
@@ -58,7 +58,7 @@ startSowingSeeds game player position =
 nextSowingStep : Game -> Game
 nextSowingStep game =
     case game.board.sowingState of
-        SowingFinished player ->
+        SowingFinished player oneMoreTurn ->
             let
                 lastSowingPlayersRow =
                     GameBoard.getRowForPlayer game.board player
@@ -67,14 +67,18 @@ nextSowingStep game =
                     GameBoard.getRowForPlayer game.board (Player.togglePlayer player)
             in
             if GameBoard.isRowEmpty lastSowingPlayersRow || GameBoard.isRowEmpty otherPlayersRow then
-                { game | board = GameBoard.addAllRemainingSeedsToStore game.board game.settings, state = End (findWinner game) }
+                { game | board = resetAllJustSown (GameBoard.addAllRemainingSeedsToStore game.board game.settings), state = End (findWinner game) }
 
             else
                 let
-                    b =
-                        game.board
+                    resetSownState =
+                        resetAllJustSown game.board
                 in
-                { game | board = { b | sowingState = NotSowing } }
+                if oneMoreTurn then
+                    { game | board = { resetSownState | sowingState = NotSowing } }
+
+                else
+                    { game | board = { resetSownState | sowingState = NotSowing }, state = Turn (togglePlayer player) }
 
         HandleLastSeedInEmptyHouse player pos ->
             let
@@ -82,8 +86,7 @@ nextSowingStep game =
                     GameBoard.handleSeedInEmptyHouse game.board game.settings player pos
             in
             { game
-                | state = Turn (Player.togglePlayer player)
-                , board = { boardAfter | sowingState = SowingFinished player }
+                | board = { boardAfter | sowingState = SowingFinished player False }
             }
 
         Sowing sowingInfo ->
@@ -125,16 +128,14 @@ nextSowingStep game =
 
                         else
                             -- anderer Spieler ist dran
-                            --  sowNextSeed
                             { game
-                                | state = Turn (Player.togglePlayer sowingInfo.playerSowing)
-                                , board = { boardAfterSowing | sowingState = SowingFinished sowingInfo.playerSowing }
+                                | board = { boardAfterSowing | sowingState = SowingFinished sowingInfo.playerSowing False }
                             }
 
                     StorePos player ->
                         -- player ist nochmal dran
                         --  sowNextSeed
-                        { game | board = { boardAfterSowing | sowingState = SowingFinished sowingInfo.playerSowing } }
+                        { game | board = { boardAfterSowing | sowingState = SowingFinished sowingInfo.playerSowing True } }
 
         _ ->
             -- should never get to this point

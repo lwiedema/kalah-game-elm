@@ -4,8 +4,9 @@ import Browser
 import Game exposing (Game, State(..))
 import GameBoard exposing (SowingState(..))
 import Html exposing (Attribute, Html, button, div, text)
-import Html.Attributes exposing (disabled, height, start, style, width)
+import Html.Attributes exposing (attribute, disabled, height, start, style, width)
 import Html.Events exposing (onClick)
+import Lists
 import Platform.Sub
 import Player exposing (Player(..), Winner(..))
 import Settings
@@ -133,10 +134,25 @@ rowViewHelper model player rowsToCreate =
 houseView : Model -> Player -> Int -> Html Msg
 houseView model player pos =
     let
-        numberOfSeeds =
-            GameBoard.numberOfSeedsInHouse (GameBoard.getRowForPlayer model.board player) pos
+        house =
+            Lists.elementAtWithDefault (GameBoard.getRowForPlayer model.board player) pos { justSownTo = False, seeds = 0 }
     in
-    button [ onClick (Click player pos), disabled (not (model.state == Turn player)) ] [ Html.text (fromInt numberOfSeeds) ]
+    button
+        ([ onClick (Click player pos)
+         , disabled (not (model.state == Turn player))
+         ]
+            ++ sownStyle house.justSownTo
+        )
+        [ Html.text (fromInt house.seeds) ]
+
+
+sownStyle : Bool -> List (Attribute Msg)
+sownStyle justSown =
+    if justSown then
+        [ style "background-color" "red" ]
+
+    else
+        []
 
 
 storeView : Model -> Player -> Html Msg

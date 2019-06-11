@@ -1,10 +1,11 @@
-module GameBoard exposing (BoardPosition(..), GameBoard, SowingState(..), addAllRemainingSeedsToStore, getRowForPlayer, getStoreForPlayer, handleSeedInEmptyHouse, initalBoard, isRowEmpty, nextPosition, numberOfSeedsInHouse, pickSeeds, sowAtPosition)
+module GameBoard exposing (BoardPosition(..), GameBoard, SowingState(..), addAllRemainingSeedsToStore, addAllSeedsInRow, getRowForPlayer, getStoreForPlayer, handleSeedInEmptyHouse, initalBoard, isRowEmpty, nextPosition, numberOfSeedsInHouse, pickSeeds, resetAllJustSown, sowAtPosition)
 
 import Html.Attributes exposing (placeholder, rows)
 import List exposing (take)
 import Lists exposing (setElementAt)
 import Player exposing (Player(..), togglePlayer)
 import Settings exposing (Settings)
+import String exposing (toInt)
 
 
 
@@ -29,13 +30,15 @@ type alias Row =
 
 type alias House =
     -- small pit
-    Int
+    { seeds : Int
+    , justSownTo : Bool
+    }
 
 
 type SowingState
     = NotSowing
     | Sowing SowingInfo
-    | SowingFinished Player
+    | SowingFinished Player Bool -- Bool-Flag whether player has one more turn
     | HandleLastSeedInEmptyHouse Player Int
 
 
@@ -73,22 +76,32 @@ initalBoard =
 
 
 createRow : Int -> Int -> Row
-createRow =
-    Lists.repeat
+createRow houses seeds =
+    Lists.repeat houses { seeds = seeds, justSownTo = False }
 
 
 
 -- END create inital game-board
 
 
+addAllSeedsInRow : Row -> Int -> Int
+addAllSeedsInRow row seeds =
+    case row of
+        [] ->
+            seeds
+
+        h :: hs ->
+            h.seeds + addAllSeedsInRow hs seeds
+
+
 addAllRemainingSeedsToStore : GameBoard -> Settings -> GameBoard
 addAllRemainingSeedsToStore board settings =
     let
         seedsInRowOne =
-            List.foldr (+) 0 (getRowForPlayer board One)
+            addAllSeedsInRow (getRowForPlayer board One) 0
 
         seedsInRowTwo =
-            List.foldr (+) 0 (getRowForPlayer board Two)
+            addAllSeedsInRow (getRowForPlayer board Two) 0
 
         playerGettingSeeds =
             if
@@ -108,7 +121,7 @@ addAllRemainingSeedsToStore board settings =
 removeAllSeedsFromHouses : GameBoard -> GameBoard
 removeAllSeedsFromHouses gameBoard =
     { gameBoard
-        | rows = ( List.map (\_ -> 0) (getRowForPlayer gameBoard One), List.map (\_ -> 0) (getRowForPlayer gameBoard Two) )
+        | rows = ( List.map (\house -> { house | seeds = 0 }) (getRowForPlayer gameBoard One), List.map (\house -> { house | seeds = 0 }) (getRowForPlayer gameBoard Two) )
     }
 
 
@@ -150,11 +163,21 @@ sowAtPosition board position =
 sowSeedToHouse : Int -> Row -> Row
 sowSeedToHouse pos row =
     case Lists.elementAt row pos of
-        Just x ->
-            Lists.setElementAt row pos (x + 1)
+        Just house ->
+            Lists.setElementAt row pos { justSownTo = True, seeds = house.seeds + 1 }
 
         Nothing ->
             row
+
+
+resetAllJustSown : GameBoard -> GameBoard
+resetAllJustSown board =
+    { board | rows = ( resetRow (getRowForPlayer board One), resetRow (getRowForPlayer board Two) ) }
+
+
+resetRow : Row -> Row
+resetRow row =
+    List.map (\house -> { house | justSownTo = False }) row
 
 
 handleSeedInEmptyHouse : GameBoard -> Settings -> Player -> Int -> GameBoard
@@ -181,8 +204,8 @@ handleSeedInEmptyHouse board settings playerOnTurn seedingPos =
 numberOfSeedsInHouse : Row -> Int -> Int
 numberOfSeedsInHouse row pos =
     case Lists.elementAt row pos of
-        Just x ->
-            x
+        Just house ->
+            house.seeds
 
         Nothing ->
             0
@@ -191,12 +214,17 @@ numberOfSeedsInHouse row pos =
 pickSeeds : Player -> Int -> GameBoard -> GameBoard
 pickSeeds player pos board =
     -- removes all seeds from house
-    setRowForPlayer player (Lists.setElementAt (getRowForPlayer board player) pos 0) board
+    case Lists.elementAt (getRowForPlayer board player) pos of
+        Just house ->
+            setRowForPlayer player (Lists.setElementAt (getRowForPlayer board player) pos { house | seeds = 0 }) board
+
+        Nothing ->
+            board
 
 
 isRowEmpty : Row -> Bool
 isRowEmpty row =
-    not (Lists.any (\x -> not (x == 0)) row)
+    not (Lists.any (\house -> not (house.seeds == 0)) row)
 
 
 

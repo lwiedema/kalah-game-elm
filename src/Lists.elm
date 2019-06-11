@@ -1,4 +1,4 @@
-module Lists exposing (any, elementAt, last, repeat, setElementAt)
+module Lists exposing (any, elementAt, elementAtWithDefault, last, repeat, setElementAt)
 
 
 repeat : Int -> a -> List a
@@ -18,6 +18,16 @@ elementAt list pos =
 
     else
         Nothing
+
+
+elementAtWithDefault : List a -> Int -> a -> a
+elementAtWithDefault list pos default =
+    case elementAt list pos of
+        Nothing ->
+            default
+
+        Just x ->
+            x
 
 
 setElementAt : List a -> Int -> a -> List a
