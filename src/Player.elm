@@ -8,6 +8,7 @@ type Player
 
 type Winner
     = Winner Player ( Int, Int )
+      -- tuple with finalScore for player One and Two
     | Drawn
 
 

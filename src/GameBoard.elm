@@ -1,11 +1,8 @@
-module GameBoard exposing (BoardPosition(..), GameBoard, SowingState(..), addAllSeedsInRow, getFinalScore, getRowForPlayer, getStoreForPlayer, handleSeedInEmptyHouse, initalBoard, isRowEmpty, nextPosition, numberOfSeedsInHouse, pickSeeds, resetAllJustSown, sowAtPosition)
+module GameBoard exposing (BoardPosition(..), GameBoard, SowingState(..), getFinalScore, getRowForPlayer, getStoreForPlayer, handleSeedInEmptyHouse, initalBoard, isRowEmpty, nextPosition, numberOfSeedsInHouse, pickSeeds, resetSowingStates, sowAtPosition)
 
-import Html.Attributes exposing (placeholder, rows)
-import List exposing (take)
 import Lists exposing (setElementAt)
-import Player exposing (Player(..), togglePlayer)
+import Player exposing (Player(..))
 import Settings exposing (Settings)
-import String exposing (toInt)
 
 
 
@@ -25,27 +22,27 @@ type alias Store =
 
 
 type alias Row =
+    -- small pits
     List House
 
 
 type alias House =
-    -- small pit
-    { seeds : Int
-    , justSownTo : Bool
+    { seeds : Int -- number of seeds in house
+    , justSownTo : Bool -- flag if there was recently added a seed
     }
 
 
 type SowingState
     = NotSowing
     | Sowing SowingInfo
-    | SowingFinished Player Bool -- Bool-Flag whether player has one more turn
+    | SowingFinished Player Bool -- bool-flag if player has one more turn
     | HandleLastSeedInEmptyHouse Player Int
 
 
 type alias SowingInfo =
     { playerSowing : Player
-    , seedsToSow : Int
-    , position : BoardPosition
+    , seedsToSow : Int -- number of seeds left to sow
+    , position : BoardPosition -- position where to sow next
     }
 
 
@@ -89,27 +86,32 @@ createRow houses seeds =
 -- END create inital game-board
 
 
-addAllSeedsInRow : Row -> Int -> Int
-addAllSeedsInRow row seeds =
-    case row of
-        [] ->
-            seeds
-
-        h :: hs ->
-            h.seeds + addAllSeedsInRow hs seeds
+numberOfSeedsInRow : Row -> Int
+numberOfSeedsInRow row =
+    List.foldr (\house -> (+) house.seeds) 0 row
 
 
 getFinalScore : GameBoard -> Settings -> ( Int, Int )
 getFinalScore board settings =
+    -- finding out final score after game finished
     let
+        -- getting number of seeds per row and store
         seedsInRowOne =
-            addAllSeedsInRow (getRowForPlayer board One) 0
+            numberOfSeedsInRow (getRowForPlayer board One)
 
         seedsInRowTwo =
-            addAllSeedsInRow (getRowForPlayer board Two) 0
+            numberOfSeedsInRow (getRowForPlayer board Two)
 
+        seedsInStoreOne =
+            (getStoreForPlayer board One).seeds
+
+        seedsInStoreTwo =
+            (getStoreForPlayer board Two).seeds
+
+        -- finding out who gets seeds which are still in row
         playerGettingSeeds =
             if
+                -- depends on setting and who runs out of seeds first
                 (seedsInRowOne == 0 && settings.lastSeedsForFinishingPlayer)
                     || (seedsInRowTwo == 0 && not settings.lastSeedsForFinishingPlayer)
             then
@@ -117,12 +119,6 @@ getFinalScore board settings =
 
             else
                 Two
-
-        seedsInStoreOne =
-            (getStoreForPlayer board One).seeds
-
-        seedsInStoreTwo =
-            (getStoreForPlayer board Two).seeds
     in
     case playerGettingSeeds of
         One ->
@@ -132,71 +128,46 @@ getFinalScore board settings =
             ( seedsInStoreOne, seedsInStoreTwo + seedsInRowOne + seedsInRowTwo )
 
 
-removeAllSeedsFromHouses : GameBoard -> GameBoard
-removeAllSeedsFromHouses gameBoard =
-    { gameBoard
-        | rows =
-            ( List.map
-                (\house -> { house | seeds = 0 })
-                (getRowForPlayer gameBoard One)
-            , List.map
-                (\house -> { house | seeds = 0 })
-                (getRowForPlayer gameBoard Two)
-            )
-    }
-
-
 nextPosition : Settings -> Player -> BoardPosition -> BoardPosition
 nextPosition settings playerOnTurn position =
-    -- find next seeding position
+    -- find next sowing position
     case position of
         RowPos player posInRow ->
             if posInRow + 1 >= settings.numberOfHouses then
+                -- last house in row
                 if playerOnTurn == player then
+                    -- own row: store comes next
                     StorePos playerOnTurn
 
                 else
+                    -- opponent's store not sown, continue in own row
                     RowPos playerOnTurn 0
 
             else
                 RowPos player (posInRow + 1)
 
         StorePos player ->
-            RowPos (togglePlayer player) 0
-
-
-addSeedsToStore : Player -> Int -> GameBoard -> GameBoard
-addSeedsToStore player numOfSeeds board =
-    let
-        store =
-            getStoreForPlayer board player
-    in
-    setStoreForPlayer player { seeds = store.seeds + numOfSeeds, justSownTo = True } board
+            RowPos (Player.togglePlayer player) 0
 
 
 sowAtPosition : GameBoard -> BoardPosition -> GameBoard
 sowAtPosition board position =
     -- add one seed to position
     case position of
-        RowPos player int ->
-            setRowForPlayer player (sowSeedToHouse int (getRowForPlayer board player)) board
+        RowPos player pos ->
+            setRowForPlayer
+                player
+                (sowSeedToHouse pos (getRowForPlayer board player))
+                board
 
         StorePos player ->
             addSeedsToStore player 1 board
 
 
-sowSeedToHouse : Int -> Row -> Row
-sowSeedToHouse pos row =
-    case Lists.elementAt row pos of
-        Just house ->
-            Lists.setElementAt row pos { justSownTo = True, seeds = house.seeds + 1 }
-
-        Nothing ->
-            row
-
-
-resetAllJustSown : GameBoard -> GameBoard
-resetAllJustSown board =
+resetSowingStates : GameBoard -> GameBoard
+resetSowingStates board =
+    -- set justSownTo-States of both rows and stores to False
+    -- as well as board-sowingState to NotSowing
     { board
         | rows =
             ( resetSownStateInRow (getRowForPlayer board One)
@@ -210,21 +181,14 @@ resetAllJustSown board =
     }
 
 
-resetSownStateInStore : Store -> Store
-resetSownStateInStore store =
-    { store | justSownTo = False }
-
-
-resetSownStateInRow : Row -> Row
-resetSownStateInRow row =
-    List.map (\house -> { house | justSownTo = False }) row
-
-
 handleSeedInEmptyHouse : GameBoard -> Settings -> Player -> Int -> GameBoard
 handleSeedInEmptyHouse board settings playerOnTurn seedingPos =
+    -- when last seed gets sown in an empty house in own row,
+    -- this seed and all seeds from opposite (other player's) house
+    -- are added to store
     let
         otherPlayersRow =
-            getRowForPlayer board (togglePlayer playerOnTurn)
+            getRowForPlayer board (Player.togglePlayer playerOnTurn)
     in
     board
         -- remove single seed
@@ -237,7 +201,7 @@ handleSeedInEmptyHouse board settings playerOnTurn seedingPos =
             (numberOfSeedsInHouse otherPlayersRow (settings.numberOfHouses - 1 - seedingPos))
         -- remove seeds from other player's house
         |> pickSeeds
-            (togglePlayer playerOnTurn)
+            (Player.togglePlayer playerOnTurn)
             (settings.numberOfHouses - 1 - seedingPos)
 
 
@@ -256,7 +220,14 @@ pickSeeds player pos board =
     -- removes all seeds from house
     case Lists.elementAt (getRowForPlayer board player) pos of
         Just house ->
-            setRowForPlayer player (Lists.setElementAt (getRowForPlayer board player) pos { house | seeds = 0 }) board
+            setRowForPlayer
+                player
+                (Lists.setElementAt
+                    (getRowForPlayer board player)
+                    pos
+                    { house | seeds = 0 }
+                )
+                board
 
         Nothing ->
             board
@@ -268,6 +239,43 @@ isRowEmpty row =
 
 
 
+-- BEGIN "private" helper functions
+
+
+sowSeedToHouse : Int -> Row -> Row
+sowSeedToHouse pos row =
+    case Lists.elementAt row pos of
+        Just house ->
+            Lists.setElementAt row pos { justSownTo = True, seeds = house.seeds + 1 }
+
+        Nothing ->
+            row
+
+
+addSeedsToStore : Player -> Int -> GameBoard -> GameBoard
+addSeedsToStore player numOfSeeds board =
+    let
+        store =
+            getStoreForPlayer board player
+    in
+    setStoreForPlayer
+        player
+        { seeds = store.seeds + numOfSeeds, justSownTo = True }
+        board
+
+
+resetSownStateInStore : Store -> Store
+resetSownStateInStore store =
+    { store | justSownTo = False }
+
+
+resetSownStateInRow : Row -> Row
+resetSownStateInRow row =
+    List.map (\house -> { house | justSownTo = False }) row
+
+
+
+-- END "private" helper functions
 -- BEGIN "getter/setter" for row and store by player
 
 

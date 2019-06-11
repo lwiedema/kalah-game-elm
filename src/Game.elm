@@ -126,15 +126,15 @@ nextSowingStep game =
             in
             if GameBoard.isRowEmpty lastSowingPlayersRow || GameBoard.isRowEmpty otherPlayersRow then
                 -- one row is empty, game ends
-                { game | board = GameBoard.resetAllJustSown game.board, state = End (findWinner game) }
+                { game | board = GameBoard.resetSowingStates game.board, state = End (findWinner game) }
 
             else if oneMoreTurn then
                 -- player ended sowing in store, gets one more turn
-                { game | board = GameBoard.resetAllJustSown game.board }
+                { game | board = GameBoard.resetSowingStates game.board }
 
             else
                 -- other player gets turn
-                { game | board = GameBoard.resetAllJustSown game.board, state = Turn (Player.togglePlayer player) }
+                { game | board = GameBoard.resetSowingStates game.board, state = Turn (Player.togglePlayer player) }
 
         HandleLastSeedInEmptyHouse player pos ->
             -- last seed was sown to an empty house in player's own row
