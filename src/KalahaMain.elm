@@ -157,7 +157,13 @@ sownStyle justSown =
 
 storeView : Model -> Player -> Html Msg
 storeView model player =
-    Html.text (fromInt (GameBoard.getStoreForPlayer model.board player))
+    let
+        store =
+            GameBoard.getStoreForPlayer model.board player
+    in
+    div (sownStyle store.justSownTo)
+        [ Html.text (fromInt store.seeds)
+        ]
 
 
 infoView : Model -> Html Msg

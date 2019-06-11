@@ -19,10 +19,17 @@ type State
 
 findWinner : Game -> Winner
 findWinner game =
-    if GameBoard.getStoreForPlayer game.board One == GameBoard.getStoreForPlayer game.board Two then
+    let
+        storeOne =
+            GameBoard.getStoreForPlayer game.board One
+
+        storeTwo =
+            GameBoard.getStoreForPlayer game.board Two
+    in
+    if storeOne.seeds == storeTwo.seeds then
         Drawn
 
-    else if GameBoard.getStoreForPlayer game.board One > GameBoard.getStoreForPlayer game.board Two then
+    else if storeOne.seeds > storeTwo.seeds then
         Winner One
 
     else

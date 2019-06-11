@@ -21,7 +21,7 @@ type alias GameBoard =
 
 type alias Store =
     -- big pit, end zone
-    Int
+    House
 
 
 type alias Row =
@@ -59,13 +59,18 @@ type BoardPosition
 -- BEGIN create inital game-board
 
 
+emptyHouse : House
+emptyHouse =
+    { seeds = 0, justSownTo = False }
+
+
 buildBoard : Settings -> GameBoard
 buildBoard settings =
     { rows =
         ( createRow settings.numberOfHouses settings.numberOfSeeds
         , createRow settings.numberOfHouses settings.numberOfSeeds
         )
-    , stores = ( 0, 0 )
+    , stores = ( emptyHouse, emptyHouse )
     , sowingState = NotSowing
     }
 
@@ -114,7 +119,8 @@ addAllRemainingSeedsToStore board settings =
                 Two
     in
     board
-        |> setStoreForPlayer playerGettingSeeds (getStoreForPlayer board playerGettingSeeds + seedsInRowOne + seedsInRowTwo)
+        |> addSeedsToStore playerGettingSeeds seedsInRowOne
+        |> addSeedsToStore playerGettingSeeds seedsInRowTwo
         |> removeAllSeedsFromHouses
 
 
@@ -146,7 +152,11 @@ nextPosition settings playerOnTurn position =
 
 addSeedsToStore : Player -> Int -> GameBoard -> GameBoard
 addSeedsToStore player numOfSeeds board =
-    setStoreForPlayer player (getStoreForPlayer board player + numOfSeeds) board
+    let
+        store =
+            getStoreForPlayer board player
+    in
+    setStoreForPlayer player { seeds = store.seeds + numOfSeeds, justSownTo = True } board
 
 
 sowAtPosition : GameBoard -> BoardPosition -> GameBoard
@@ -157,7 +167,7 @@ sowAtPosition board position =
             setRowForPlayer player (sowSeedToHouse int (getRowForPlayer board player)) board
 
         StorePos player ->
-            setStoreForPlayer player (getStoreForPlayer board player + 1) board
+            addSeedsToStore player 1 board
 
 
 sowSeedToHouse : Int -> Row -> Row
@@ -172,7 +182,15 @@ sowSeedToHouse pos row =
 
 resetAllJustSown : GameBoard -> GameBoard
 resetAllJustSown board =
-    { board | rows = ( resetRow (getRowForPlayer board One), resetRow (getRowForPlayer board Two) ) }
+    { board
+        | rows = ( resetRow (getRowForPlayer board One), resetRow (getRowForPlayer board Two) )
+        , stores = ( resetStore (getStoreForPlayer board One), resetStore (getStoreForPlayer board Two) )
+    }
+
+
+resetStore : Store -> Store
+resetStore store =
+    { store | justSownTo = False }
 
 
 resetRow : Row -> Row
