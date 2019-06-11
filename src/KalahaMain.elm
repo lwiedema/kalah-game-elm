@@ -14,8 +14,18 @@ import String exposing (fromInt)
 import Time
 
 
+
+-- BEGIN datatypes
+
+
 type alias Model =
     Game
+
+
+type Msg
+    = Click Player Int
+    | NextSowingStep
+    | Other
 
 
 initalModel : Model
@@ -26,10 +36,9 @@ initalModel =
     }
 
 
-type Msg
-    = Click Player Int
-    | NextSowingStep
-    | Other
+
+-- END datatypes
+-- BEGIN web-app
 
 
 main : Program () Model Msg
@@ -103,7 +112,10 @@ view model =
                         (upsideDown :: rowStyle)
                         (rowView model Two)
                     , div [ style "height" "20%" ]
-                        [ infoView model ]
+                        ([ infoView model
+                         ]
+                            ++ sowingView model
+                        )
                     , div
                         rowStyle
                         (rowView model One)
@@ -114,6 +126,11 @@ view model =
                 [ storeView model One ]
             ]
         ]
+
+
+
+-- END web-app
+-- BEGIN views
 
 
 rowView : Model -> Player -> List (Html Msg)
@@ -144,15 +161,6 @@ houseView model player pos =
             ++ sownStyle house.justSownTo
         )
         [ Html.text (fromInt house.seeds) ]
-
-
-sownStyle : Bool -> List (Attribute Msg)
-sownStyle justSown =
-    if justSown then
-        [ style "background-color" "red" ]
-
-    else
-        []
 
 
 storeView : Model -> Player -> Html Msg
@@ -190,8 +198,30 @@ infoView model =
         )
 
 
+sowingView : Model -> List (Html Msg)
+sowingView model =
+    case model.board.sowingState of
+        Sowing info ->
+            [ seedsToSowView info.seedsToSow ]
 
--- Attributes
+        SowingFinished _ _ ->
+            [ seedsToSowView 0 ]
+
+        HandleLastSeedInEmptyHouse _ _ ->
+            [ seedsToSowView 0 ]
+
+        NotSowing ->
+            []
+
+
+seedsToSowView : Int -> Html Msg
+seedsToSowView numOfSeeds =
+    Html.text ("Sowing: " ++ String.fromInt numOfSeeds)
+
+
+
+-- END views
+-- BEGIN styles & attributes
 
 
 storeStyle : List (Attribute Msg)
@@ -219,3 +249,16 @@ upsideDown =
 grayBackground : Attribute Msg
 grayBackground =
     style "background-color" "#4a4a4a"
+
+
+sownStyle : Bool -> List (Attribute Msg)
+sownStyle justSown =
+    if justSown then
+        [ style "background-color" "red" ]
+
+    else
+        []
+
+
+
+-- END Styles & Attributes
