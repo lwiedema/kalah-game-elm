@@ -1,4 +1,4 @@
-module KalahaMain exposing (Model, Msg(..), initalModel, main, subscriptions, update, view)
+module KalahaMain exposing (main)
 
 import Browser
 import Game exposing (Game, State(..))
