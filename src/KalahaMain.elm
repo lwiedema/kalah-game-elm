@@ -66,11 +66,12 @@ subscriptions model =
 update : Msg -> Model -> Model
 update msg model =
     case msg of
-        Click player int ->
+        Click player pos ->
             case model.state of
                 Turn onTurn ->
-                    if onTurn == player then
-                        Game.startSowingSeeds model player int
+                    -- check if click on house was legal
+                    if onTurn == player && not (GameBoard.numberOfSeedsInHouse (GameBoard.getRowForPlayer model.board player) pos == 0) then
+                        Game.startSowingSeeds model player pos
 
                     else
                         model
