@@ -3,7 +3,7 @@ module KalahaMain exposing (main)
 import Browser
 import Game exposing (Game, State(..))
 import GameBoard exposing (SowingState(..))
-import Html exposing (Attribute, Html, button, div, q, text)
+import Html exposing (Attribute, Html, button, div, text)
 import Html.Attributes exposing (attribute, disabled, start, style)
 import Html.Events exposing (onClick)
 import Lists
@@ -89,10 +89,7 @@ view : Model -> Html Msg
 view model =
     div []
         [ div
-            [ style "width" "900px"
-            , style "height" "400px"
-            , grayBackground
-            ]
+            boardStyle
             [ div
                 (upsideDown :: storeStyle)
                 [ storeView model Two ]
@@ -109,8 +106,9 @@ view model =
                         (upsideDown :: rowStyle)
                         (rowView model Two)
                     , div
-                        [ style "height" "80px"
-                        , style "margin-top" "-4px"
+                        [ style "height" "60px"
+                        , style "border" "10px solid white"
+                        , style "border-radius" "10px"
                         , style "background-color" "white"
                         ]
                         [ infoView model
@@ -217,31 +215,9 @@ storeView model player =
 infoView : Model -> Html Msg
 infoView model =
     div
-        [ style "padding" "10px"
-        , style "background-color" "white"
-        , style "height" "60px"
+        [ style "padding" "17px 0 15px 0"
         ]
-        [ Html.text
-            (case model.state of
-                Turn p ->
-                    "Spieler " ++ Player.toString p ++ " ist am Zug."
-
-                End winner ->
-                    "Spiel beendet. "
-                        ++ (case winner of
-                                Drawn ->
-                                    "Es ist unentschieden."
-
-                                Winner w finalScore ->
-                                    "Es gewinnt Spieler "
-                                        ++ Player.toString w
-                                        ++ ". Endstand: "
-                                        ++ String.fromInt (Tuple.first finalScore)
-                                        ++ ":"
-                                        ++ String.fromInt (Tuple.second finalScore)
-                           )
-            )
-        , div
+        [ div
             [ style "width" "100%"
             , style "display" "flex"
             , style "justify-content" "space-evenly"
@@ -309,9 +285,14 @@ upsideDown =
     style "transform" "rotate(180deg)"
 
 
-grayBackground : Attribute Msg
-grayBackground =
-    style "background-color" "#4a4a4a"
+boardStyle : List (Attribute Msg)
+boardStyle =
+    [ style "border" "20px solid #4a4a4a"
+    , style "background-color" "#4a4a4a"
+    , style "border-radius" "40px"
+    , style "width" "900px"
+    , style "height" "400px"
+    ]
 
 
 cursorStyle : Bool -> Attribute Msg
@@ -341,3 +322,27 @@ seedRadiusString =
 seedSizeString : String
 seedSizeString =
     String.fromInt seedSize
+
+
+infoText : Model -> Html Msg
+infoText model =
+    Html.text
+        (case model.state of
+            Turn p ->
+                "Spieler " ++ Player.toString p ++ " ist am Zug."
+
+            End winner ->
+                "Spiel beendet. "
+                    ++ (case winner of
+                            Drawn ->
+                                "Es ist unentschieden."
+
+                            Winner w finalScore ->
+                                "Es gewinnt Spieler "
+                                    ++ Player.toString w
+                                    ++ ". Endstand: "
+                                    ++ String.fromInt (Tuple.first finalScore)
+                                    ++ ":"
+                                    ++ String.fromInt (Tuple.second finalScore)
+                       )
+        )
