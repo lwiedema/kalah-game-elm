@@ -3,14 +3,16 @@ module KalahaMain exposing (main)
 import Browser
 import Game exposing (Game, State(..))
 import GameBoard exposing (SowingState(..))
-import Html exposing (Attribute, Html, button, div, text)
-import Html.Attributes exposing (attribute, disabled, height, start, style, width)
+import Html exposing (Attribute, Html, button, div, q, text)
+import Html.Attributes exposing (attribute, disabled, start, style)
 import Html.Events exposing (onClick)
 import Lists
 import Platform.Sub
 import Player exposing (Player(..), Winner(..))
 import Settings
 import String exposing (fromInt)
+import Svg exposing (switch)
+import Svg.Attributes
 import Time
 
 
@@ -102,20 +104,16 @@ view model =
                 , style "float" "left"
                 ]
                 [ div
-                    [ style "position" "absolute"
-                    , style "top" "5px"
-                    , style "right" "5px"
-                    , style "bottom" "5px"
-                    , style "left" "5px"
-                    ]
+                    [ style "height" "100%" ]
                     [ div
                         (upsideDown :: rowStyle)
                         (rowView model Two)
-                    , div [ style "height" "20%" ]
-                        ([ infoView model
-                         ]
-                            ++ sowingView model
-                        )
+                    , div
+                        [ style "height" "20%"
+                        , style "margin-top" "-4px"
+                        ]
+                        [ infoView model
+                        ]
                     , div
                         rowStyle
                         (rowView model One)
@@ -135,29 +133,42 @@ view model =
 
 rowView : Model -> Player -> List (Html Msg)
 rowView model player =
-    List.foldl (::) [] (rowViewHelper model player model.settings.numberOfHouses)
+    rowViewHelper model player model.settings.numberOfHouses
 
 
 rowViewHelper : Model -> Player -> Int -> List (Html Msg)
-rowViewHelper model player rowsToCreate =
-    case rowsToCreate of
+rowViewHelper model player housesToCreate =
+    case housesToCreate of
         1 ->
-            houseView model player (model.settings.numberOfHouses - rowsToCreate) :: []
+            houseView model player (model.settings.numberOfHouses - housesToCreate) :: []
 
         _ ->
-            rowViewHelper model player (rowsToCreate - 1) ++ [ houseView model player (model.settings.numberOfHouses - rowsToCreate) ]
+            houseView model player (model.settings.numberOfHouses - housesToCreate)
+                :: rowViewHelper model player (housesToCreate - 1)
 
 
 houseView : Model -> Player -> Int -> Html Msg
 houseView model player pos =
     let
         house =
-            Lists.elementAtWithDefault (GameBoard.getRowForPlayer model.board player) pos { justSownTo = False, seeds = 0 }
+            Lists.elementAtWithDefault
+                (GameBoard.getRowForPlayer model.board player)
+                pos
+                { justSownTo = False, seeds = 0 }
     in
-    button
-        ([ onClick (Click player pos)
-         , disabled (not (model.state == Turn player))
-         ]
+    div
+        ((case model.state of
+            Turn p ->
+                [ clickPossible (p == player) ]
+
+            End _ ->
+                []
+         )
+            ++ [ onClick (Click player pos)
+               , style "width" (String.fromFloat (100 / toFloat model.settings.numberOfHouses) ++ "%")
+               , style "height" "100%"
+               , style "float" "left"
+               ]
             ++ sownStyle house.justSownTo
         )
         [ Html.text (fromInt house.seeds) ]
@@ -176,47 +187,66 @@ storeView model player =
 
 infoView : Model -> Html Msg
 infoView model =
-    Html.text
-        (case model.state of
-            Turn p ->
-                "Spieler " ++ Player.toString p ++ " ist am Zug."
+    div []
+        [ Html.text
+            (case model.state of
+                Turn p ->
+                    "Spieler " ++ Player.toString p ++ " ist am Zug."
 
-            End winner ->
-                "Spiel beendet. "
-                    ++ (case winner of
-                            Drawn ->
-                                "Es ist unentschieden."
+                End winner ->
+                    "Spiel beendet. "
+                        ++ (case winner of
+                                Drawn ->
+                                    "Es ist unentschieden."
 
-                            Winner w finalScore ->
-                                "Es gewinnt Spieler "
-                                    ++ Player.toString w
-                                    ++ ". Endstand: "
-                                    ++ String.fromInt (Tuple.first finalScore)
-                                    ++ ":"
-                                    ++ String.fromInt (Tuple.second finalScore)
-                       )
+                                Winner w finalScore ->
+                                    "Es gewinnt Spieler "
+                                        ++ Player.toString w
+                                        ++ ". Endstand: "
+                                        ++ String.fromInt (Tuple.first finalScore)
+                                        ++ ":"
+                                        ++ String.fromInt (Tuple.second finalScore)
+                           )
+            )
+        , div
+            [ style "width" "100%"
+            , style "display" "flex"
+            , style "justify-content" "space-evenly"
+            ]
+            [ sowingView model ]
+        ]
+
+
+sowingView : Model -> Html Msg
+sowingView model =
+    div []
+        (case model.board.sowingState of
+            Sowing info ->
+                seedsToSowView info.seedsToSow
+
+            SowingFinished _ _ ->
+                seedsToSowView 0
+
+            HandleLastSeedInEmptyHouse _ _ ->
+                seedsToSowView 0
+
+            NotSowing ->
+                []
         )
 
 
-sowingView : Model -> List (Html Msg)
-sowingView model =
-    case model.board.sowingState of
-        Sowing info ->
-            [ seedsToSowView info.seedsToSow ]
-
-        SowingFinished _ _ ->
-            [ seedsToSowView 0 ]
-
-        HandleLastSeedInEmptyHouse _ _ ->
-            [ seedsToSowView 0 ]
-
-        NotSowing ->
-            []
-
-
-seedsToSowView : Int -> Html Msg
+seedsToSowView : Int -> List (Html Msg)
 seedsToSowView numOfSeeds =
-    Html.text ("Sowing: " ++ String.fromInt numOfSeeds)
+    List.repeat numOfSeeds (seedView "red")
+
+
+seedView : String -> Html Msg
+seedView color =
+    div [ style "padding" "2px", style "float" "left" ]
+        [ Svg.svg [ Svg.Attributes.viewBox ("0 0 " ++ seedSizeString ++ " " ++ seedSizeString), Svg.Attributes.width seedSizeString, Svg.Attributes.height seedSizeString, Svg.Attributes.fill color ]
+            [ Svg.circle [ Svg.Attributes.cx seedRadiusString, Svg.Attributes.cy seedRadiusString, Svg.Attributes.r seedRadiusString ] []
+            ]
+        ]
 
 
 
@@ -260,5 +290,30 @@ sownStyle justSown =
         []
 
 
+clickPossible : Bool -> Attribute Msg
+clickPossible possible =
+    case possible of
+        True ->
+            style "cursor" "pointer"
+
+        False ->
+            style "cursor" "default"
+
+
 
 -- END Styles & Attributes
+
+
+seedSize : Int
+seedSize =
+    20
+
+
+seedRadiusString : String
+seedRadiusString =
+    String.fromInt (seedSize // 2)
+
+
+seedSizeString : String
+seedSizeString =
+    String.fromInt seedSize
