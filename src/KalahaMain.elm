@@ -88,44 +88,47 @@ update msg model =
 
 view : Model -> Html Msg
 view model =
-    div
-        [ style "width" "940px"
-        ]
-        [ infoView model Two
-        , div
-            boardStyle
-            [ div
-                (upsideDown model Two :: storeStyle)
-                [ storeView model Two ]
-            , div
-                [ fillParentHeight
-                , centerText
-                , orderSiblingsHorizontally
-                , style "width" "580px"
-                , style "position" "relative"
-                ]
-                [ div
-                    [ fillParentHeight ]
-                    [ div
-                        rowStyle
-                        (rowView model Two)
-                    , div
-                        [ style "height" "60px"
-                        , style "border" "10px solid white"
-                        , style "border-radius" "10px"
-                        , style "background-color" "white"
-                        ]
-                        [ sowingView model ]
-                    , div
-                        rowStyle
-                        (rowView model One)
-                    ]
-                ]
-            , div
-                storeStyle
-                [ storeView model One ]
+    div [ style "height" "100%", style "width" "100%" ]
+        [ div
+            [ style "width" "948px"
+            , style "margin" "0 auto"
             ]
-        , infoView model One
+            [ infoView model Two
+            , div
+                boardStyle
+                [ div
+                    (upsideDown model Two :: storeStyle)
+                    [ storeView model Two ]
+                , div
+                    [ fillParentHeight
+                    , centerText
+                    , orderSiblingsHorizontally
+                    , style "width" "580px"
+                    , style "position" "relative"
+                    ]
+                    [ div
+                        [ fillParentHeight ]
+                        [ div
+                            rowStyle
+                            (rowView model Two)
+                        , div
+                            [ style "height" "60px"
+                            , style "border" "10px solid #dcdcdc"
+                            , style "border-radius" "10px"
+                            , style "background-color" "#dcdcdc"
+                            ]
+                            [ sowingView model ]
+                        , div
+                            rowStyle
+                            (rowView model One)
+                        ]
+                    ]
+                , div
+                    storeStyle
+                    [ storeView model One ]
+                ]
+            , infoView model One
+            ]
         ]
 
 
@@ -171,13 +174,17 @@ rowHouseView model player pos =
     in
     -- show seeds as number and circles
     div
-        [ upsideDown model player
-        , cursorStyle model player
-        , onClick (Click player pos)
-        , fillParentHeight
-        , orderSiblingsHorizontally
-        , style "width" "72px"
-        ]
+        ([ upsideDown model player
+         , cursorStyle model player
+         , onClick (Click player pos)
+         , fillParentHeight
+         , orderSiblingsHorizontally
+         , style "width" "72px"
+         , style "padding" "0 5px"
+         ]
+            ++ textFont
+            ++ houseStyle
+        )
         [ Html.text (fromInt house.seeds)
         , div
             [ fillParentWidth ]
@@ -193,12 +200,12 @@ seedsInHouseView numOfSeeds justSownTo =
 
         _ ->
             case justSownTo of
-                -- newly added seed displayed red, others black
+                -- newly added seed displayed in other color then normal
                 True ->
-                    List.repeat (numOfSeeds - 1) (seedView "black") ++ [ seedView "red" ]
+                    List.repeat (numOfSeeds - 1) (seedView normalSeedColor) ++ [ seedView sowedSeedColor ]
 
                 False ->
-                    List.repeat numOfSeeds (seedView "black")
+                    List.repeat numOfSeeds (seedView normalSeedColor)
 
 
 storeView : Model -> Player -> Html Msg
@@ -208,11 +215,19 @@ storeView model player =
             GameBoard.getStoreForPlayer model.board player
     in
     div
-        [ centerText
-        , style "margin" "10px"
-        , style "width" "140px"
-        ]
-        [ div [ fillParentWidth ] [ Html.text (fromInt store.seeds) ]
+        ([ centerText
+         , style "margin" "10px"
+         , style "width" "140px"
+         , style "height" "380px"
+         ]
+            ++ houseStyle
+            ++ textFont
+        )
+        [ div
+            [ fillParentWidth
+            , style "padding" "10px 0"
+            ]
+            [ Html.text (fromInt store.seeds) ]
         , div
             [ style "padding" "10px"
             , fillParentWidth
@@ -224,10 +239,13 @@ storeView model player =
 infoView : Model -> Player -> Html Msg
 infoView model player =
     div
-        [ upsideDown model player
-        , fillParentWidth
-        , centerText
-        ]
+        ([ upsideDown model player
+         , fillParentWidth
+         , centerText
+         , style "padding" "5px"
+         ]
+            ++ textFont
+        )
         [ Html.text
             ("Spieler " ++ Player.toString player ++ ": ")
         , Html.br [] []
@@ -290,7 +308,7 @@ sowingView model =
 
 seedsToSowView : Int -> List (Html Msg)
 seedsToSowView numOfSeeds =
-    List.repeat numOfSeeds (seedView "red")
+    List.repeat numOfSeeds (seedView sowingSeedsColor)
 
 
 seedView : String -> Html Msg
@@ -337,18 +355,21 @@ rowStyle =
            ]
 
 
+houseStyle : List (Attribute Msg)
+houseStyle =
+    [ style "border" "2px solid"
+    , style "border-radius" "20px"
+    , style "background-color" "#979797"
+    , style "overflow" "hidden"
+    ]
+
+
 boardStyle : List (Attribute Msg)
 boardStyle =
-    let
-        boardColor =
-            "#939393"
-
-        --"#4a4a4a"
-    in
-    [ style "border" ("20px solid " ++ boardColor)
-    , style "background-color" boardColor
+    [ style "border" ("20px solid " ++ boardBackgroundColor)
+    , style "background-color" boardBackgroundColor
     , style "border-radius" "40px"
-    , style "height" "400px"
+    , style "height" "408px"
     ]
 
 
@@ -403,9 +424,40 @@ orderSiblingsHorizontally =
     style "float" "left"
 
 
+textFont : List (Attribute Msg)
+textFont =
+    [ style "font-family" "Arial"
+    , style "font-size" "20px"
+    ]
+
+
 
 -- END Styles & Attributes
 -- BEGIN constants on seedSize
+
+
+sowingSeedsColor : String
+sowingSeedsColor =
+    "#db004e"
+
+
+sowedSeedColor : String
+sowedSeedColor =
+    "#00db8d"
+
+
+normalSeedColor : String
+normalSeedColor =
+    "#3c3c3c"
+
+
+
+--"black"
+
+
+boardBackgroundColor : String
+boardBackgroundColor =
+    "#4b4b4b"
 
 
 seedSize : Int
