@@ -11,7 +11,7 @@ import Platform.Sub
 import Player exposing (Player(..), Winner(..))
 import Settings
 import String exposing (fromInt)
-import Svg
+import Svg exposing (symbol)
 import Svg.Attributes
 import Time
 
@@ -97,7 +97,7 @@ view model =
                 (upsideDown :: storeStyle)
                 [ storeView model Two ]
             , div
-                [ style "width" "60%"
+                [ style "width" "580px"
                 , style "height" "100%"
                 , style "text-align" "center"
                 , style "position" "relative"
@@ -159,7 +159,7 @@ houseView model player pos =
     div
         ((case model.state of
             Turn p ->
-                [ clickPossible (p == player) ]
+                [ cursorStyle (p == player) ]
 
             End _ ->
                 []
@@ -168,10 +168,16 @@ houseView model player pos =
                , style "width" (String.fromFloat (100 / toFloat model.settings.numberOfHouses) ++ "%")
                , style "height" "100%"
                , style "float" "left"
+
+               --, style "border" "1px black solid"
                ]
         )
         [ Html.text (fromInt house.seeds)
-        , div [] (seedsInHouseView house.seeds house.justSownTo)
+        , div
+            [ style "width" "90%"
+            , style "margin" "5%"
+            ]
+            (seedsInHouseView house.seeds house.justSownTo)
         ]
 
 
@@ -196,9 +202,19 @@ storeView model player =
         store =
             GameBoard.getStoreForPlayer model.board player
     in
-    div []
-        [ Html.text (fromInt store.seeds)
-        , div [] (seedsInHouseView store.seeds store.justSownTo)
+    div
+        [ style "text-align" "center"
+        , style "margin" "10px"
+        , style "width" "140px"
+
+        --, style "position" "relative"
+        ]
+        [ div [ style "width" "100%" ] [ Html.text (fromInt store.seeds) ]
+        , div
+            [ style "padding" "10px"
+            , style "width" "100%"
+            ]
+            (seedsInHouseView store.seeds store.justSownTo)
         ]
 
 
@@ -273,8 +289,7 @@ seedView color =
 
 storeStyle : List (Attribute Msg)
 storeStyle =
-    [ style "width" "20%"
-    , style "height" "100%"
+    [ style "height" "100%"
     , style "float" "left"
     ]
 
@@ -298,8 +313,8 @@ grayBackground =
     style "background-color" "#4a4a4a"
 
 
-clickPossible : Bool -> Attribute Msg
-clickPossible possible =
+cursorStyle : Bool -> Attribute Msg
+cursorStyle possible =
     case possible of
         True ->
             style "cursor" "pointer"
