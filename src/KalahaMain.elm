@@ -11,7 +11,7 @@ import Platform.Sub
 import Player exposing (Player(..), Winner(..))
 import Settings
 import String exposing (fromInt)
-import Svg exposing (symbol)
+import Svg
 import Svg.Attributes
 import Time
 
@@ -98,14 +98,14 @@ view model =
                 (upsideDown model Two :: storeStyle)
                 [ storeView model Two ]
             , div
-                [ style "width" "580px"
-                , style "height" "100%"
-                , style "text-align" "center"
+                [ fillParentHeight
+                , centerText
+                , orderSiblingsHorizontally
+                , style "width" "580px"
                 , style "position" "relative"
-                , style "float" "left"
                 ]
                 [ div
-                    [ style "height" "100%" ]
+                    [ fillParentHeight ]
                     [ div
                         rowStyle
                         (rowView model Two)
@@ -115,8 +115,7 @@ view model =
                         , style "border-radius" "10px"
                         , style "background-color" "white"
                         ]
-                        [ sowingView model
-                        ]
+                        [ sowingView model ]
                     , div
                         rowStyle
                         (rowView model One)
@@ -138,23 +137,20 @@ view model =
 rowView : Model -> Player -> List (Html Msg)
 rowView model player =
     (if player == Two then
+        -- mirror list of houses for player Two
         List.foldl (::) []
 
      else
         identity
     )
-        (rowViewHelper
-            model
-            player
-            model.settings.numberOfHouses
-        )
+        (rowViewHelper model player model.settings.numberOfHouses)
 
 
 rowViewHelper : Model -> Player -> Int -> List (Html Msg)
 rowViewHelper model player housesToCreate =
     case housesToCreate of
-        1 ->
-            houseView model player (model.settings.numberOfHouses - housesToCreate) :: []
+        0 ->
+            []
 
         _ ->
             houseView model player (model.settings.numberOfHouses - housesToCreate)
@@ -171,24 +167,16 @@ houseView model player pos =
                 { justSownTo = False, seeds = 0 }
     in
     div
-        (upsideDown model player
-            :: (case model.state of
-                    Turn p ->
-                        [ cursorStyle (p == player) ]
-
-                    End _ ->
-                        []
-               )
-            ++ [ onClick (Click player pos)
-               , style "width" "72px"
-               , style "height" "100%"
-               , style "float" "left"
-               ]
-        )
+        [ upsideDown model player
+        , cursorStyle model player
+        , onClick (Click player pos)
+        , fillParentHeight
+        , orderSiblingsHorizontally
+        , style "width" "72px"
+        ]
         [ Html.text (fromInt house.seeds)
         , div
-            [ style "width" "100%"
-            ]
+            [ fillParentWidth ]
             (seedsInHouseView house.seeds house.justSownTo)
         ]
 
@@ -201,6 +189,7 @@ seedsInHouseView numOfSeeds justSownTo =
 
         _ ->
             case justSownTo of
+                -- newly added seed displayed red, others black
                 True ->
                     List.repeat (numOfSeeds - 1) (seedView "black") ++ [ seedView "red" ]
 
@@ -215,14 +204,14 @@ storeView model player =
             GameBoard.getStoreForPlayer model.board player
     in
     div
-        [ style "text-align" "center"
+        [ centerText
         , style "margin" "10px"
         , style "width" "140px"
         ]
-        [ div [ style "width" "100%" ] [ Html.text (fromInt store.seeds) ]
+        [ div [ fillParentWidth ] [ Html.text (fromInt store.seeds) ]
         , div
             [ style "padding" "10px"
-            , style "width" "100%"
+            , fillParentWidth
             ]
             (seedsInHouseView store.seeds store.justSownTo)
         ]
@@ -231,11 +220,10 @@ storeView model player =
 infoView : Model -> Player -> Html Msg
 infoView model player =
     div
-        (upsideDown model player
-            :: [ style "width" "100%"
-               , style "text-align" "center"
-               ]
-        )
+        [ upsideDown model player
+        , fillParentWidth
+        , centerText
+        ]
         [ Html.text
             ("Spieler " ++ Player.toString player ++ ": ")
         , Html.br [] []
@@ -276,10 +264,7 @@ sowingView model =
         [ style "padding" "17px 0 15px 0"
         ]
         [ div
-            [ style "width" "100%"
-            , style "display" "flex"
-            , style "justify-content" "space-evenly"
-            ]
+            (fillParentWidth :: spaceChildrenEvenly)
             [ div []
                 (case model.board.sowingState of
                     Sowing info ->
@@ -304,10 +289,23 @@ seedsToSowView numOfSeeds =
 
 
 seedView : String -> Html Msg
-seedView color =
-    div [ style "padding" "2px", style "float" "left" ]
-        [ Svg.svg [ Svg.Attributes.viewBox ("0 0 " ++ seedSizeString ++ " " ++ seedSizeString), Svg.Attributes.width seedSizeString, Svg.Attributes.height seedSizeString, Svg.Attributes.fill color ]
-            [ Svg.circle [ Svg.Attributes.cx seedRadiusString, Svg.Attributes.cy seedRadiusString, Svg.Attributes.r seedRadiusString ] []
+seedView seedColor =
+    div
+        [ orderSiblingsHorizontally
+        , style "padding" "2px"
+        ]
+        [ Svg.svg
+            [ Svg.Attributes.viewBox ("0 0 " ++ seedSizeString ++ " " ++ seedSizeString)
+            , Svg.Attributes.width seedSizeString
+            , Svg.Attributes.height seedSizeString
+            ]
+            [ Svg.circle
+                [ Svg.Attributes.cx seedRadiusString
+                , Svg.Attributes.cy seedRadiusString
+                , Svg.Attributes.r seedRadiusString
+                , Svg.Attributes.fill seedColor
+                ]
+                []
             ]
         ]
 
@@ -319,28 +317,18 @@ seedView color =
 
 storeStyle : List (Attribute Msg)
 storeStyle =
-    [ style "height" "100%"
-    , style "float" "left"
+    [ fillParentHeight
+    , orderSiblingsHorizontally
     ]
 
 
 rowStyle : List (Attribute Msg)
 rowStyle =
-    [ style "width" "580px"
-    , style "padding" "10px 0"
-    , style "height" "140px"
-    , style "display" "flex"
-    , style "justify-content" "space-evenly"
-    ]
-
-
-upsideDown : Model -> Player -> Attribute Msg
-upsideDown model player =
-    if model.settings.upsideDownEnabled && player == Two then
-        style "transform" "rotate(180deg)"
-
-    else
-        style "" ""
+    spaceChildrenEvenly
+        ++ [ style "width" "580px"
+           , style "padding" "10px 0"
+           , style "height" "140px"
+           ]
 
 
 boardStyle : List (Attribute Msg)
@@ -358,14 +346,55 @@ boardStyle =
     ]
 
 
-cursorStyle : Bool -> Attribute Msg
-cursorStyle possible =
-    case possible of
-        True ->
-            style "cursor" "pointer"
+cursorStyle : Model -> Player -> Attribute Msg
+cursorStyle model player =
+    case model.state of
+        Turn p ->
+            case p == player of
+                True ->
+                    style "cursor" "pointer"
 
-        False ->
+                False ->
+                    style "cursor" "default"
+
+        End _ ->
             style "cursor" "default"
+
+
+upsideDown : Model -> Player -> Attribute Msg
+upsideDown model player =
+    if model.settings.upsideDownEnabled && player == Two then
+        style "transform" "rotate(180deg)"
+
+    else
+        style "" ""
+
+
+fillParentWidth : Attribute Msg
+fillParentWidth =
+    style "width" "100%"
+
+
+fillParentHeight : Attribute Msg
+fillParentHeight =
+    style "height" "100%"
+
+
+centerText : Attribute Msg
+centerText =
+    style "text-align" "center"
+
+
+spaceChildrenEvenly : List (Attribute Msg)
+spaceChildrenEvenly =
+    [ style "display" "flex"
+    , style "justify-content" "space-evenly"
+    ]
+
+
+orderSiblingsHorizontally : Attribute Msg
+orderSiblingsHorizontally =
+    style "float" "left"
 
 
 
