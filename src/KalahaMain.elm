@@ -11,7 +11,7 @@ import Platform.Sub
 import Player exposing (Player(..), Winner(..))
 import Settings
 import String exposing (fromInt)
-import Svg exposing (switch)
+import Svg
 import Svg.Attributes
 import Time
 
@@ -169,9 +169,25 @@ houseView model player pos =
                , style "height" "100%"
                , style "float" "left"
                ]
-            ++ sownStyle house.justSownTo
         )
-        [ Html.text (fromInt house.seeds) ]
+        [ Html.text (fromInt house.seeds)
+        , div [] (seedsInHouseView house.seeds house.justSownTo)
+        ]
+
+
+seedsInHouseView : Int -> Bool -> List (Html Msg)
+seedsInHouseView numOfSeeds justSownTo =
+    case numOfSeeds of
+        0 ->
+            []
+
+        _ ->
+            case justSownTo of
+                True ->
+                    List.repeat (numOfSeeds - 1) (seedView "black") ++ [ seedView "red" ]
+
+                False ->
+                    List.repeat numOfSeeds (seedView "black")
 
 
 storeView : Model -> Player -> Html Msg
@@ -180,8 +196,9 @@ storeView model player =
         store =
             GameBoard.getStoreForPlayer model.board player
     in
-    div (sownStyle store.justSownTo)
+    div []
         [ Html.text (fromInt store.seeds)
+        , div [] (seedsInHouseView store.seeds store.justSownTo)
         ]
 
 
@@ -279,15 +296,6 @@ upsideDown =
 grayBackground : Attribute Msg
 grayBackground =
     style "background-color" "#4a4a4a"
-
-
-sownStyle : Bool -> List (Attribute Msg)
-sownStyle justSown =
-    if justSown then
-        [ style "background-color" "red" ]
-
-    else
-        []
 
 
 clickPossible : Bool -> Attribute Msg
