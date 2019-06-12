@@ -109,8 +109,9 @@ view model =
                         (upsideDown :: rowStyle)
                         (rowView model Two)
                     , div
-                        [ style "height" "20%"
+                        [ style "height" "80px"
                         , style "margin-top" "-4px"
+                        , style "background-color" "white"
                         ]
                         [ infoView model
                         ]
@@ -165,17 +166,14 @@ houseView model player pos =
                 []
          )
             ++ [ onClick (Click player pos)
-               , style "width" (String.fromFloat (100 / toFloat model.settings.numberOfHouses) ++ "%")
+               , style "width" "72px"
                , style "height" "100%"
                , style "float" "left"
-
-               --, style "border" "1px black solid"
                ]
         )
         [ Html.text (fromInt house.seeds)
         , div
-            [ style "width" "90%"
-            , style "margin" "5%"
+            [ style "width" "100%"
             ]
             (seedsInHouseView house.seeds house.justSownTo)
         ]
@@ -206,8 +204,6 @@ storeView model player =
         [ style "text-align" "center"
         , style "margin" "10px"
         , style "width" "140px"
-
-        --, style "position" "relative"
         ]
         [ div [ style "width" "100%" ] [ Html.text (fromInt store.seeds) ]
         , div
@@ -220,7 +216,11 @@ storeView model player =
 
 infoView : Model -> Html Msg
 infoView model =
-    div []
+    div
+        [ style "padding" "10px"
+        , style "background-color" "white"
+        , style "height" "60px"
+        ]
         [ Html.text
             (case model.state of
                 Turn p ->
@@ -296,10 +296,11 @@ storeStyle =
 
 rowStyle : List (Attribute Msg)
 rowStyle =
-    [ style "background-color" "yellow"
-    , style "width" "100%"
-    , style "height" "40%"
-    , style "display" "inline-block"
+    [ style "width" "580px"
+    , style "padding" "10px 0"
+    , style "height" "140px"
+    , style "display" "flex"
+    , style "justify-content" "space-evenly"
     ]
 
 
