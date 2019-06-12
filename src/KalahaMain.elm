@@ -148,24 +148,28 @@ rowView model player =
 
 rowViewHelper : Model -> Player -> Int -> List (Html Msg)
 rowViewHelper model player housesToCreate =
+    -- create houses recursively
     case housesToCreate of
         0 ->
             []
 
         _ ->
-            houseView model player (model.settings.numberOfHouses - housesToCreate)
+            rowHouseView model player (model.settings.numberOfHouses - housesToCreate)
                 :: rowViewHelper model player (housesToCreate - 1)
 
 
-houseView : Model -> Player -> Int -> Html Msg
-houseView model player pos =
+rowHouseView : Model -> Player -> Int -> Html Msg
+rowHouseView model player pos =
+    -- create view for one house
     let
+        -- get information on house from board
         house =
             Lists.elementAtWithDefault
                 (GameBoard.getRowForPlayer model.board player)
                 pos
                 { justSownTo = False, seeds = 0 }
     in
+    -- show seeds as number and circles
     div
         [ upsideDown model player
         , cursorStyle model player
@@ -260,6 +264,7 @@ infoView model player =
 
 sowingView : Model -> Html Msg
 sowingView model =
+    -- create view showing seeds to be sown in middle of board
     div
         [ style "padding" "17px 0 15px 0"
         ]
@@ -290,6 +295,7 @@ seedsToSowView numOfSeeds =
 
 seedView : String -> Html Msg
 seedView seedColor =
+    -- creating view for one single seed as svg
     div
         [ orderSiblingsHorizontally
         , style "padding" "2px"
@@ -399,6 +405,7 @@ orderSiblingsHorizontally =
 
 
 -- END Styles & Attributes
+-- BEGIN constants on seedSize
 
 
 seedSize : Int
@@ -414,3 +421,7 @@ seedRadiusString =
 seedSizeString : String
 seedSizeString =
     String.fromInt seedSize
+
+
+
+-- END constants on seedSize
