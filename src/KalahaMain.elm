@@ -87,11 +87,14 @@ update msg model =
 
 view : Model -> Html Msg
 view model =
-    div []
-        [ div
+    div
+        [ style "width" "940px"
+        ]
+        [ infoView model Two
+        , div
             boardStyle
             [ div
-                (upsideDown :: storeStyle)
+                (upsideDown model Two :: storeStyle)
                 [ storeView model Two ]
             , div
                 [ style "width" "580px"
@@ -103,7 +106,7 @@ view model =
                 [ div
                     [ style "height" "100%" ]
                     [ div
-                        (upsideDown :: rowStyle)
+                        rowStyle
                         (rowView model Two)
                     , div
                         [ style "height" "60px"
@@ -111,7 +114,7 @@ view model =
                         , style "border-radius" "10px"
                         , style "background-color" "white"
                         ]
-                        [ infoView model
+                        [ sowingView model
                         ]
                     , div
                         rowStyle
@@ -122,6 +125,7 @@ view model =
                 storeStyle
                 [ storeView model One ]
             ]
+        , infoView model One
         ]
 
 
@@ -132,7 +136,17 @@ view model =
 
 rowView : Model -> Player -> List (Html Msg)
 rowView model player =
-    rowViewHelper model player model.settings.numberOfHouses
+    (if player == Two then
+        List.foldl (::) []
+
+     else
+        identity
+    )
+        (rowViewHelper
+            model
+            player
+            model.settings.numberOfHouses
+        )
 
 
 rowViewHelper : Model -> Player -> Int -> List (Html Msg)
@@ -156,13 +170,14 @@ houseView model player pos =
                 { justSownTo = False, seeds = 0 }
     in
     div
-        ((case model.state of
-            Turn p ->
-                [ cursorStyle (p == player) ]
+        (upsideDown model player
+            :: (case model.state of
+                    Turn p ->
+                        [ cursorStyle (p == player) ]
 
-            End _ ->
-                []
-         )
+                    End _ ->
+                        []
+               )
             ++ [ onClick (Click player pos)
                , style "width" "72px"
                , style "height" "100%"
@@ -212,8 +227,50 @@ storeView model player =
         ]
 
 
-infoView : Model -> Html Msg
-infoView model =
+infoView : Model -> Player -> Html Msg
+infoView model player =
+    div
+        (upsideDown model player
+            :: [ style "width" "100%"
+               , style "text-align" "center"
+               ]
+        )
+        [ Html.text
+            ("Spieler " ++ Player.toString player ++ ": ")
+        , Html.br [] []
+        , Html.text
+            (case model.state of
+                Turn p ->
+                    if p == player then
+                        "Du bist am Zug."
+
+                    else
+                        "Spieler " ++ Player.toString p ++ " ist am Zug."
+
+                End winner ->
+                    "Spiel beendet. "
+                        ++ (case winner of
+                                Drawn ->
+                                    "Es ist unentschieden."
+
+                                Winner w finalScore ->
+                                    (if w == player then
+                                        "Du hast gewonnen. "
+
+                                     else
+                                        "Leider verloren. "
+                                    )
+                                        ++ "Endstand: "
+                                        ++ String.fromInt (Tuple.first finalScore)
+                                        ++ ":"
+                                        ++ String.fromInt (Tuple.second finalScore)
+                           )
+            )
+        ]
+
+
+sowingView : Model -> Html Msg
+sowingView model =
     div
         [ style "padding" "17px 0 15px 0"
         ]
@@ -222,26 +279,22 @@ infoView model =
             , style "display" "flex"
             , style "justify-content" "space-evenly"
             ]
-            [ sowingView model ]
+            [ div []
+                (case model.board.sowingState of
+                    Sowing info ->
+                        seedsToSowView info.seedsToSow
+
+                    SowingFinished _ _ ->
+                        seedsToSowView 0
+
+                    HandleLastSeedInEmptyHouse _ _ ->
+                        seedsToSowView 0
+
+                    NotSowing ->
+                        []
+                )
+            ]
         ]
-
-
-sowingView : Model -> Html Msg
-sowingView model =
-    div []
-        (case model.board.sowingState of
-            Sowing info ->
-                seedsToSowView info.seedsToSow
-
-            SowingFinished _ _ ->
-                seedsToSowView 0
-
-            HandleLastSeedInEmptyHouse _ _ ->
-                seedsToSowView 0
-
-            NotSowing ->
-                []
-        )
 
 
 seedsToSowView : Int -> List (Html Msg)
@@ -280,17 +333,26 @@ rowStyle =
     ]
 
 
-upsideDown : Attribute Msg
-upsideDown =
-    style "transform" "rotate(180deg)"
+upsideDown : Model -> Player -> Attribute Msg
+upsideDown model player =
+    if model.settings.upsideDownEnabled && player == Two then
+        style "transform" "rotate(180deg)"
+
+    else
+        style "" ""
 
 
 boardStyle : List (Attribute Msg)
 boardStyle =
-    [ style "border" "20px solid #4a4a4a"
-    , style "background-color" "#4a4a4a"
+    let
+        boardColor =
+            "#939393"
+
+        --"#4a4a4a"
+    in
+    [ style "border" ("20px solid " ++ boardColor)
+    , style "background-color" boardColor
     , style "border-radius" "40px"
-    , style "width" "900px"
     , style "height" "400px"
     ]
 
@@ -322,27 +384,3 @@ seedRadiusString =
 seedSizeString : String
 seedSizeString =
     String.fromInt seedSize
-
-
-infoText : Model -> Html Msg
-infoText model =
-    Html.text
-        (case model.state of
-            Turn p ->
-                "Spieler " ++ Player.toString p ++ " ist am Zug."
-
-            End winner ->
-                "Spiel beendet. "
-                    ++ (case winner of
-                            Drawn ->
-                                "Es ist unentschieden."
-
-                            Winner w finalScore ->
-                                "Es gewinnt Spieler "
-                                    ++ Player.toString w
-                                    ++ ". Endstand: "
-                                    ++ String.fromInt (Tuple.first finalScore)
-                                    ++ ":"
-                                    ++ String.fromInt (Tuple.second finalScore)
-                       )
-        )

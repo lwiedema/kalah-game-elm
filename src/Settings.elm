@@ -6,6 +6,7 @@ type alias Settings =
     , numberOfSeeds : Int
     , lastSeedsForFinishingPlayer : Bool
     , sowingSpeed : SowingSpeed
+    , upsideDownEnabled : Bool
     }
 
 
@@ -34,4 +35,5 @@ defaultSettings =
     , numberOfSeeds = 4
     , lastSeedsForFinishingPlayer = False
     , sowingSpeed = Normal
+    , upsideDownEnabled = False
     }
