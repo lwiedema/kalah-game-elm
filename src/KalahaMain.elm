@@ -8,6 +8,7 @@ import Html exposing (Attribute, Html, button, div, text)
 import Html.Attributes exposing (attribute, disabled, start, style)
 import Html.Events exposing (onClick)
 import Lists
+import Material.Icons.Action
 import Material.Icons.Navigation
 import Platform.Sub
 import Player exposing (Player(..), Winner(..))
@@ -30,6 +31,7 @@ type Msg
     = Click Player Int
     | NextSowingStep
     | Restart
+    | OpenSettings
     | Other
 
 
@@ -88,58 +90,64 @@ update msg model =
         Restart ->
             initalModel
 
+        OpenSettings ->
+            model
+
         Other ->
             model
 
 
 view : Model -> Html Msg
 view model =
-    div [ style "height" "100%", style "width" "100%" ]
-        [ div
-            [ style "width" "948px"
-            , style "margin" "0 auto"
-            ]
-            [ infoView model Two
-            , div
-                boardStyle
-                [ div
-                    (upsideDown model Two :: storeStyle)
-                    [ storeView model Two ]
-                , div
-                    [ fillParentHeight
-                    , centerText
-                    , orderSiblingsHorizontally
-                    , style "width" "580px"
-                    , style "position" "relative"
-                    ]
-                    [ div
-                        [ fillParentHeight ]
-                        [ div
-                            rowStyle
-                            (rowView model Two)
-                        , div
-                            [ style "height" "60px"
-                            , style "border" "10px solid #dcdcdc"
-                            , style "border-radius" "10px"
-                            , style "background-color" "#dcdcdc"
-                            ]
-                            [ case model.state of
-                                Turn _ ->
-                                    sowingView model
-
-                                End _ ->
-                                    restartButton
-                            ]
-                        , div
-                            rowStyle
-                            (rowView model One)
-                        ]
-                    ]
-                , div
-                    storeStyle
-                    [ storeView model One ]
+    div []
+        [ div [ style "display" "inline-block" ] [ iconButton "Einstellungen" Material.Icons.Action.settings OpenSettings ]
+        , div [ style "height" "100%", style "width" "100%" ]
+            [ div
+                [ style "width" "948px"
+                , style "margin" "0 auto"
                 ]
-            , infoView model One
+                [ infoView model Two
+                , div
+                    boardStyle
+                    [ div
+                        (upsideDown model Two :: storeStyle)
+                        [ storeView model Two ]
+                    , div
+                        [ fillParentHeight
+                        , centerText
+                        , orderSiblingsHorizontally
+                        , style "width" "580px"
+                        , style "position" "relative"
+                        ]
+                        [ div
+                            [ fillParentHeight ]
+                            [ div
+                                rowStyle
+                                (rowView model Two)
+                            , div
+                                [ style "height" "60px"
+                                , style "border" "10px solid #dcdcdc"
+                                , style "border-radius" "10px"
+                                , style "background-color" "#dcdcdc"
+                                ]
+                                [ case model.state of
+                                    Turn _ ->
+                                        sowingView model
+
+                                    End _ ->
+                                        restartButton
+                                ]
+                            , div
+                                rowStyle
+                                (rowView model One)
+                            ]
+                        ]
+                    , div
+                        storeStyle
+                        [ storeView model One ]
+                    ]
+                , infoView model One
+                ]
             ]
         ]
 
@@ -294,13 +302,18 @@ infoView model player =
 
 restartButton : Html Msg
 restartButton =
+    iconButton "Neues Spiel" Material.Icons.Navigation.refresh Restart
+
+
+iconButton : String -> (Color.Color -> Int -> Svg.Svg Msg) -> Msg -> Html Msg
+iconButton text icon onClickMsg =
     Html.div
-        [ onClick Restart
-        , style "background-color" "green"
-        , style "width" "150px"
+        [ onClick onClickMsg
+        , style "background-color" sowedSeedColor
+        , style "width" "160px"
         , style "height" "30px"
         , style "margin" "10px auto"
-        , style "border" "5px solid green"
+        , style "border" ("5px solid " ++ sowedSeedColor)
         , style "border-radius" "10px"
         , style "cursor" "pointer"
         ]
@@ -310,16 +323,16 @@ restartButton =
                 , Svg.Attributes.width "30"
                 , Svg.Attributes.height "30"
                 ]
-                [ Material.Icons.Navigation.refresh Color.white 30 ]
+                [ icon (Color.rgb255 60 60 60) 30 ]
             ]
         , div
             ([ style "float" "right"
-             , style "color" "white"
+             , style "color" normalSeedColor
              , style "padding" "4px 0"
              ]
                 ++ textFont
             )
-            [ Html.text "Neues Spiel" ]
+            [ Html.text text ]
         ]
 
 
