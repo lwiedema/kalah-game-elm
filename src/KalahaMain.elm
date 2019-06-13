@@ -128,7 +128,7 @@ view model =
                                     sowingView model
 
                                 End _ ->
-                                    restartButton model
+                                    restartButton
                             ]
                         , div
                             rowStyle
@@ -292,8 +292,8 @@ infoView model player =
         ]
 
 
-restartButton : Model -> Html Msg
-restartButton model =
+restartButton : Html Msg
+restartButton =
     Html.div
         [ onClick Restart
         , style "background-color" "green"
