@@ -1,12 +1,14 @@
 module KalahaMain exposing (main)
 
 import Browser
+import Color
 import Game exposing (Game, State(..))
 import GameBoard exposing (SowingState(..))
 import Html exposing (Attribute, Html, button, div, text)
 import Html.Attributes exposing (attribute, disabled, start, style)
 import Html.Events exposing (onClick)
 import Lists
+import Material.Icons.Navigation
 import Platform.Sub
 import Player exposing (Player(..), Winner(..))
 import Settings
@@ -27,6 +29,7 @@ type alias Model =
 type Msg
     = Click Player Int
     | NextSowingStep
+    | Restart
     | Other
 
 
@@ -82,6 +85,9 @@ update msg model =
         NextSowingStep ->
             Game.nextSowingStep model
 
+        Restart ->
+            initalModel
+
         Other ->
             model
 
@@ -117,7 +123,13 @@ view model =
                             , style "border-radius" "10px"
                             , style "background-color" "#dcdcdc"
                             ]
-                            [ sowingView model ]
+                            [ case model.state of
+                                Turn _ ->
+                                    sowingView model
+
+                                End _ ->
+                                    restartButton model
+                            ]
                         , div
                             rowStyle
                             (rowView model One)
@@ -277,6 +289,37 @@ infoView model player =
                                         ++ String.fromInt (Tuple.second finalScore)
                            )
             )
+        ]
+
+
+restartButton : Model -> Html Msg
+restartButton model =
+    Html.div
+        [ onClick Restart
+        , style "background-color" "green"
+        , style "width" "150px"
+        , style "height" "30px"
+        , style "margin" "10px auto"
+        , style "border" "5px solid green"
+        , style "border-radius" "10px"
+        , style "cursor" "pointer"
+        ]
+        [ div [ style "float" "left" ]
+            [ Svg.svg
+                [ Svg.Attributes.viewBox "0 0 30 30"
+                , Svg.Attributes.width "30"
+                , Svg.Attributes.height "30"
+                ]
+                [ Material.Icons.Navigation.refresh Color.white 30 ]
+            ]
+        , div
+            ([ style "float" "right"
+             , style "color" "white"
+             , style "padding" "4px 0"
+             ]
+                ++ textFont
+            )
+            [ Html.text "Neues Spiel" ]
         ]
 
 
