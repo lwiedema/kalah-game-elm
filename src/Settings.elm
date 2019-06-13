@@ -3,6 +3,7 @@ module Settings exposing (Settings, SowingSpeed(..), defaultSettings, speedInMil
 
 type alias Settings =
     { numberOfHouses : Int
+    , settingsOpen : Bool
     , numberOfSeeds : Int
     , lastSeedsForFinishingPlayer : Bool
     , sowingSpeed : SowingSpeed
@@ -32,6 +33,7 @@ speedInMilliseconds sowingSpeed =
 defaultSettings : Settings
 defaultSettings =
     { numberOfHouses = 6
+    , settingsOpen = False
     , numberOfSeeds = 4
     , lastSeedsForFinishingPlayer = False
     , sowingSpeed = Normal

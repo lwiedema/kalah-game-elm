@@ -12,7 +12,7 @@ import Material.Icons.Action
 import Material.Icons.Navigation
 import Platform.Sub
 import Player exposing (Player(..), Winner(..))
-import Settings
+import Settings exposing (SowingSpeed(..))
 import String exposing (fromInt)
 import Svg
 import Svg.Attributes
@@ -32,6 +32,7 @@ type Msg
     | NextSowingStep
     | Restart
     | OpenSettings
+    | SowingSpeedChanged SowingSpeed
     | Other
 
 
@@ -91,7 +92,23 @@ update msg model =
             initalModel
 
         OpenSettings ->
-            model
+            let
+                oldSettings =
+                    model.settings
+            in
+            { model
+                | settings =
+                    { oldSettings
+                        | settingsOpen = not model.settings.settingsOpen
+                    }
+            }
+
+        SowingSpeedChanged speed ->
+            let
+                oldSettings =
+                    model.settings
+            in
+            { model | settings = { oldSettings | sowingSpeed = speed } }
 
         Other ->
             model
@@ -102,7 +119,7 @@ view model =
     div []
         [ div [ style "display" "inline-block" ] [ iconButton "Einstellungen" Material.Icons.Action.settings OpenSettings ]
         , div [ style "height" "100%", style "width" "100%" ]
-            [ div
+            ([ div
                 [ style "width" "948px"
                 , style "margin" "0 auto"
                 ]
@@ -148,13 +165,82 @@ view model =
                     ]
                 , infoView model One
                 ]
-            ]
+             ]
+                ++ settingsView model
+            )
         ]
 
 
 
 -- END web-app
 -- BEGIN views
+
+
+settingsView : Model -> List (Html Msg)
+settingsView model =
+    case model.settings.settingsOpen of
+        True ->
+            [ div
+                [ style "background-color" "white"
+                , style "width" "500px"
+                , style "height" "500px"
+                , style "position" "absolute"
+                , style "z-index" "10"
+                , style "top" "60px"
+                , style "border" ("5px solid " ++ sowedSeedColor)
+                , style "border-radius" "10px"
+                , centerText
+                ]
+                [ Html.form []
+                    [ Html.label [] [ Html.text "Geschwindigkeit" ]
+                    , Html.br []
+                        []
+                    , div
+                        spaceChildrenEvenly
+                        [ div [ onClick (SowingSpeedChanged Slow), pointerCursor ]
+                            [ Html.input
+                                [ Html.Attributes.type_ "radio"
+                                , Html.Attributes.name "sowingSpeed"
+                                , Html.Attributes.value "slow"
+                                , Html.Attributes.checked (model.settings.sowingSpeed == Slow)
+                                ]
+                                []
+                            , Html.text "Langsam"
+                            ]
+                        , div [ onClick (SowingSpeedChanged Normal), pointerCursor ]
+                            [ Html.input
+                                [ Html.Attributes.type_ "radio"
+                                , Html.Attributes.name "sowingSpeed"
+                                , Html.Attributes.value "normal"
+                                , Html.Attributes.checked (model.settings.sowingSpeed == Normal)
+                                ]
+                                []
+                            , Html.text "Normal"
+                            ]
+                        , div [ onClick (SowingSpeedChanged Fast), pointerCursor ]
+                            [ Html.input
+                                [ Html.Attributes.type_ "radio"
+                                , Html.Attributes.name "sowingSpeed"
+                                , Html.Attributes.value "fast"
+                                , Html.Attributes.checked (model.settings.sowingSpeed == Fast)
+                                ]
+                                []
+                            , Html.text "Schnell"
+                            ]
+                        ]
+                    ]
+                ]
+
+            -- [ Html.select []
+            --     [ Html.option [] [ Html.text "Langsam" ]
+            --     , Html.option [] [ Html.text "Normal" ]
+            --     , Html.option [] [ Html.text "Schnell" ]
+            --     ]
+            -- ]
+            ]
+
+        False ->
+            []
 
 
 rowView : Model -> Player -> List (Html Msg)
@@ -315,7 +401,7 @@ iconButton text icon onClickMsg =
         , style "margin" "10px auto"
         , style "border" ("5px solid " ++ sowedSeedColor)
         , style "border-radius" "10px"
-        , style "cursor" "pointer"
+        , pointerCursor
         ]
         [ div [ style "float" "left" ]
             [ Svg.svg
@@ -435,13 +521,18 @@ cursorStyle model player =
         Turn p ->
             case p == player of
                 True ->
-                    style "cursor" "pointer"
+                    pointerCursor
 
                 False ->
                     style "cursor" "default"
 
         End _ ->
             style "cursor" "default"
+
+
+pointerCursor : Attribute Msg
+pointerCursor =
+    style "cursor" "pointer"
 
 
 upsideDown : Model -> Player -> Attribute Msg
