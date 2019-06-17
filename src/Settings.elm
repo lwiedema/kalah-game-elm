@@ -8,6 +8,7 @@ type alias Settings =
     , lastSeedsForFinishingPlayer : Bool
     , sowingSpeed : SowingSpeed
     , upsideDownEnabled : Bool
+    , sowInOpponentsStore : Bool
     }
 
 
@@ -38,4 +39,5 @@ defaultSettings =
     , lastSeedsForFinishingPlayer = False
     , sowingSpeed = Normal
     , upsideDownEnabled = False
+    , sowInOpponentsStore = False
     }

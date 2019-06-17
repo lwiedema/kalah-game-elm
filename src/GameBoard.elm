@@ -235,8 +235,13 @@ nextPosition settings playerOnTurn position =
                     StorePos playerOnTurn
 
                 else
-                    -- opponent's store not sown, continue in own row
-                    RowPos playerOnTurn 0
+                    case settings.sowInOpponentsStore of
+                        True ->
+                            StorePos player
+
+                        False ->
+                            -- opponent's store not sown, continue in own row
+                            RowPos playerOnTurn 0
 
             else
                 RowPos player (posInRow + 1)

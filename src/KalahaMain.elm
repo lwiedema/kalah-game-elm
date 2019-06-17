@@ -36,6 +36,7 @@ type Msg
     | SeedNumberChanged Int
     | LastSeedsBehaviourChanged
     | UpsideDownChanged
+    | SowOpponentsStoreChanged
 
 
 initalModel : Model
@@ -143,6 +144,16 @@ update msg model =
                         | upsideDownEnabled = not model.settings.upsideDownEnabled
                     }
             }
+
+        SowOpponentsStoreChanged ->
+            let
+                oldSettings =
+                    model.settings
+
+                newSettings =
+                    { oldSettings | sowInOpponentsStore = not oldSettings.sowInOpponentsStore }
+            in
+            { initalModel | settings = newSettings, board = GameBoard.buildBoard newSettings }
 
 
 view : Model -> Html Msg
@@ -328,6 +339,19 @@ settingsView model =
                                 ]
                                 []
                             , Html.text "Am Ende des Spieles erhält der Spieler, der keine Steine mehr in seiner Reihe hat, die übrig gebliebenen Steine."
+                            ]
+                        ]
+                    , Html.br [] []
+                    , div
+                        []
+                        [ Html.label [] [ Html.text "Gegnerisches Kalaha" ]
+                        , div (onClick SowOpponentsStoreChanged :: settingsChoiceStyle)
+                            [ Html.input
+                                [ Html.Attributes.type_ "checkbox"
+                                , Html.Attributes.checked model.settings.sowInOpponentsStore
+                                ]
+                                []
+                            , Html.text "Steine werden auch in das gegnerische Kalaha verteilt."
                             ]
                         ]
                     ]
