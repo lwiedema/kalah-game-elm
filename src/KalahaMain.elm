@@ -1,5 +1,6 @@
 module KalahaMain exposing (main)
 
+import ArrayHelper
 import Browser
 import Color
 import Game exposing (Game, State(..))
@@ -273,9 +274,9 @@ rowHouseView model player pos =
     let
         -- get information on house from board
         house =
-            Lists.elementAtWithDefault
-                (GameBoard.getRowForPlayer model.board player)
+            ArrayHelper.getWithDefault
                 pos
+                (GameBoard.getRowForPlayer model.board player)
                 { justSownTo = False, seeds = 0 }
     in
     -- show seeds as number and circles

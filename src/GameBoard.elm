@@ -1,6 +1,7 @@
 module GameBoard exposing (BoardPosition(..), GameBoard, SowingState(..), getFinalScore, getRowForPlayer, getStoreForPlayer, handleSeedInEmptyHouse, initalBoard, isRowEmpty, nextPosition, numberOfSeedsInHouse, pickSeeds, resetSowingStates, sowAtPosition)
 
-import Lists exposing (setElementAt)
+import Array exposing (Array)
+import ArrayHelper
 import Player exposing (Player(..))
 import Settings exposing (Settings)
 
@@ -23,7 +24,7 @@ type alias Store =
 
 type alias Row =
     -- small pits
-    List House
+    Array House
 
 
 type alias House =
@@ -79,7 +80,7 @@ initalBoard =
 
 createRow : Int -> Int -> Row
 createRow houses seeds =
-    Lists.repeat houses { seeds = seeds, justSownTo = False }
+    Array.repeat houses { seeds = seeds, justSownTo = False }
 
 
 
@@ -145,14 +146,14 @@ handleSeedInEmptyHouse board settings playerOnTurn seedingPos =
 pickSeeds : Player -> Int -> GameBoard -> GameBoard
 pickSeeds player pos board =
     -- removes all seeds from house
-    case Lists.elementAt (getRowForPlayer board player) pos of
+    case Array.get pos (getRowForPlayer board player) of
         Just house ->
             setRowForPlayer
                 player
-                (Lists.setElementAt
-                    (getRowForPlayer board player)
+                (Array.set
                     pos
                     { house | seeds = 0 }
+                    (getRowForPlayer board player)
                 )
                 board
 
@@ -167,7 +168,7 @@ pickSeeds player pos board =
 
 numberOfSeedsInHouse : Row -> Int -> Int
 numberOfSeedsInHouse row pos =
-    case Lists.elementAt row pos of
+    case Array.get pos row of
         Just house ->
             house.seeds
 
@@ -177,12 +178,12 @@ numberOfSeedsInHouse row pos =
 
 isRowEmpty : Row -> Bool
 isRowEmpty row =
-    not (Lists.any (\house -> not (house.seeds == 0)) row)
+    not (ArrayHelper.any (\house -> not (house.seeds == 0)) row)
 
 
 numberOfSeedsInRow : Row -> Int
 numberOfSeedsInRow row =
-    List.foldr (\house -> (+) house.seeds) 0 row
+    Array.foldr (\house -> (+) house.seeds) 0 row
 
 
 getFinalScore : GameBoard -> Settings -> ( Int, Int )
@@ -251,9 +252,9 @@ nextPosition settings playerOnTurn position =
 
 sowSeedToHouse : Int -> Row -> Row
 sowSeedToHouse pos row =
-    case Lists.elementAt row pos of
+    case Array.get pos row of
         Just house ->
-            Lists.setElementAt row pos { justSownTo = True, seeds = house.seeds + 1 }
+            Array.set pos { justSownTo = True, seeds = house.seeds + 1 } row
 
         Nothing ->
             row
@@ -278,7 +279,7 @@ resetSownStateInStore store =
 
 resetSownStateInRow : Row -> Row
 resetSownStateInRow row =
-    List.map (\house -> { house | justSownTo = False }) row
+    Array.map (\house -> { house | justSownTo = False }) row
 
 
 
