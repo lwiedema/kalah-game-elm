@@ -8,7 +8,6 @@ import GameBoard exposing (SowingState(..))
 import Html exposing (Attribute, Html, button, div, text)
 import Html.Attributes exposing (attribute, disabled, start, style)
 import Html.Events exposing (onClick)
-import Lists
 import Material.Icons.Action
 import Material.Icons.Navigation
 import Platform.Sub
