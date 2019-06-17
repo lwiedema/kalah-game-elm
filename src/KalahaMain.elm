@@ -33,6 +33,9 @@ type Msg
     | Restart
     | OpenSettings
     | SowingSpeedChanged SowingSpeed
+    | SeedNumberChanged Int
+    | LastSeedsBehaviourChanged
+    | UpsideDownChanged
     | Other
 
 
@@ -89,7 +92,7 @@ update msg model =
             Game.nextSowingStep model
 
         Restart ->
-            initalModel
+            { initalModel | settings = model.settings, board = GameBoard.buildBoard model.settings }
 
         OpenSettings ->
             let
@@ -109,6 +112,38 @@ update msg model =
                     model.settings
             in
             { model | settings = { oldSettings | sowingSpeed = speed } }
+
+        SeedNumberChanged n ->
+            let
+                oldSettings =
+                    model.settings
+
+                newSettings =
+                    { oldSettings | numberOfSeeds = n }
+            in
+            { initalModel | settings = newSettings, board = GameBoard.buildBoard newSettings }
+
+        LastSeedsBehaviourChanged ->
+            let
+                oldSettings =
+                    model.settings
+
+                newSettings =
+                    { oldSettings | lastSeedsForFinishingPlayer = not oldSettings.lastSeedsForFinishingPlayer }
+            in
+            { initalModel | settings = newSettings, board = GameBoard.buildBoard newSettings }
+
+        UpsideDownChanged ->
+            let
+                oldSettings =
+                    model.settings
+            in
+            { model
+                | settings =
+                    { oldSettings
+                        | upsideDownEnabled = not model.settings.upsideDownEnabled
+                    }
+            }
 
         Other ->
             model
@@ -181,23 +216,40 @@ settingsView model =
     case model.settings.settingsOpen of
         True ->
             [ div
-                [ style "background-color" "white"
-                , style "width" "500px"
-                , style "height" "500px"
-                , style "position" "absolute"
-                , style "z-index" "10"
-                , style "top" "60px"
-                , style "border" ("5px solid " ++ sowedSeedColor)
-                , style "border-radius" "10px"
-                , centerText
-                ]
-                [ Html.form []
-                    [ Html.label [] [ Html.text "Geschwindigkeit" ]
-                    , Html.br []
+                ([ style "background-color" "white"
+                 , style "width" "500px"
+                 , style "height" "500px"
+                 , style "position" "absolute"
+                 , style "z-index" "10"
+                 , style "top" "60px"
+                 , style "border" ("5px solid " ++ sowedSeedColor)
+                 , style "border-radius" "10px"
+                 , style "opacity" "0.95"
+                 , centerText
+                 ]
+                    ++ defaultTextFont
+                )
+                [ Html.br [] []
+                , Html.text "Einstellungen zur Darstellung"
+                , Html.form [ style "margin" "10px", style "font-size" "18px" ]
+                    [ div
                         []
+                        [ Html.label [] [ Html.text "Tablet-Modus" ]
+                        , div (onClick UpsideDownChanged :: settingsChoiceStyle)
+                            [ Html.input
+                                [ Html.Attributes.type_ "checkbox"
+                                , Html.Attributes.checked model.settings.upsideDownEnabled
+                                ]
+                                []
+                            , Html.text "Die Spielelemente für Spieler 2 werden kopfüber dargestellt."
+                            ]
+                        ]
+                    , Html.br [] []
+                    , Html.label [] [ Html.text "Geschwindigkeit der Animation" ]
+                    , Html.br [] []
                     , div
                         spaceChildrenEvenly
-                        [ div [ onClick (SowingSpeedChanged Slow), pointerCursor ]
+                        [ div (onClick (SowingSpeedChanged Slow) :: settingsChoiceStyle)
                             [ Html.input
                                 [ Html.Attributes.type_ "radio"
                                 , Html.Attributes.name "sowingSpeed"
@@ -207,7 +259,7 @@ settingsView model =
                                 []
                             , Html.text "Langsam"
                             ]
-                        , div [ onClick (SowingSpeedChanged Normal), pointerCursor ]
+                        , div (onClick (SowingSpeedChanged Normal) :: settingsChoiceStyle)
                             [ Html.input
                                 [ Html.Attributes.type_ "radio"
                                 , Html.Attributes.name "sowingSpeed"
@@ -217,7 +269,7 @@ settingsView model =
                                 []
                             , Html.text "Normal"
                             ]
-                        , div [ onClick (SowingSpeedChanged Fast), pointerCursor ]
+                        , div (onClick (SowingSpeedChanged Fast) :: settingsChoiceStyle)
                             [ Html.input
                                 [ Html.Attributes.type_ "radio"
                                 , Html.Attributes.name "sowingSpeed"
@@ -229,14 +281,61 @@ settingsView model =
                             ]
                         ]
                     ]
+                , div [ style "height" "2px", style "width" "90%", style "margin" "0 auto", style "background-color" sowingSeedsColor ] []
+                , Html.br [] []
+                , Html.text "Einstellungen der Spielregeln"
+                , Html.form [ style "margin" "10px", style "font-size" "18px" ]
+                    [ div [ style "font-size" "14px" ] [ Html.text "Hinweis: Das Spiel wird bei Änderung neu gestartet." ]
+                    , Html.br [] []
+                    , Html.label [] [ Html.text "Anzahl der Steine pro Mulde" ]
+                    , div
+                        spaceChildrenEvenly
+                        [ div (onClick (SeedNumberChanged 3) :: settingsChoiceStyle)
+                            [ Html.input
+                                [ Html.Attributes.type_ "radio"
+                                , Html.Attributes.name "seedNumber"
+                                , Html.Attributes.value "3"
+                                , Html.Attributes.checked (model.settings.numberOfSeeds == 3)
+                                ]
+                                []
+                            , Html.text "3"
+                            ]
+                        , div (onClick (SeedNumberChanged 4) :: settingsChoiceStyle)
+                            [ Html.input
+                                [ Html.Attributes.type_ "radio"
+                                , Html.Attributes.name "seedNumber"
+                                , Html.Attributes.value "4"
+                                , Html.Attributes.checked (model.settings.numberOfSeeds == 4)
+                                ]
+                                []
+                            , Html.text "4"
+                            ]
+                        , div (onClick (SeedNumberChanged 6) :: settingsChoiceStyle)
+                            [ Html.input
+                                [ Html.Attributes.type_ "radio"
+                                , Html.Attributes.name "seedNumber"
+                                , Html.Attributes.value "6"
+                                , Html.Attributes.checked (model.settings.numberOfSeeds == 6)
+                                ]
+                                []
+                            , Html.text "6"
+                            ]
+                        ]
+                    , Html.br [] []
+                    , div
+                        []
+                        [ Html.label [] [ Html.text "Verteilung übriger Steine" ]
+                        , div (onClick LastSeedsBehaviourChanged :: settingsChoiceStyle)
+                            [ Html.input
+                                [ Html.Attributes.type_ "checkbox"
+                                , Html.Attributes.checked model.settings.lastSeedsForFinishingPlayer
+                                ]
+                                []
+                            , Html.text "Am Ende des Spieles erhält der Spieler, der keine Steine mehr in seiner Reihe hat, die übrig gebliebenen Steine."
+                            ]
+                        ]
+                    ]
                 ]
-
-            -- [ Html.select []
-            --     [ Html.option [] [ Html.text "Langsam" ]
-            --     , Html.option [] [ Html.text "Normal" ]
-            --     , Html.option [] [ Html.text "Schnell" ]
-            --     ]
-            -- ]
             ]
 
         False ->
@@ -288,7 +387,7 @@ rowHouseView model player pos =
          , style "width" "72px"
          , style "padding" "0 5px"
          ]
-            ++ textFont
+            ++ defaultTextFont
             ++ houseStyle
         )
         [ Html.text (fromInt house.seeds)
@@ -327,7 +426,7 @@ storeView model player =
          , style "height" "380px"
          ]
             ++ houseStyle
-            ++ textFont
+            ++ defaultTextFont
         )
         [ div
             [ fillParentWidth
@@ -350,7 +449,7 @@ infoView model player =
          , centerText
          , style "padding" "5px"
          ]
-            ++ textFont
+            ++ defaultTextFont
         )
         [ Html.text
             ("Spieler " ++ Player.toString player ++ ": ")
@@ -416,7 +515,7 @@ iconButton text icon onClickMsg =
              , style "color" normalSeedColor
              , style "padding" "4px 0"
              ]
-                ++ textFont
+                ++ defaultTextFont
             )
             [ Html.text text ]
         ]
@@ -571,11 +670,16 @@ orderSiblingsHorizontally =
     style "float" "left"
 
 
-textFont : List (Attribute Msg)
-textFont =
+defaultTextFont : List (Attribute Msg)
+defaultTextFont =
     [ style "font-family" "Arial"
     , style "font-size" "20px"
     ]
+
+
+settingsChoiceStyle : List (Attribute Msg)
+settingsChoiceStyle =
+    [ pointerCursor, style "font-size" "16px", style "margin-top" "5px" ]
 
 
 

@@ -1,4 +1,4 @@
-module GameBoard exposing (BoardPosition(..), GameBoard, SowingState(..), getFinalScore, getRowForPlayer, getStoreForPlayer, handleSeedInEmptyHouse, initalBoard, isRowEmpty, nextPosition, numberOfSeedsInHouse, pickSeeds, resetSowingStates, sowAtPosition)
+module GameBoard exposing (BoardPosition(..), GameBoard, SowingState(..), buildBoard, getFinalScore, getRowForPlayer, getStoreForPlayer, handleSeedInEmptyHouse, initalBoard, isRowEmpty, nextPosition, numberOfSeedsInHouse, pickSeeds, resetSowingStates, sowAtPosition)
 
 import Array exposing (Array)
 import ArrayHelper
