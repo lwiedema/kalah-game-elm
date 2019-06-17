@@ -36,7 +36,6 @@ type Msg
     | SeedNumberChanged Int
     | LastSeedsBehaviourChanged
     | UpsideDownChanged
-    | Other
 
 
 initalModel : Model
@@ -144,9 +143,6 @@ update msg model =
                         | upsideDownEnabled = not model.settings.upsideDownEnabled
                     }
             }
-
-        Other ->
-            model
 
 
 view : Model -> Html Msg
@@ -684,7 +680,7 @@ settingsChoiceStyle =
 
 
 -- END Styles & Attributes
--- BEGIN constants on seedSize
+-- BEGIN constants
 
 
 sowingSeedsColor : String
@@ -700,10 +696,6 @@ sowedSeedColor =
 normalSeedColor : String
 normalSeedColor =
     "#3c3c3c"
-
-
-
---"black"
 
 
 boardBackgroundColor : String
@@ -727,4 +719,4 @@ seedSizeString =
 
 
 
--- END constants on seedSize
+-- END constants
