@@ -32,11 +32,15 @@ type Msg
     | NextSowingStep
     | Restart
     | OpenSettings
-    | SowingSpeedChanged SowingSpeed
-    | SeedNumberChanged Int
-    | LastSeedsBehaviourChanged
-    | UpsideDownChanged
-    | SowOpponentsStoreChanged
+    | SettingChanged SettingOption
+
+
+type SettingOption
+    = Speed SowingSpeed
+    | SeedNumber Int
+    | LastSeedsBehaviour
+    | UpsideDown
+    | SowOpponentsStore
 
 
 initalModel : Model
@@ -106,54 +110,52 @@ update msg model =
                     }
             }
 
-        SowingSpeedChanged speed ->
+        SettingChanged option ->
             let
                 oldSettings =
                     model.settings
             in
-            { model | settings = { oldSettings | sowingSpeed = speed } }
+            case option of
+                Speed speed ->
+                    { model | settings = { oldSettings | sowingSpeed = speed } }
 
-        SeedNumberChanged n ->
-            let
-                oldSettings =
-                    model.settings
-
-                newSettings =
-                    { oldSettings | numberOfSeeds = n }
-            in
-            { initalModel | settings = newSettings, board = GameBoard.buildBoard newSettings }
-
-        LastSeedsBehaviourChanged ->
-            let
-                oldSettings =
-                    model.settings
-
-                newSettings =
-                    { oldSettings | lastSeedsForFinishingPlayer = not oldSettings.lastSeedsForFinishingPlayer }
-            in
-            { initalModel | settings = newSettings, board = GameBoard.buildBoard newSettings }
-
-        UpsideDownChanged ->
-            let
-                oldSettings =
-                    model.settings
-            in
-            { model
-                | settings =
-                    { oldSettings
-                        | upsideDownEnabled = not model.settings.upsideDownEnabled
+                SeedNumber n ->
+                    let
+                        newSettings =
+                            { oldSettings | numberOfSeeds = n }
+                    in
+                    { initalModel
+                        | settings = newSettings
+                        , board = GameBoard.buildBoard newSettings
                     }
-            }
 
-        SowOpponentsStoreChanged ->
-            let
-                oldSettings =
-                    model.settings
+                LastSeedsBehaviour ->
+                    let
+                        newSettings =
+                            { oldSettings | lastSeedsForFinishingPlayer = not oldSettings.lastSeedsForFinishingPlayer }
+                    in
+                    { initalModel
+                        | settings = newSettings
+                        , board = GameBoard.buildBoard newSettings
+                    }
 
-                newSettings =
-                    { oldSettings | sowInOpponentsStore = not oldSettings.sowInOpponentsStore }
-            in
-            { initalModel | settings = newSettings, board = GameBoard.buildBoard newSettings }
+                UpsideDown ->
+                    { model
+                        | settings =
+                            { oldSettings
+                                | upsideDownEnabled = not model.settings.upsideDownEnabled
+                            }
+                    }
+
+                SowOpponentsStore ->
+                    let
+                        newSettings =
+                            { oldSettings | sowInOpponentsStore = not oldSettings.sowInOpponentsStore }
+                    in
+                    { initalModel
+                        | settings = newSettings
+                        , board = GameBoard.buildBoard newSettings
+                    }
 
 
 view : Model -> Html Msg
@@ -242,7 +244,7 @@ settingsView model =
                     [ div
                         []
                         [ Html.label [] [ Html.text "Tablet-Modus" ]
-                        , div (onClick UpsideDownChanged :: settingsChoiceStyle)
+                        , div (onClick (SettingChanged UpsideDown) :: settingsChoiceStyle)
                             [ Html.input
                                 [ Html.Attributes.type_ "checkbox"
                                 , Html.Attributes.checked model.settings.upsideDownEnabled
@@ -256,7 +258,7 @@ settingsView model =
                     , Html.br [] []
                     , div
                         spaceChildrenEvenly
-                        [ div (onClick (SowingSpeedChanged Slow) :: settingsChoiceStyle)
+                        [ div (onClick (SettingChanged (Speed Slow)) :: settingsChoiceStyle)
                             [ Html.input
                                 [ Html.Attributes.type_ "radio"
                                 , Html.Attributes.name "sowingSpeed"
@@ -266,7 +268,7 @@ settingsView model =
                                 []
                             , Html.text "Langsam"
                             ]
-                        , div (onClick (SowingSpeedChanged Normal) :: settingsChoiceStyle)
+                        , div (onClick (SettingChanged (Speed Normal)) :: settingsChoiceStyle)
                             [ Html.input
                                 [ Html.Attributes.type_ "radio"
                                 , Html.Attributes.name "sowingSpeed"
@@ -276,7 +278,7 @@ settingsView model =
                                 []
                             , Html.text "Normal"
                             ]
-                        , div (onClick (SowingSpeedChanged Fast) :: settingsChoiceStyle)
+                        , div (onClick (SettingChanged (Speed Fast)) :: settingsChoiceStyle)
                             [ Html.input
                                 [ Html.Attributes.type_ "radio"
                                 , Html.Attributes.name "sowingSpeed"
@@ -297,7 +299,7 @@ settingsView model =
                     , Html.label [] [ Html.text "Anzahl der Steine pro Mulde" ]
                     , div
                         spaceChildrenEvenly
-                        [ div (onClick (SeedNumberChanged 3) :: settingsChoiceStyle)
+                        [ div (onClick (SettingChanged (SeedNumber 3)) :: settingsChoiceStyle)
                             [ Html.input
                                 [ Html.Attributes.type_ "radio"
                                 , Html.Attributes.name "seedNumber"
@@ -307,7 +309,7 @@ settingsView model =
                                 []
                             , Html.text "3"
                             ]
-                        , div (onClick (SeedNumberChanged 4) :: settingsChoiceStyle)
+                        , div (onClick (SettingChanged (SeedNumber 4)) :: settingsChoiceStyle)
                             [ Html.input
                                 [ Html.Attributes.type_ "radio"
                                 , Html.Attributes.name "seedNumber"
@@ -317,7 +319,7 @@ settingsView model =
                                 []
                             , Html.text "4"
                             ]
-                        , div (onClick (SeedNumberChanged 6) :: settingsChoiceStyle)
+                        , div (onClick (SettingChanged (SeedNumber 6)) :: settingsChoiceStyle)
                             [ Html.input
                                 [ Html.Attributes.type_ "radio"
                                 , Html.Attributes.name "seedNumber"
@@ -332,7 +334,7 @@ settingsView model =
                     , div
                         []
                         [ Html.label [] [ Html.text "Verteilung übriger Steine" ]
-                        , div (onClick LastSeedsBehaviourChanged :: settingsChoiceStyle)
+                        , div (onClick (SettingChanged LastSeedsBehaviour) :: settingsChoiceStyle)
                             [ Html.input
                                 [ Html.Attributes.type_ "checkbox"
                                 , Html.Attributes.checked model.settings.lastSeedsForFinishingPlayer
@@ -345,7 +347,7 @@ settingsView model =
                     , div
                         []
                         [ Html.label [] [ Html.text "Gegnerisches Kalaha" ]
-                        , div (onClick SowOpponentsStoreChanged :: settingsChoiceStyle)
+                        , div (onClick (SettingChanged SowOpponentsStore) :: settingsChoiceStyle)
                             [ Html.input
                                 [ Html.Attributes.type_ "checkbox"
                                 , Html.Attributes.checked model.settings.sowInOpponentsStore
