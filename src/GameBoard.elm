@@ -29,7 +29,7 @@ type alias Row =
 
 type alias House =
     { seeds : Int -- number of seeds in house
-    , justSownTo : Bool -- flag if there was recently added a seed
+    , justSown : Int -- flag if there was recently added a seed
     }
 
 
@@ -57,9 +57,9 @@ type BoardPosition
 -- BEGIN create inital game-board
 
 
-emptyHouse : House
-emptyHouse =
-    { seeds = 0, justSownTo = False }
+emptyStore : Store
+emptyStore =
+    { seeds = 0, justSown = 0 }
 
 
 buildBoard : Settings -> GameBoard
@@ -68,7 +68,7 @@ buildBoard settings =
         ( createRow settings.numberOfHouses settings.numberOfSeeds
         , createRow settings.numberOfHouses settings.numberOfSeeds
         )
-    , stores = ( emptyHouse, emptyHouse )
+    , stores = ( emptyStore, emptyStore )
     , sowingState = NotSowing
     }
 
@@ -80,7 +80,7 @@ initalBoard =
 
 createRow : Int -> Int -> Row
 createRow houses seeds =
-    Array.repeat houses { seeds = seeds, justSownTo = False }
+    Array.repeat houses { seeds = seeds, justSown = 0 }
 
 
 
@@ -104,7 +104,7 @@ sowAtPosition board position =
 
 resetSowingStates : GameBoard -> GameBoard
 resetSowingStates board =
-    -- set justSownTo-States of both rows and stores to False
+    -- set justSown-States of both rows and stores to 0
     -- as well as board-sowingState to NotSowing
     { board
         | rows =
@@ -259,7 +259,7 @@ sowSeedToHouse : Int -> Row -> Row
 sowSeedToHouse pos row =
     case Array.get pos row of
         Just house ->
-            Array.set pos { justSownTo = True, seeds = house.seeds + 1 } row
+            Array.set pos { justSown = house.justSown + 1, seeds = house.seeds + 1 } row
 
         Nothing ->
             row
@@ -273,18 +273,20 @@ addSeedsToStore player numOfSeeds board =
     in
     setStoreForPlayer
         player
-        { seeds = store.seeds + numOfSeeds, justSownTo = True }
+        { seeds = store.seeds + numOfSeeds
+        , justSown = store.justSown + numOfSeeds
+        }
         board
 
 
 resetSownStateInStore : Store -> Store
 resetSownStateInStore store =
-    { store | justSownTo = False }
+    { store | justSown = 0 }
 
 
 resetSownStateInRow : Row -> Row
 resetSownStateInRow row =
-    Array.map (\house -> { house | justSownTo = False }) row
+    Array.map (\house -> { house | justSown = 0 }) row
 
 
 

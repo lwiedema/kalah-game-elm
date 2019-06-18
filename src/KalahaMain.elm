@@ -351,7 +351,7 @@ settingsView model =
                                 , Html.Attributes.checked model.settings.sowInOpponentsStore
                                 ]
                                 []
-                            , Html.text "Steine werden auch in das gegnerische Kalaha verteilt."
+                            , Html.text "Steine werden auch in das gegnerische Kalaha (große Mulde) verteilt."
                             ]
                         ]
                     ]
@@ -395,7 +395,7 @@ rowHouseView model player pos =
             ArrayHelper.getWithDefault
                 pos
                 (GameBoard.getRowForPlayer model.board player)
-                { justSownTo = False, seeds = 0 }
+                { justSown = 0, seeds = 0 }
     in
     -- show seeds as number and circles
     div
@@ -413,24 +413,20 @@ rowHouseView model player pos =
         [ Html.text (fromInt house.seeds)
         , div
             [ fillParentWidth ]
-            (seedsInHouseView house.seeds house.justSownTo)
+            (seedsInHouseView house.seeds house.justSown)
         ]
 
 
-seedsInHouseView : Int -> Bool -> List (Html Msg)
-seedsInHouseView numOfSeeds justSownTo =
+seedsInHouseView : Int -> Int -> List (Html Msg)
+seedsInHouseView numOfSeeds numOfNewlySownSeeds =
     case numOfSeeds of
         0 ->
             []
 
         _ ->
-            case justSownTo of
-                -- newly added seed displayed in other color then normal
-                True ->
-                    List.repeat (numOfSeeds - 1) (seedView normalSeedColor) ++ [ seedView sowedSeedColor ]
-
-                False ->
-                    List.repeat numOfSeeds (seedView normalSeedColor)
+            -- newly added seed displayed in other color then normal
+            List.repeat (numOfSeeds - numOfNewlySownSeeds) (seedView normalSeedColor)
+                ++ List.repeat numOfNewlySownSeeds (seedView sowedSeedColor)
 
 
 storeView : Model -> Player -> Html Msg
@@ -457,7 +453,7 @@ storeView model player =
             [ style "padding" "10px"
             , fillParentWidth
             ]
-            (seedsInHouseView store.seeds store.justSownTo)
+            (seedsInHouseView store.seeds store.justSown)
         ]
 
 
