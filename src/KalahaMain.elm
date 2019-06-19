@@ -14,7 +14,7 @@ import Platform.Cmd
 import Platform.Sub
 import Player exposing (Player(..), Winner(..))
 import Random
-import Settings exposing (Opponent(..), Settings, SowingSpeed(..))
+import Settings exposing (Intelligence(..), Opponent(..), Settings, SowingSpeed(..))
 import String
 import Svg
 import Svg.Attributes
@@ -46,6 +46,8 @@ type SettingOption
     | LastSeedsBehaviour
     | UpsideDown
     | SowOpponentsStore
+    | OpponentOption
+    | IntelligenceOption Intelligence
 
 
 initalModel : Model
@@ -158,6 +160,12 @@ update msg model =
 
                 SowOpponentsStore ->
                     ( restartGame { oldSettings | sowInOpponentsStore = not oldSettings.sowInOpponentsStore }, Cmd.none )
+
+                OpponentOption ->
+                    ( restartGame (Settings.toggleOpponentOption oldSettings), Cmd.none )
+
+                IntelligenceOption i ->
+                    ( restartGame { oldSettings | opponent = Computer i }, Cmd.none )
 
         ComputerHasTurn ->
             ( model, Random.generate RandomMoveWeights (weightMoves model.settings) )
@@ -474,7 +482,7 @@ settingsView model =
             [ div
                 ([ style "background-color" "white"
                  , style "width" "500px"
-                 , style "height" "500px"
+                 , style "height" "600px"
                  , style "position" "absolute"
                  , style "z-index" "10"
                  , style "top" "60px"
@@ -603,6 +611,64 @@ settingsView model =
                             , Html.text "Steine werden auch in das gegnerische Kalaha (große Mulde) verteilt."
                             ]
                         ]
+                    , Html.br [] []
+                    , div
+                        []
+                        [ Html.label [] [ Html.text "Gegenspieler & Schwierigkeitsstufe" ]
+                        , div (onClick (SettingChanged OpponentOption) :: settingsChoiceStyle)
+                            [ Html.input
+                                [ Html.Attributes.type_ "checkbox"
+                                , Html.Attributes.checked
+                                    (case model.settings.opponent of
+                                        Real ->
+                                            False
+
+                                        Computer _ ->
+                                            True
+                                    )
+                                ]
+                                []
+                            , Html.text "Gegen den Computer spielen."
+                            ]
+                        ]
+                    , case model.settings.opponent of
+                        Real ->
+                            div [] []
+
+                        Computer intelligence ->
+                            div
+                                spaceChildrenEvenly
+                                [ div (onClick (SettingChanged (IntelligenceOption Low)) :: settingsChoiceStyle)
+                                    [ Html.input
+                                        [ Html.Attributes.type_ "radio"
+                                        , Html.Attributes.name "computersIntelligence"
+                                        , Html.Attributes.value "low"
+                                        , Html.Attributes.checked (intelligence == Low)
+                                        ]
+                                        []
+                                    , Html.text "leicht"
+                                    ]
+                                , div (onClick (SettingChanged (IntelligenceOption Medium)) :: settingsChoiceStyle)
+                                    [ Html.input
+                                        [ Html.Attributes.type_ "radio"
+                                        , Html.Attributes.name "computersIntelligence"
+                                        , Html.Attributes.value "medium"
+                                        , Html.Attributes.checked (intelligence == Medium)
+                                        ]
+                                        []
+                                    , Html.text "mittel"
+                                    ]
+                                , div (onClick (SettingChanged (IntelligenceOption High)) :: settingsChoiceStyle)
+                                    [ Html.input
+                                        [ Html.Attributes.type_ "radio"
+                                        , Html.Attributes.name "computersIntelligence"
+                                        , Html.Attributes.value "high"
+                                        , Html.Attributes.checked (intelligence == High)
+                                        ]
+                                        []
+                                    , Html.text "schwer"
+                                    ]
+                                ]
                     ]
                 ]
             ]

@@ -1,4 +1,4 @@
-module Settings exposing (Opponent(..), Settings, SowingSpeed(..), defaultSettings, randomnessRange, speedInMilliseconds)
+module Settings exposing (Intelligence(..), Opponent(..), Settings, SowingSpeed(..), defaultSettings, randomnessRange, speedInMilliseconds, toggleOpponentOption)
 
 
 type alias Settings =
@@ -28,6 +28,16 @@ type Intelligence
     = High
     | Medium
     | Low
+
+
+toggleOpponentOption : Settings -> Settings
+toggleOpponentOption settings =
+    case settings.opponent of
+        Real ->
+            { settings | opponent = Computer Medium }
+
+        Computer _ ->
+            { settings | opponent = Real }
 
 
 randomnessRange : Intelligence -> Float
@@ -65,5 +75,5 @@ defaultSettings =
     , sowingSpeed = Normal
     , upsideDownEnabled = False
     , sowInOpponentsStore = False
-    , opponent = Computer Medium
+    , opponent = Real
     }
