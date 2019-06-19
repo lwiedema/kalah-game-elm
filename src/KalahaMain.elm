@@ -1,19 +1,20 @@
 module KalahaMain exposing (main)
 
+import Array
 import ArrayHelper
 import Browser
 import Color
 import Game exposing (Game, State(..))
 import GameBoard exposing (SowingState(..))
 import Html exposing (Attribute, Html, button, div, text)
-import Html.Attributes exposing (attribute, disabled, start, style)
+import Html.Attributes exposing (style)
 import Html.Events exposing (onClick)
 import Material.Icons.Action
 import Material.Icons.Navigation
 import Platform.Sub
 import Player exposing (Player(..), Winner(..))
-import Settings exposing (SowingSpeed(..))
-import String exposing (fromInt)
+import Settings exposing (Settings, SowingSpeed(..))
+import String
 import Svg
 import Svg.Attributes
 import Time
@@ -96,7 +97,7 @@ update msg model =
             Game.nextSowingStep model
 
         Restart ->
-            { initalModel | settings = model.settings, board = GameBoard.buildBoard model.settings }
+            restartGame model.settings
 
         OpenSettings ->
             let
@@ -120,24 +121,10 @@ update msg model =
                     { model | settings = { oldSettings | sowingSpeed = speed } }
 
                 SeedNumber n ->
-                    let
-                        newSettings =
-                            { oldSettings | numberOfSeeds = n }
-                    in
-                    { initalModel
-                        | settings = newSettings
-                        , board = GameBoard.buildBoard newSettings
-                    }
+                    restartGame { oldSettings | numberOfSeeds = n }
 
                 LastSeedsBehaviour ->
-                    let
-                        newSettings =
-                            { oldSettings | lastSeedsForFinishingPlayer = not oldSettings.lastSeedsForFinishingPlayer }
-                    in
-                    { initalModel
-                        | settings = newSettings
-                        , board = GameBoard.buildBoard newSettings
-                    }
+                    restartGame { oldSettings | lastSeedsForFinishingPlayer = not oldSettings.lastSeedsForFinishingPlayer }
 
                 UpsideDown ->
                     { model
@@ -148,14 +135,7 @@ update msg model =
                     }
 
                 SowOpponentsStore ->
-                    let
-                        newSettings =
-                            { oldSettings | sowInOpponentsStore = not oldSettings.sowInOpponentsStore }
-                    in
-                    { initalModel
-                        | settings = newSettings
-                        , board = GameBoard.buildBoard newSettings
-                    }
+                    restartGame { oldSettings | sowInOpponentsStore = not oldSettings.sowInOpponentsStore }
 
 
 view : Model -> Html Msg
@@ -215,9 +195,234 @@ view model =
         ]
 
 
+restartGame : Settings -> Model
+restartGame settings =
+    { initalModel | settings = settings, board = GameBoard.buildBoard settings }
+
+
 
 -- END web-app
 -- BEGIN views
+
+
+rowView : Model -> Player -> List (Html Msg)
+rowView model player =
+    (if player == Two then
+        -- mirror list of houses for player Two
+        List.foldl (::) []
+
+     else
+        identity
+    )
+        (rowViewHelper model player model.settings.numberOfHouses)
+
+
+rowViewHelper : Model -> Player -> Int -> List (Html Msg)
+rowViewHelper model player housesToCreate =
+    -- create houses recursively
+    case housesToCreate of
+        0 ->
+            []
+
+        _ ->
+            rowHouseView model player (model.settings.numberOfHouses - housesToCreate)
+                :: rowViewHelper model player (housesToCreate - 1)
+
+
+rowHouseView : Model -> Player -> Int -> Html Msg
+rowHouseView model player pos =
+    -- create view for one house
+    let
+        -- get information on house from board
+        h =
+            Array.get pos (GameBoard.getRowForPlayer model.board player)
+    in
+    case h of
+        Just house ->
+            -- show seeds as number and circles
+            div
+                ([ upsideDown model player
+                 , cursorStyle model player
+                 , onClick (Click player pos)
+                 , fillParentHeight
+                 , orderSiblingsHorizontally
+                 , style "width" "72px"
+                 , style "padding" "0 5px"
+                 ]
+                    ++ defaultTextFont
+                    ++ houseStyle
+                )
+                [ Html.text (String.fromInt house.seeds)
+                , div
+                    [ fillParentWidth ]
+                    (seedsInHouseView house.seeds house.justSown)
+                ]
+
+        Nothing ->
+            div [] []
+
+
+seedsInHouseView : Int -> Int -> List (Html Msg)
+seedsInHouseView numOfSeeds numOfNewlySownSeeds =
+    case numOfSeeds of
+        0 ->
+            []
+
+        _ ->
+            -- newly added seed displayed in other color then normal
+            List.repeat (numOfSeeds - numOfNewlySownSeeds) (seedView normalSeedColor)
+                ++ List.repeat numOfNewlySownSeeds (seedView sowedSeedColor)
+
+
+storeView : Model -> Player -> Html Msg
+storeView model player =
+    let
+        store =
+            GameBoard.getStoreForPlayer model.board player
+    in
+    div
+        ([ centerText
+         , style "margin" "10px"
+         , style "width" "140px"
+         , style "height" "380px"
+         ]
+            ++ houseStyle
+            ++ defaultTextFont
+        )
+        [ div
+            [ fillParentWidth
+            , style "padding" "10px 0"
+            ]
+            [ Html.text (String.fromInt store.seeds) ]
+        , div
+            [ style "padding" "10px"
+            , fillParentWidth
+            ]
+            (seedsInHouseView store.seeds store.justSown)
+        ]
+
+
+infoView : Model -> Player -> Html Msg
+infoView model player =
+    div
+        ([ upsideDown model player
+         , fillParentWidth
+         , centerText
+         , style "padding" "5px"
+         ]
+            ++ defaultTextFont
+        )
+        [ Html.text
+            ("Spieler " ++ Player.toString player ++ ": ")
+        , Html.br [] []
+        , Html.text
+            (case model.state of
+                Turn p ->
+                    if p == player then
+                        "Du bist am Zug."
+
+                    else
+                        "Spieler " ++ Player.toString p ++ " ist am Zug."
+
+                End winner ->
+                    "Spiel beendet. "
+                        ++ (case winner of
+                                Drawn ->
+                                    "Es ist unentschieden."
+
+                                Winner w finalScore ->
+                                    (if w == player then
+                                        "Du hast gewonnen. "
+
+                                     else
+                                        "Leider verloren. "
+                                    )
+                                        ++ "Endstand: "
+                                        ++ String.fromInt (Tuple.first finalScore)
+                                        ++ ":"
+                                        ++ String.fromInt (Tuple.second finalScore)
+                           )
+            )
+        ]
+
+
+restartButton : Html Msg
+restartButton =
+    iconButton "Neues Spiel" Material.Icons.Navigation.refresh Restart
+
+
+iconButton : String -> (Color.Color -> Int -> Svg.Svg Msg) -> Msg -> Html Msg
+iconButton text icon onClickMsg =
+    Html.div
+        [ onClick onClickMsg
+        , style "background-color" sowedSeedColor
+        , style "width" "160px"
+        , style "height" "30px"
+        , style "margin" "10px auto"
+        , style "border" ("5px solid " ++ sowedSeedColor)
+        , style "border-radius" "10px"
+        , pointerCursor
+        ]
+        [ div [ style "float" "left" ]
+            [ Svg.svg
+                [ Svg.Attributes.viewBox "0 0 30 30"
+                , Svg.Attributes.width "30"
+                , Svg.Attributes.height "30"
+                ]
+                [ icon (Color.rgb255 60 60 60) 30 ]
+            ]
+        , div
+            ([ style "float" "right"
+             , style "color" normalSeedColor
+             , style "padding" "4px 0"
+             ]
+                ++ defaultTextFont
+            )
+            [ Html.text text ]
+        ]
+
+
+sowingView : Model -> Html Msg
+sowingView model =
+    -- create view showing seeds to be sown in middle of board
+    div
+        [ style "padding" "17px 0 15px 0"
+        ]
+        [ div
+            (fillParentWidth :: spaceChildrenEvenly)
+            [ div []
+                (case model.board.sowingState of
+                    Sowing info ->
+                        List.repeat info.seedsToSow (seedView sowingSeedsColor)
+
+                    _ ->
+                        []
+                )
+            ]
+        ]
+
+
+seedView : String -> Html Msg
+seedView seedColor =
+    -- creating view for one single seed as svg
+    div
+        [ orderSiblingsHorizontally
+        , style "padding" "2px"
+        ]
+        [ Svg.svg
+            [ Svg.Attributes.viewBox ("0 0 " ++ seedSizeString ++ " " ++ seedSizeString)
+            , Svg.Attributes.width seedSizeString
+            , Svg.Attributes.height seedSizeString
+            ]
+            [ Svg.circle
+                [ Svg.Attributes.cx seedRadiusString
+                , Svg.Attributes.cy seedRadiusString
+                , Svg.Attributes.r seedRadiusString
+                , Svg.Attributes.fill seedColor
+                ]
+                []
+            ]
+        ]
 
 
 settingsView : Model -> List (Html Msg)
@@ -362,235 +567,6 @@ settingsView model =
 
         False ->
             []
-
-
-rowView : Model -> Player -> List (Html Msg)
-rowView model player =
-    (if player == Two then
-        -- mirror list of houses for player Two
-        List.foldl (::) []
-
-     else
-        identity
-    )
-        (rowViewHelper model player model.settings.numberOfHouses)
-
-
-rowViewHelper : Model -> Player -> Int -> List (Html Msg)
-rowViewHelper model player housesToCreate =
-    -- create houses recursively
-    case housesToCreate of
-        0 ->
-            []
-
-        _ ->
-            rowHouseView model player (model.settings.numberOfHouses - housesToCreate)
-                :: rowViewHelper model player (housesToCreate - 1)
-
-
-rowHouseView : Model -> Player -> Int -> Html Msg
-rowHouseView model player pos =
-    -- create view for one house
-    let
-        -- get information on house from board
-        house =
-            ArrayHelper.getWithDefault
-                pos
-                (GameBoard.getRowForPlayer model.board player)
-                { justSown = 0, seeds = 0 }
-    in
-    -- show seeds as number and circles
-    div
-        ([ upsideDown model player
-         , cursorStyle model player
-         , onClick (Click player pos)
-         , fillParentHeight
-         , orderSiblingsHorizontally
-         , style "width" "72px"
-         , style "padding" "0 5px"
-         ]
-            ++ defaultTextFont
-            ++ houseStyle
-        )
-        [ Html.text (fromInt house.seeds)
-        , div
-            [ fillParentWidth ]
-            (seedsInHouseView house.seeds house.justSown)
-        ]
-
-
-seedsInHouseView : Int -> Int -> List (Html Msg)
-seedsInHouseView numOfSeeds numOfNewlySownSeeds =
-    case numOfSeeds of
-        0 ->
-            []
-
-        _ ->
-            -- newly added seed displayed in other color then normal
-            List.repeat (numOfSeeds - numOfNewlySownSeeds) (seedView normalSeedColor)
-                ++ List.repeat numOfNewlySownSeeds (seedView sowedSeedColor)
-
-
-storeView : Model -> Player -> Html Msg
-storeView model player =
-    let
-        store =
-            GameBoard.getStoreForPlayer model.board player
-    in
-    div
-        ([ centerText
-         , style "margin" "10px"
-         , style "width" "140px"
-         , style "height" "380px"
-         ]
-            ++ houseStyle
-            ++ defaultTextFont
-        )
-        [ div
-            [ fillParentWidth
-            , style "padding" "10px 0"
-            ]
-            [ Html.text (fromInt store.seeds) ]
-        , div
-            [ style "padding" "10px"
-            , fillParentWidth
-            ]
-            (seedsInHouseView store.seeds store.justSown)
-        ]
-
-
-infoView : Model -> Player -> Html Msg
-infoView model player =
-    div
-        ([ upsideDown model player
-         , fillParentWidth
-         , centerText
-         , style "padding" "5px"
-         ]
-            ++ defaultTextFont
-        )
-        [ Html.text
-            ("Spieler " ++ Player.toString player ++ ": ")
-        , Html.br [] []
-        , Html.text
-            (case model.state of
-                Turn p ->
-                    if p == player then
-                        "Du bist am Zug."
-
-                    else
-                        "Spieler " ++ Player.toString p ++ " ist am Zug."
-
-                End winner ->
-                    "Spiel beendet. "
-                        ++ (case winner of
-                                Drawn ->
-                                    "Es ist unentschieden."
-
-                                Winner w finalScore ->
-                                    (if w == player then
-                                        "Du hast gewonnen. "
-
-                                     else
-                                        "Leider verloren. "
-                                    )
-                                        ++ "Endstand: "
-                                        ++ String.fromInt (Tuple.first finalScore)
-                                        ++ ":"
-                                        ++ String.fromInt (Tuple.second finalScore)
-                           )
-            )
-        ]
-
-
-restartButton : Html Msg
-restartButton =
-    iconButton "Neues Spiel" Material.Icons.Navigation.refresh Restart
-
-
-iconButton : String -> (Color.Color -> Int -> Svg.Svg Msg) -> Msg -> Html Msg
-iconButton text icon onClickMsg =
-    Html.div
-        [ onClick onClickMsg
-        , style "background-color" sowedSeedColor
-        , style "width" "160px"
-        , style "height" "30px"
-        , style "margin" "10px auto"
-        , style "border" ("5px solid " ++ sowedSeedColor)
-        , style "border-radius" "10px"
-        , pointerCursor
-        ]
-        [ div [ style "float" "left" ]
-            [ Svg.svg
-                [ Svg.Attributes.viewBox "0 0 30 30"
-                , Svg.Attributes.width "30"
-                , Svg.Attributes.height "30"
-                ]
-                [ icon (Color.rgb255 60 60 60) 30 ]
-            ]
-        , div
-            ([ style "float" "right"
-             , style "color" normalSeedColor
-             , style "padding" "4px 0"
-             ]
-                ++ defaultTextFont
-            )
-            [ Html.text text ]
-        ]
-
-
-sowingView : Model -> Html Msg
-sowingView model =
-    -- create view showing seeds to be sown in middle of board
-    div
-        [ style "padding" "17px 0 15px 0"
-        ]
-        [ div
-            (fillParentWidth :: spaceChildrenEvenly)
-            [ div []
-                (case model.board.sowingState of
-                    Sowing info ->
-                        seedsToSowView info.seedsToSow
-
-                    SowingFinished _ _ ->
-                        seedsToSowView 0
-
-                    HandleLastSeedInEmptyHouse _ _ ->
-                        seedsToSowView 0
-
-                    NotSowing ->
-                        []
-                )
-            ]
-        ]
-
-
-seedsToSowView : Int -> List (Html Msg)
-seedsToSowView numOfSeeds =
-    List.repeat numOfSeeds (seedView sowingSeedsColor)
-
-
-seedView : String -> Html Msg
-seedView seedColor =
-    -- creating view for one single seed as svg
-    div
-        [ orderSiblingsHorizontally
-        , style "padding" "2px"
-        ]
-        [ Svg.svg
-            [ Svg.Attributes.viewBox ("0 0 " ++ seedSizeString ++ " " ++ seedSizeString)
-            , Svg.Attributes.width seedSizeString
-            , Svg.Attributes.height seedSizeString
-            ]
-            [ Svg.circle
-                [ Svg.Attributes.cx seedRadiusString
-                , Svg.Attributes.cy seedRadiusString
-                , Svg.Attributes.r seedRadiusString
-                , Svg.Attributes.fill seedColor
-                ]
-                []
-            ]
-        ]
 
 
 
