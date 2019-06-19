@@ -1,23 +1,25 @@
 module KalahaMain exposing (main)
 
 import Array
-import ArrayHelper
 import Browser
 import Color
-import Game exposing (Game, State(..))
+import Game exposing (Game, State(..), startSowingSeeds)
 import GameBoard exposing (SowingState(..))
 import Html exposing (Attribute, Html, button, div, text)
 import Html.Attributes exposing (style)
 import Html.Events exposing (onClick)
-import Material.Icons.Action
+import Material.Icons.Action exposing (settings)
 import Material.Icons.Navigation
+import Platform.Cmd
 import Platform.Sub
 import Player exposing (Player(..), Winner(..))
-import Settings exposing (Settings, SowingSpeed(..))
+import Random
+import Settings exposing (Opponent(..), Settings, SowingSpeed(..))
 import String
 import Svg
 import Svg.Attributes
 import Time
+import Utils.ListHelper as ListHelper
 
 
 
@@ -34,6 +36,8 @@ type Msg
     | Restart
     | OpenSettings
     | SettingChanged SettingOption
+    | ComputerHasTurn
+    | RandomMoveWeights (List Float)
 
 
 type SettingOption
@@ -62,7 +66,7 @@ main =
     Browser.element
         { init = \_ -> ( initalModel, Cmd.none )
         , view = view
-        , update = \msg model -> ( update msg model, Cmd.none )
+        , update = update
         , subscriptions = subscriptions
         }
 
@@ -71,13 +75,27 @@ subscriptions : Model -> Sub Msg
 subscriptions model =
     case model.board.sowingState of
         NotSowing ->
-            Sub.none
+            case model.state of
+                Turn player ->
+                    case model.settings.opponent of
+                        Real ->
+                            Sub.none
+
+                        Computer _ ->
+                            if player == Two then
+                                Time.every 500 (\_ -> ComputerHasTurn)
+
+                            else
+                                Sub.none
+
+                End _ ->
+                    Sub.none
 
         _ ->
             Time.every (Settings.speedInMilliseconds model.settings.sowingSpeed) (\_ -> NextSowingStep)
 
 
-update : Msg -> Model -> Model
+update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
         Click player pos ->
@@ -85,31 +103,33 @@ update msg model =
                 Turn onTurn ->
                     -- check if click on house was legal
                     if onTurn == player && not (GameBoard.numberOfSeedsInHouse (GameBoard.getRowForPlayer model.board player) pos == 0) then
-                        Game.startSowingSeeds model player pos
+                        ( Game.startSowingSeeds model player pos, Cmd.none )
 
                     else
-                        model
+                        ( model, Cmd.none )
 
                 _ ->
-                    model
+                    ( model, Cmd.none )
 
         NextSowingStep ->
-            Game.nextSowingStep model
+            ( Game.nextSowingStep model, Cmd.none )
 
         Restart ->
-            restartGame model.settings
+            ( restartGame model.settings, Cmd.none )
 
         OpenSettings ->
             let
                 oldSettings =
                     model.settings
             in
-            { model
+            ( { model
                 | settings =
                     { oldSettings
                         | settingsOpen = not model.settings.settingsOpen
                     }
-            }
+              }
+            , Cmd.none
+            )
 
         SettingChanged option ->
             let
@@ -118,24 +138,32 @@ update msg model =
             in
             case option of
                 Speed speed ->
-                    { model | settings = { oldSettings | sowingSpeed = speed } }
+                    ( { model | settings = { oldSettings | sowingSpeed = speed } }, Cmd.none )
 
                 SeedNumber n ->
-                    restartGame { oldSettings | numberOfSeeds = n }
+                    ( restartGame { oldSettings | numberOfSeeds = n }, Cmd.none )
 
                 LastSeedsBehaviour ->
-                    restartGame { oldSettings | lastSeedsForFinishingPlayer = not oldSettings.lastSeedsForFinishingPlayer }
+                    ( restartGame { oldSettings | lastSeedsForFinishingPlayer = not oldSettings.lastSeedsForFinishingPlayer }, Cmd.none )
 
                 UpsideDown ->
-                    { model
+                    ( { model
                         | settings =
                             { oldSettings
                                 | upsideDownEnabled = not model.settings.upsideDownEnabled
                             }
-                    }
+                      }
+                    , Cmd.none
+                    )
 
                 SowOpponentsStore ->
-                    restartGame { oldSettings | sowInOpponentsStore = not oldSettings.sowInOpponentsStore }
+                    ( restartGame { oldSettings | sowInOpponentsStore = not oldSettings.sowInOpponentsStore }, Cmd.none )
+
+        ComputerHasTurn ->
+            ( model, Random.generate RandomMoveWeights (weightMoves model.settings) )
+
+        RandomMoveWeights weights ->
+            ( startSowingSeeds model Two (nextMove model weights), Cmd.none )
 
 
 view : Model -> Html Msg
@@ -313,7 +341,21 @@ infoView model player =
             ++ defaultTextFont
         )
         [ Html.text
-            ("Spieler " ++ Player.toString player ++ ": ")
+            ("Spieler "
+                ++ Player.toString player
+                ++ (case model.settings.opponent of
+                        Real ->
+                            ""
+
+                        Computer _ ->
+                            if player == Two then
+                                " (Computer)"
+
+                            else
+                                ""
+                   )
+                ++ ": "
+            )
         , Html.br [] []
         , Html.text
             (case model.state of
@@ -718,3 +760,85 @@ seedSizeString =
 
 
 -- END constants
+-- BEGIN "artificial intelligence"
+
+
+weightMoves : Settings -> Random.Generator (List Float)
+weightMoves settings =
+    case settings.opponent of
+        Computer intelligence ->
+            Random.list settings.numberOfHouses
+                (Random.float
+                    (1 - Settings.randomnessRange intelligence)
+                    (1 + Settings.randomnessRange intelligence)
+                )
+
+        Real ->
+            -- should never get here
+            Random.list 0 (Random.float 0 0)
+
+
+nextMove : Model -> List Float -> Int
+nextMove model weights =
+    -- return position of house to empty next
+    let
+        moves =
+            List.indexedMap (\pos element -> element * moveQuality model pos) weights
+    in
+    case List.maximum moves of
+        Nothing ->
+            0
+
+        Just bestMoveQuality ->
+            ListHelper.getIndex bestMoveQuality moves
+
+
+moveQuality : Model -> Int -> Float
+moveQuality model pos =
+    let
+        row =
+            GameBoard.getRowForPlayer model.board Two
+
+        opponentsRow =
+            GameBoard.getRowForPlayer model.board One
+
+        seeds =
+            GameBoard.numberOfSeedsInHouse row pos
+    in
+    if seeds == 0 then
+        -- cannot do this move
+        0
+
+    else if model.settings.numberOfHouses - pos == seeds then
+        -- move would end in store
+        3
+
+    else if GameBoard.numberOfSeedsInHouse row (pos + seeds) == 0 then
+        -- move would end in empty house
+        -- the more seeds are in opposite house, the better it is
+        2
+            * (1
+                + 0.1
+                * toFloat
+                    (GameBoard.numberOfSeedsInHouse
+                        opponentsRow
+                        (model.settings.numberOfHouses - (pos + seeds) - 1)
+                    )
+              )
+
+    else if
+        GameBoard.numberOfSeedsInHouse
+            opponentsRow
+            (model.settings.numberOfHouses - pos - 1)
+            == 0
+    then
+        -- opposite house is empty, opponent could steal seeds
+        1 * (1 + 0.2 * toFloat seeds)
+
+    else
+        -- no "special" move, houses with more seeds are higher rated
+        1 * (1 + 0.1 * toFloat seeds)
+
+
+
+-- END "artificial intelligence"

@@ -1,4 +1,4 @@
-module ArrayHelper exposing (any, getWithDefault)
+module Utils.ArrayHelper exposing (any, getWithDefault)
 
 import Array exposing (Array)
 import List

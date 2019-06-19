@@ -1,9 +1,9 @@
-module GameBoard exposing (BoardPosition(..), GameBoard, SowingState(..), buildBoard, getFinalScore, getRowForPlayer, getStoreForPlayer, handleSeedInEmptyHouse, initalBoard, isRowEmpty, nextPosition, numberOfSeedsInHouse, pickSeeds, resetSowingStates, sowAtPosition)
+module GameBoard exposing (BoardPosition(..), GameBoard, Row, SowingState(..), buildBoard, getFinalScore, getRowForPlayer, getStoreForPlayer, handleSeedInEmptyHouse, initalBoard, isRowEmpty, nextPosition, numberOfSeedsInHouse, pickSeeds, resetSowingStates, sowAtPosition)
 
 import Array exposing (Array)
-import ArrayHelper
 import Player exposing (Player(..))
 import Settings exposing (Settings)
+import Utils.ArrayHelper as ArrayHelper
 
 
 
@@ -173,7 +173,7 @@ numberOfSeedsInHouse row pos =
             house.seeds
 
         Nothing ->
-            0
+            -1
 
 
 isRowEmpty : Row -> Bool

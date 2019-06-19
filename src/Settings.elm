@@ -1,4 +1,4 @@
-module Settings exposing (Settings, SowingSpeed(..), defaultSettings, speedInMilliseconds)
+module Settings exposing (Opponent(..), Settings, SowingSpeed(..), defaultSettings, randomnessRange, speedInMilliseconds)
 
 
 type alias Settings =
@@ -9,6 +9,7 @@ type alias Settings =
     , sowingSpeed : SowingSpeed
     , upsideDownEnabled : Bool
     , sowInOpponentsStore : Bool
+    , opponent : Opponent
     }
 
 
@@ -16,6 +17,30 @@ type SowingSpeed
     = Slow
     | Normal
     | Fast
+
+
+type Opponent
+    = Real
+    | Computer Intelligence
+
+
+type Intelligence
+    = High
+    | Medium
+    | Low
+
+
+randomnessRange : Intelligence -> Float
+randomnessRange intelligence =
+    case intelligence of
+        High ->
+            0.1
+
+        Medium ->
+            0.3
+
+        Low ->
+            0.5
 
 
 speedInMilliseconds : SowingSpeed -> Float
@@ -40,4 +65,5 @@ defaultSettings =
     , sowingSpeed = Normal
     , upsideDownEnabled = False
     , sowInOpponentsStore = False
+    , opponent = Computer Medium
     }
