@@ -9,6 +9,7 @@ type alias Settings =
     , sowingSpeed : SowingSpeed
     , upsideDownEnabled : Bool
     , sowInOpponentsStore : Bool
+    , playerTwoStarting : Bool
     , opponent : Opponent
     }
 
@@ -76,4 +77,5 @@ defaultSettings =
     , upsideDownEnabled = False
     , sowInOpponentsStore = False
     , opponent = Real
+    , playerTwoStarting = False
     }

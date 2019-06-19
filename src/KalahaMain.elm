@@ -48,14 +48,12 @@ type SettingOption
     | SowOpponentsStore
     | OpponentOption
     | IntelligenceOption Intelligence
+    | StartingPlayer
 
 
 initalModel : Model
 initalModel =
-    { state = Turn One
-    , board = GameBoard.initalBoard
-    , settings = Settings.defaultSettings
-    }
+    restartGame Settings.defaultSettings
 
 
 
@@ -85,7 +83,9 @@ subscriptions model =
 
                         Computer _ ->
                             if player == Two then
-                                Time.every 500 (\_ -> ComputerHasTurn)
+                                Time.every
+                                    (Settings.speedInMilliseconds model.settings.sowingSpeed)
+                                    (\_ -> ComputerHasTurn)
 
                             else
                                 Sub.none
@@ -94,7 +94,9 @@ subscriptions model =
                     Sub.none
 
         _ ->
-            Time.every (Settings.speedInMilliseconds model.settings.sowingSpeed) (\_ -> NextSowingStep)
+            Time.every
+                (Settings.speedInMilliseconds model.settings.sowingSpeed)
+                (\_ -> NextSowingStep)
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -167,6 +169,9 @@ update msg model =
                 IntelligenceOption i ->
                     ( restartGame { oldSettings | opponent = Computer i }, Cmd.none )
 
+                StartingPlayer ->
+                    ( restartGame { oldSettings | playerTwoStarting = not oldSettings.playerTwoStarting }, Cmd.none )
+
         ComputerHasTurn ->
             ( model, Random.generate RandomMoveWeights (weightMoves model.settings) )
 
@@ -233,7 +238,17 @@ view model =
 
 restartGame : Settings -> Model
 restartGame settings =
-    { initalModel | settings = settings, board = GameBoard.buildBoard settings }
+    { settings = settings
+    , board = GameBoard.buildBoard settings
+    , state =
+        Turn
+            (if settings.playerTwoStarting then
+                Two
+
+             else
+                One
+            )
+    }
 
 
 
@@ -481,10 +496,12 @@ settingsView model =
         True ->
             [ div
                 ([ style "background-color" "white"
-                 , style "width" "500px"
+                 , style "width" "700px"
                  , style "height" "600px"
                  , style "position" "absolute"
                  , style "z-index" "10"
+                 , style "overflow-y" "scroll"
+                 , style "overflow-x" "auto"
                  , style "top" "60px"
                  , style "border" ("5px solid " ++ sowedSeedColor)
                  , style "border-radius" "10px"
@@ -614,6 +631,19 @@ settingsView model =
                     , Html.br [] []
                     , div
                         []
+                        [ Html.label [] [ Html.text "Erster Zug" ]
+                        , div (onClick (SettingChanged StartingPlayer) :: settingsChoiceStyle)
+                            [ Html.input
+                                [ Html.Attributes.type_ "checkbox"
+                                , Html.Attributes.checked model.settings.playerTwoStarting
+                                ]
+                                []
+                            , Html.text "Spieler 2 beginnt mit dem ersten Zug"
+                            ]
+                        ]
+                    , Html.br [] []
+                    , div
+                        []
                         [ Html.label [] [ Html.text "Gegenspieler & Schwierigkeitsstufe" ]
                         , div (onClick (SettingChanged OpponentOption) :: settingsChoiceStyle)
                             [ Html.input
@@ -628,7 +658,7 @@ settingsView model =
                                     )
                                 ]
                                 []
-                            , Html.text "Gegen den Computer spielen."
+                            , Html.text "Gegen den Computer spielen"
                             ]
                         ]
                     , case model.settings.opponent of
