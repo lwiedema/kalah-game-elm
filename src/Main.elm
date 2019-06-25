@@ -4,14 +4,14 @@ import Array
 import Browser
 import Color
 import Datatypes exposing (Model, Msg(..), SettingOption(..))
-import Game exposing (State(..), startSowingSeeds)
+import Game exposing (State(..))
 import GameBoard exposing (SowingState(..))
 import Html exposing (Attribute, Html, div, text)
 import Html.Attributes exposing (style)
 import Html.Events exposing (onClick)
 import KalahaAI
-import Localization
-import Material.Icons.Action exposing (settings)
+import Localization exposing (Language(..))
+import Material.Icons.Action
 import Material.Icons.Navigation
 import Player exposing (Player(..), Winner(..))
 import Random
@@ -109,6 +109,9 @@ update msg model =
                 Speed speed ->
                     ( { model | settings = { oldSettings | sowingSpeed = speed } }, Cmd.none )
 
+                LanguageSetting language ->
+                    ( { model | settings = { oldSettings | language = language } }, Cmd.none )
+
                 SeedNumber n ->
                     ( restartGame { oldSettings | numberOfSeeds = n }, Cmd.none )
 
@@ -141,7 +144,7 @@ update msg model =
             ( model, Random.generate RandomMoveWeights (KalahaAI.weightMoves model.settings) )
 
         RandomMoveWeights weights ->
-            ( startSowingSeeds model Two (KalahaAI.nextMove model weights), Cmd.none )
+            ( Game.startSowingSeeds model Two (KalahaAI.nextMove model weights), Cmd.none )
 
 
 view : Model -> Html Msg
@@ -537,6 +540,32 @@ settingsView model =
                             ]
                             []
                         , Html.text (Localization.fastSpeed model.settings.language)
+                        ]
+                    ]
+                , Html.br [] []
+                , Html.label [] [ Html.text (Localization.languageSetting model.settings.language) ]
+                , Html.br [] []
+                , div
+                    spaceChildrenEvenly
+                    [ div (onClick (SettingChanged (LanguageSetting German)) :: settingsChoiceStyle)
+                        [ Html.input
+                            [ Html.Attributes.type_ "radio"
+                            , Html.Attributes.name "language"
+                            , Html.Attributes.value "german"
+                            , Html.Attributes.checked (model.settings.language == German)
+                            ]
+                            []
+                        , Html.text (Localization.germanLanguage model.settings.language)
+                        ]
+                    , div (onClick (SettingChanged (LanguageSetting English)) :: settingsChoiceStyle)
+                        [ Html.input
+                            [ Html.Attributes.type_ "radio"
+                            , Html.Attributes.name "language"
+                            , Html.Attributes.value "english"
+                            , Html.Attributes.checked (model.settings.language == English)
+                            ]
+                            []
+                        , Html.text (Localization.englishLanguage model.settings.language)
                         ]
                     ]
                 ]

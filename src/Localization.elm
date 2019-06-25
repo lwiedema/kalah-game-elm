@@ -1,4 +1,4 @@
-module Localization exposing (Language(..), animationSpeedTitle, drawnGame, easyDifficulty, fastSpeed, finalScore, firstTurnDescription, firstTurnTitle, gameModeHint, gameModeSettings, gameOver, highDifficulty, lastSeedsDescription, lastSeedsTitle, mediumDifficulty, normalSpeed, numberOfSeeds, opponentDescription, opponentLevelTitle, opponentsStoreDescription, opponentsStoreTitle, opponentsTurn, player, presentationSettings, restart, settings, slowSpeed, tabletModeDescription, tabletModeTitle, youLoose, youWin, yourTurn)
+module Localization exposing (Language(..), animationSpeedTitle, drawnGame, easyDifficulty, englishLanguage, fastSpeed, finalScore, firstTurnDescription, firstTurnTitle, gameModeHint, gameModeSettings, gameOver, germanLanguage, highDifficulty, languageSetting, lastSeedsDescription, lastSeedsTitle, mediumDifficulty, normalSpeed, numberOfSeeds, opponentDescription, opponentLevelTitle, opponentsStoreDescription, opponentsStoreTitle, opponentsTurn, player, presentationSettings, restart, settings, slowSpeed, tabletModeDescription, tabletModeTitle, youLoose, youWin, yourTurn)
 
 
 type Language
@@ -174,6 +174,36 @@ fastSpeed language =
 
         English ->
             "Fast"
+
+
+languageSetting : Language -> String
+languageSetting language =
+    case language of
+        German ->
+            "Sprache"
+
+        English ->
+            "Language"
+
+
+germanLanguage : Language -> String
+germanLanguage language =
+    case language of
+        German ->
+            "deutsch"
+
+        English ->
+            "german"
+
+
+englishLanguage : Language -> String
+englishLanguage language =
+    case language of
+        German ->
+            "englisch"
+
+        English ->
+            "english"
 
 
 gameModeSettings : Language -> String

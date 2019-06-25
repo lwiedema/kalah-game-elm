@@ -1,6 +1,7 @@
 module Datatypes exposing (Model, Msg(..), SettingOption(..))
 
 import Game exposing (Game)
+import Localization exposing (Language(..))
 import Player exposing (Player(..))
 import Settings exposing (Intelligence(..), SowingSpeed(..))
 
@@ -28,3 +29,4 @@ type SettingOption
     | OpponentOption
     | IntelligenceOption Intelligence
     | StartingPlayer
+    | LanguageSetting Language
