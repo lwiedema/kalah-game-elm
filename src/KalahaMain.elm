@@ -5,13 +5,11 @@ import Browser
 import Color
 import Game exposing (Game, State(..), startSowingSeeds)
 import GameBoard exposing (SowingState(..))
-import Html exposing (Attribute, Html, button, div, text)
+import Html exposing (Attribute, Html, div, text)
 import Html.Attributes exposing (style)
 import Html.Events exposing (onClick)
 import Material.Icons.Action exposing (settings)
 import Material.Icons.Navigation
-import Platform.Cmd
-import Platform.Sub
 import Player exposing (Player(..), Winner(..))
 import Random
 import Settings exposing (Intelligence(..), Opponent(..), Settings, SowingSpeed(..))
@@ -184,7 +182,7 @@ view model =
     div []
         [ div [ style "display" "inline-block" ] [ iconButton "Einstellungen" Material.Icons.Action.settings OpenSettings ]
         , div [ style "height" "100%", style "width" "100%" ]
-            ([ div
+            (div
                 [ style "width" "948px"
                 , style "margin" "0 auto"
                 ]
@@ -230,8 +228,7 @@ view model =
                     ]
                 , infoView model One
                 ]
-             ]
-                ++ settingsView model
+                :: settingsView model
             )
         ]
 
@@ -492,219 +489,218 @@ seedView seedColor =
 
 settingsView : Model -> List (Html Msg)
 settingsView model =
-    case model.settings.settingsOpen of
-        True ->
-            [ div
-                ([ style "background-color" "white"
-                 , style "width" "700px"
-                 , style "height" "600px"
-                 , style "position" "absolute"
-                 , style "z-index" "10"
-                 , style "overflow-y" "scroll"
-                 , style "overflow-x" "auto"
-                 , style "top" "60px"
-                 , style "border" ("5px solid " ++ sowedSeedColor)
-                 , style "border-radius" "10px"
-                 , style "opacity" "0.95"
-                 , centerText
-                 ]
-                    ++ defaultTextFont
-                )
-                [ Html.br [] []
-                , Html.text "Einstellungen zur Darstellung"
-                , Html.form [ style "margin" "10px", style "font-size" "18px" ]
-                    [ div
-                        []
-                        [ Html.label [] [ Html.text "Tablet-Modus" ]
-                        , div (onClick (SettingChanged UpsideDown) :: settingsChoiceStyle)
-                            [ Html.input
-                                [ Html.Attributes.type_ "checkbox"
-                                , Html.Attributes.checked model.settings.upsideDownEnabled
-                                ]
-                                []
-                            , Html.text "Die Spielelemente für Spieler 2 werden kopfüber dargestellt."
+    if model.settings.settingsOpen then
+        [ div
+            ([ style "background-color" "white"
+             , style "width" "700px"
+             , style "height" "600px"
+             , style "position" "absolute"
+             , style "z-index" "10"
+             , style "overflow-y" "scroll"
+             , style "overflow-x" "auto"
+             , style "top" "60px"
+             , style "border" ("5px solid " ++ sowedSeedColor)
+             , style "border-radius" "10px"
+             , style "opacity" "0.95"
+             , centerText
+             ]
+                ++ defaultTextFont
+            )
+            [ Html.br [] []
+            , Html.text "Einstellungen zur Darstellung"
+            , Html.form [ style "margin" "10px", style "font-size" "18px" ]
+                [ div
+                    []
+                    [ Html.label [] [ Html.text "Tablet-Modus" ]
+                    , div (onClick (SettingChanged UpsideDown) :: settingsChoiceStyle)
+                        [ Html.input
+                            [ Html.Attributes.type_ "checkbox"
+                            , Html.Attributes.checked model.settings.upsideDownEnabled
                             ]
-                        ]
-                    , Html.br [] []
-                    , Html.label [] [ Html.text "Geschwindigkeit der Animation" ]
-                    , Html.br [] []
-                    , div
-                        spaceChildrenEvenly
-                        [ div (onClick (SettingChanged (Speed Slow)) :: settingsChoiceStyle)
-                            [ Html.input
-                                [ Html.Attributes.type_ "radio"
-                                , Html.Attributes.name "sowingSpeed"
-                                , Html.Attributes.value "slow"
-                                , Html.Attributes.checked (model.settings.sowingSpeed == Slow)
-                                ]
-                                []
-                            , Html.text "Langsam"
-                            ]
-                        , div (onClick (SettingChanged (Speed Normal)) :: settingsChoiceStyle)
-                            [ Html.input
-                                [ Html.Attributes.type_ "radio"
-                                , Html.Attributes.name "sowingSpeed"
-                                , Html.Attributes.value "normal"
-                                , Html.Attributes.checked (model.settings.sowingSpeed == Normal)
-                                ]
-                                []
-                            , Html.text "Normal"
-                            ]
-                        , div (onClick (SettingChanged (Speed Fast)) :: settingsChoiceStyle)
-                            [ Html.input
-                                [ Html.Attributes.type_ "radio"
-                                , Html.Attributes.name "sowingSpeed"
-                                , Html.Attributes.value "fast"
-                                , Html.Attributes.checked (model.settings.sowingSpeed == Fast)
-                                ]
-                                []
-                            , Html.text "Schnell"
-                            ]
+                            []
+                        , Html.text "Die Spielelemente für Spieler 2 werden kopfüber dargestellt."
                         ]
                     ]
-                , div [ style "height" "2px", style "width" "90%", style "margin" "0 auto", style "background-color" sowingSeedsColor ] []
                 , Html.br [] []
-                , Html.text "Einstellungen der Spielregeln"
-                , Html.form [ style "margin" "10px", style "font-size" "18px" ]
-                    [ div [ style "font-size" "14px" ] [ Html.text "Hinweis: Das Spiel wird bei Änderung neu gestartet." ]
-                    , Html.br [] []
-                    , Html.label [] [ Html.text "Anzahl der Steine pro Mulde" ]
-                    , div
-                        spaceChildrenEvenly
-                        [ div (onClick (SettingChanged (SeedNumber 3)) :: settingsChoiceStyle)
-                            [ Html.input
-                                [ Html.Attributes.type_ "radio"
-                                , Html.Attributes.name "seedNumber"
-                                , Html.Attributes.value "3"
-                                , Html.Attributes.checked (model.settings.numberOfSeeds == 3)
-                                ]
-                                []
-                            , Html.text "3"
+                , Html.label [] [ Html.text "Geschwindigkeit der Animation" ]
+                , Html.br [] []
+                , div
+                    spaceChildrenEvenly
+                    [ div (onClick (SettingChanged (Speed Slow)) :: settingsChoiceStyle)
+                        [ Html.input
+                            [ Html.Attributes.type_ "radio"
+                            , Html.Attributes.name "sowingSpeed"
+                            , Html.Attributes.value "slow"
+                            , Html.Attributes.checked (model.settings.sowingSpeed == Slow)
                             ]
-                        , div (onClick (SettingChanged (SeedNumber 4)) :: settingsChoiceStyle)
-                            [ Html.input
-                                [ Html.Attributes.type_ "radio"
-                                , Html.Attributes.name "seedNumber"
-                                , Html.Attributes.value "4"
-                                , Html.Attributes.checked (model.settings.numberOfSeeds == 4)
-                                ]
-                                []
-                            , Html.text "4"
-                            ]
-                        , div (onClick (SettingChanged (SeedNumber 6)) :: settingsChoiceStyle)
-                            [ Html.input
-                                [ Html.Attributes.type_ "radio"
-                                , Html.Attributes.name "seedNumber"
-                                , Html.Attributes.value "6"
-                                , Html.Attributes.checked (model.settings.numberOfSeeds == 6)
-                                ]
-                                []
-                            , Html.text "6"
-                            ]
+                            []
+                        , Html.text "Langsam"
                         ]
-                    , Html.br [] []
-                    , div
-                        []
-                        [ Html.label [] [ Html.text "Verteilung übriger Steine" ]
-                        , div (onClick (SettingChanged LastSeedsBehaviour) :: settingsChoiceStyle)
-                            [ Html.input
-                                [ Html.Attributes.type_ "checkbox"
-                                , Html.Attributes.checked model.settings.lastSeedsForFinishingPlayer
-                                ]
-                                []
-                            , Html.text "Am Ende des Spieles erhält der Spieler, der keine Steine mehr in seiner Reihe hat, die übrig gebliebenen Steine."
+                    , div (onClick (SettingChanged (Speed Normal)) :: settingsChoiceStyle)
+                        [ Html.input
+                            [ Html.Attributes.type_ "radio"
+                            , Html.Attributes.name "sowingSpeed"
+                            , Html.Attributes.value "normal"
+                            , Html.Attributes.checked (model.settings.sowingSpeed == Normal)
                             ]
+                            []
+                        , Html.text "Normal"
                         ]
-                    , Html.br [] []
-                    , div
-                        []
-                        [ Html.label [] [ Html.text "Gegnerisches Kalaha" ]
-                        , div (onClick (SettingChanged SowOpponentsStore) :: settingsChoiceStyle)
-                            [ Html.input
-                                [ Html.Attributes.type_ "checkbox"
-                                , Html.Attributes.checked model.settings.sowInOpponentsStore
-                                ]
-                                []
-                            , Html.text "Steine werden auch in das gegnerische Kalaha (große Mulde) verteilt."
+                    , div (onClick (SettingChanged (Speed Fast)) :: settingsChoiceStyle)
+                        [ Html.input
+                            [ Html.Attributes.type_ "radio"
+                            , Html.Attributes.name "sowingSpeed"
+                            , Html.Attributes.value "fast"
+                            , Html.Attributes.checked (model.settings.sowingSpeed == Fast)
                             ]
+                            []
+                        , Html.text "Schnell"
                         ]
-                    , Html.br [] []
-                    , div
-                        []
-                        [ Html.label [] [ Html.text "Erster Zug" ]
-                        , div (onClick (SettingChanged StartingPlayer) :: settingsChoiceStyle)
-                            [ Html.input
-                                [ Html.Attributes.type_ "checkbox"
-                                , Html.Attributes.checked model.settings.playerTwoStarting
-                                ]
-                                []
-                            , Html.text "Spieler 2 beginnt mit dem ersten Zug"
-                            ]
-                        ]
-                    , Html.br [] []
-                    , div
-                        []
-                        [ Html.label [] [ Html.text "Gegenspieler & Schwierigkeitsstufe" ]
-                        , div (onClick (SettingChanged OpponentOption) :: settingsChoiceStyle)
-                            [ Html.input
-                                [ Html.Attributes.type_ "checkbox"
-                                , Html.Attributes.checked
-                                    (case model.settings.opponent of
-                                        Real ->
-                                            False
-
-                                        Computer _ ->
-                                            True
-                                    )
-                                ]
-                                []
-                            , Html.text "Gegen den Computer spielen"
-                            ]
-                        ]
-                    , case model.settings.opponent of
-                        Real ->
-                            div [] []
-
-                        Computer intelligence ->
-                            div
-                                spaceChildrenEvenly
-                                [ div (onClick (SettingChanged (IntelligenceOption Low)) :: settingsChoiceStyle)
-                                    [ Html.input
-                                        [ Html.Attributes.type_ "radio"
-                                        , Html.Attributes.name "computersIntelligence"
-                                        , Html.Attributes.value "low"
-                                        , Html.Attributes.checked (intelligence == Low)
-                                        ]
-                                        []
-                                    , Html.text "leicht"
-                                    ]
-                                , div (onClick (SettingChanged (IntelligenceOption Medium)) :: settingsChoiceStyle)
-                                    [ Html.input
-                                        [ Html.Attributes.type_ "radio"
-                                        , Html.Attributes.name "computersIntelligence"
-                                        , Html.Attributes.value "medium"
-                                        , Html.Attributes.checked (intelligence == Medium)
-                                        ]
-                                        []
-                                    , Html.text "mittel"
-                                    ]
-                                , div (onClick (SettingChanged (IntelligenceOption High)) :: settingsChoiceStyle)
-                                    [ Html.input
-                                        [ Html.Attributes.type_ "radio"
-                                        , Html.Attributes.name "computersIntelligence"
-                                        , Html.Attributes.value "high"
-                                        , Html.Attributes.checked (intelligence == High)
-                                        ]
-                                        []
-                                    , Html.text "schwer"
-                                    ]
-                                ]
                     ]
                 ]
-            ]
+            , div [ style "height" "2px", style "width" "90%", style "margin" "0 auto", style "background-color" sowingSeedsColor ] []
+            , Html.br [] []
+            , Html.text "Einstellungen des Spielmodus"
+            , Html.form [ style "margin" "10px", style "font-size" "18px" ]
+                [ div [ style "font-size" "14px" ] [ Html.text "Hinweis: Das Spiel wird bei Änderung neu gestartet." ]
+                , Html.br [] []
+                , Html.label [] [ Html.text "Anzahl der Steine pro Mulde" ]
+                , div
+                    spaceChildrenEvenly
+                    [ div (onClick (SettingChanged (SeedNumber 3)) :: settingsChoiceStyle)
+                        [ Html.input
+                            [ Html.Attributes.type_ "radio"
+                            , Html.Attributes.name "seedNumber"
+                            , Html.Attributes.value "3"
+                            , Html.Attributes.checked (model.settings.numberOfSeeds == 3)
+                            ]
+                            []
+                        , Html.text "3"
+                        ]
+                    , div (onClick (SettingChanged (SeedNumber 4)) :: settingsChoiceStyle)
+                        [ Html.input
+                            [ Html.Attributes.type_ "radio"
+                            , Html.Attributes.name "seedNumber"
+                            , Html.Attributes.value "4"
+                            , Html.Attributes.checked (model.settings.numberOfSeeds == 4)
+                            ]
+                            []
+                        , Html.text "4"
+                        ]
+                    , div (onClick (SettingChanged (SeedNumber 6)) :: settingsChoiceStyle)
+                        [ Html.input
+                            [ Html.Attributes.type_ "radio"
+                            , Html.Attributes.name "seedNumber"
+                            , Html.Attributes.value "6"
+                            , Html.Attributes.checked (model.settings.numberOfSeeds == 6)
+                            ]
+                            []
+                        , Html.text "6"
+                        ]
+                    ]
+                , Html.br [] []
+                , div
+                    []
+                    [ Html.label [] [ Html.text "Verteilung übriger Steine" ]
+                    , div (onClick (SettingChanged LastSeedsBehaviour) :: settingsChoiceStyle)
+                        [ Html.input
+                            [ Html.Attributes.type_ "checkbox"
+                            , Html.Attributes.checked model.settings.lastSeedsForFinishingPlayer
+                            ]
+                            []
+                        , Html.text "Am Ende des Spieles erhält der Spieler, der keine Steine mehr in seiner Reihe hat, die übrig gebliebenen Steine."
+                        ]
+                    ]
+                , Html.br [] []
+                , div
+                    []
+                    [ Html.label [] [ Html.text "Gegnerisches Kalaha" ]
+                    , div (onClick (SettingChanged SowOpponentsStore) :: settingsChoiceStyle)
+                        [ Html.input
+                            [ Html.Attributes.type_ "checkbox"
+                            , Html.Attributes.checked model.settings.sowInOpponentsStore
+                            ]
+                            []
+                        , Html.text "Steine werden auch in das gegnerische Kalaha (große Mulde) verteilt."
+                        ]
+                    ]
+                , Html.br [] []
+                , div
+                    []
+                    [ Html.label [] [ Html.text "Erster Zug" ]
+                    , div (onClick (SettingChanged StartingPlayer) :: settingsChoiceStyle)
+                        [ Html.input
+                            [ Html.Attributes.type_ "checkbox"
+                            , Html.Attributes.checked model.settings.playerTwoStarting
+                            ]
+                            []
+                        , Html.text "Spieler 2 beginnt mit dem ersten Zug"
+                        ]
+                    ]
+                , Html.br [] []
+                , div
+                    []
+                    [ Html.label [] [ Html.text "Gegenspieler & Schwierigkeitsstufe" ]
+                    , div (onClick (SettingChanged OpponentOption) :: settingsChoiceStyle)
+                        [ Html.input
+                            [ Html.Attributes.type_ "checkbox"
+                            , Html.Attributes.checked
+                                (case model.settings.opponent of
+                                    Real ->
+                                        False
 
-        False ->
-            []
+                                    Computer _ ->
+                                        True
+                                )
+                            ]
+                            []
+                        , Html.text "Gegen den Computer spielen"
+                        ]
+                    ]
+                , case model.settings.opponent of
+                    Real ->
+                        div [] []
+
+                    Computer intelligence ->
+                        div
+                            spaceChildrenEvenly
+                            [ div (onClick (SettingChanged (IntelligenceOption Low)) :: settingsChoiceStyle)
+                                [ Html.input
+                                    [ Html.Attributes.type_ "radio"
+                                    , Html.Attributes.name "computersIntelligence"
+                                    , Html.Attributes.value "low"
+                                    , Html.Attributes.checked (intelligence == Low)
+                                    ]
+                                    []
+                                , Html.text "leicht"
+                                ]
+                            , div (onClick (SettingChanged (IntelligenceOption Medium)) :: settingsChoiceStyle)
+                                [ Html.input
+                                    [ Html.Attributes.type_ "radio"
+                                    , Html.Attributes.name "computersIntelligence"
+                                    , Html.Attributes.value "medium"
+                                    , Html.Attributes.checked (intelligence == Medium)
+                                    ]
+                                    []
+                                , Html.text "mittel"
+                                ]
+                            , div (onClick (SettingChanged (IntelligenceOption High)) :: settingsChoiceStyle)
+                                [ Html.input
+                                    [ Html.Attributes.type_ "radio"
+                                    , Html.Attributes.name "computersIntelligence"
+                                    , Html.Attributes.value "high"
+                                    , Html.Attributes.checked (intelligence == High)
+                                    ]
+                                    []
+                                , Html.text "schwer"
+                                ]
+                            ]
+                ]
+            ]
+        ]
+
+    else
+        []
 
 
 
@@ -750,12 +746,11 @@ cursorStyle : Model -> Player -> Attribute Msg
 cursorStyle model player =
     case model.state of
         Turn p ->
-            case p == player of
-                True ->
-                    pointerCursor
+            if p == player then
+                pointerCursor
 
-                False ->
-                    style "cursor" "default"
+            else
+                style "cursor" "default"
 
         End _ ->
             style "cursor" "default"

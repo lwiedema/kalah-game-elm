@@ -97,7 +97,7 @@ nextSowingStep game =
                                 | board = { boardAfterSowing | sowingState = SowingFinished sowingInfo.playerSowing False }
                             }
 
-                    StorePos player ->
+                    StorePos _ ->
                         -- last seed sown to store: player gets one more turn
                         { game | board = { boardAfterSowing | sowingState = SowingFinished sowingInfo.playerSowing True } }
 

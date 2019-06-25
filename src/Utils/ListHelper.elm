@@ -1,7 +1,5 @@
 module Utils.ListHelper exposing (getIndex)
 
-import List
-
 
 getIndex : a -> List a -> Int
 getIndex element list =
