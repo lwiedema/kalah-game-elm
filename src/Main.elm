@@ -4,13 +4,14 @@ import Array
 import Browser
 import Color
 import Datatypes exposing (Model, Msg(..), SettingOption(..))
-import Game exposing (State(..), startSowingSeeds)
+import Game exposing (State(..))
 import GameBoard exposing (SowingState(..))
 import Html exposing (Attribute, Html, div, text)
 import Html.Attributes exposing (style)
 import Html.Events exposing (onClick)
 import KalahaAI
-import Material.Icons.Action exposing (settings)
+import Localization exposing (Language(..))
+import Material.Icons.Action
 import Material.Icons.Navigation
 import Player exposing (Player(..), Winner(..))
 import Random
@@ -108,6 +109,9 @@ update msg model =
                 Speed speed ->
                     ( { model | settings = { oldSettings | sowingSpeed = speed } }, Cmd.none )
 
+                LanguageSetting language ->
+                    ( { model | settings = { oldSettings | language = language } }, Cmd.none )
+
                 SeedNumber n ->
                     ( restartGame { oldSettings | numberOfSeeds = n }, Cmd.none )
 
@@ -140,13 +144,19 @@ update msg model =
             ( model, Random.generate RandomMoveWeights (KalahaAI.weightMoves model.settings) )
 
         RandomMoveWeights weights ->
-            ( startSowingSeeds model Two (KalahaAI.nextMove model weights), Cmd.none )
+            ( Game.startSowingSeeds model Two (KalahaAI.nextMove model weights), Cmd.none )
 
 
 view : Model -> Html Msg
 view model =
     div []
-        [ div [ style "display" "inline-block" ] [ iconButton "Einstellungen" Material.Icons.Action.settings OpenSettings ]
+        [ div
+            [ style "display" "inline-block" ]
+            [ iconButton
+                (Localization.settings model.settings.language)
+                Material.Icons.Action.settings
+                OpenSettings
+            ]
         , div [ style "height" "100%", style "width" "100%" ]
             (div
                 [ style "width" "948px"
@@ -181,7 +191,7 @@ view model =
                                         sowingView model
 
                                     End _ ->
-                                        restartButton
+                                        restartButton model
                                 ]
                             , div
                                 rowStyle
@@ -332,7 +342,8 @@ infoView model player =
             ++ defaultTextFont
         )
         [ Html.text
-            ("Spieler "
+            (Localization.player model.settings.language
+                ++ " "
                 ++ Player.toString player
                 ++ (case model.settings.opponent of
                         Real ->
@@ -352,25 +363,28 @@ infoView model player =
             (case model.state of
                 Turn p ->
                     if p == player then
-                        "Du bist am Zug."
+                        Localization.yourTurn model.settings.language
 
                     else
-                        "Spieler " ++ Player.toString p ++ " ist am Zug."
+                        Localization.opponentsTurn model.settings.language (Localization.player model.settings.language ++ " " ++ Player.toString p)
 
                 End winner ->
-                    "Spiel beendet. "
+                    Localization.gameOver model.settings.language
+                        ++ " "
                         ++ (case winner of
                                 Drawn ->
-                                    "Es ist unentschieden."
+                                    Localization.drawnGame model.settings.language
 
                                 Winner w finalScore ->
                                     (if w == player then
-                                        "Du hast gewonnen. "
+                                        Localization.youWin model.settings.language
 
                                      else
-                                        "Leider verloren. "
+                                        Localization.youLoose model.settings.language
                                     )
-                                        ++ "Endstand: "
+                                        ++ " "
+                                        ++ Localization.finalScore model.settings.language
+                                        ++ ": "
                                         ++ String.fromInt (Tuple.first finalScore)
                                         ++ ":"
                                         ++ String.fromInt (Tuple.second finalScore)
@@ -379,9 +393,9 @@ infoView model player =
         ]
 
 
-restartButton : Html Msg
-restartButton =
-    iconButton "Neues Spiel" Material.Icons.Navigation.refresh Restart
+restartButton : Model -> Html Msg
+restartButton model =
+    iconButton (Localization.restart model.settings.language) Material.Icons.Navigation.refresh Restart
 
 
 iconButton : String -> (Color.Color -> Int -> Svg.Svg Msg) -> Msg -> Html Msg
@@ -478,22 +492,22 @@ settingsView model =
                 ++ defaultTextFont
             )
             [ Html.br [] []
-            , Html.text "Einstellungen zur Darstellung"
+            , Html.text (Localization.presentationSettings model.settings.language)
             , Html.form [ style "margin" "10px", style "font-size" "18px" ]
                 [ div
                     []
-                    [ Html.label [] [ Html.text "Tablet-Modus" ]
+                    [ Html.label [] [ Html.text (Localization.tabletModeTitle model.settings.language) ]
                     , div (onClick (SettingChanged UpsideDown) :: settingsChoiceStyle)
                         [ Html.input
                             [ Html.Attributes.type_ "checkbox"
                             , Html.Attributes.checked model.settings.upsideDownEnabled
                             ]
                             []
-                        , Html.text "Die Spielelemente für Spieler 2 werden kopfüber dargestellt."
+                        , Html.text (Localization.tabletModeDescription model.settings.language)
                         ]
                     ]
                 , Html.br [] []
-                , Html.label [] [ Html.text "Geschwindigkeit der Animation" ]
+                , Html.label [] [ Html.text (Localization.animationSpeedTitle model.settings.language) ]
                 , Html.br [] []
                 , div
                     spaceChildrenEvenly
@@ -505,7 +519,7 @@ settingsView model =
                             , Html.Attributes.checked (model.settings.sowingSpeed == Slow)
                             ]
                             []
-                        , Html.text "Langsam"
+                        , Html.text (Localization.slowSpeed model.settings.language)
                         ]
                     , div (onClick (SettingChanged (Speed Normal)) :: settingsChoiceStyle)
                         [ Html.input
@@ -515,7 +529,7 @@ settingsView model =
                             , Html.Attributes.checked (model.settings.sowingSpeed == Normal)
                             ]
                             []
-                        , Html.text "Normal"
+                        , Html.text (Localization.normalSpeed model.settings.language)
                         ]
                     , div (onClick (SettingChanged (Speed Fast)) :: settingsChoiceStyle)
                         [ Html.input
@@ -525,17 +539,43 @@ settingsView model =
                             , Html.Attributes.checked (model.settings.sowingSpeed == Fast)
                             ]
                             []
-                        , Html.text "Schnell"
+                        , Html.text (Localization.fastSpeed model.settings.language)
+                        ]
+                    ]
+                , Html.br [] []
+                , Html.label [] [ Html.text (Localization.languageSetting model.settings.language) ]
+                , Html.br [] []
+                , div
+                    spaceChildrenEvenly
+                    [ div (onClick (SettingChanged (LanguageSetting German)) :: settingsChoiceStyle)
+                        [ Html.input
+                            [ Html.Attributes.type_ "radio"
+                            , Html.Attributes.name "language"
+                            , Html.Attributes.value "german"
+                            , Html.Attributes.checked (model.settings.language == German)
+                            ]
+                            []
+                        , Html.text (Localization.germanLanguage model.settings.language)
+                        ]
+                    , div (onClick (SettingChanged (LanguageSetting English)) :: settingsChoiceStyle)
+                        [ Html.input
+                            [ Html.Attributes.type_ "radio"
+                            , Html.Attributes.name "language"
+                            , Html.Attributes.value "english"
+                            , Html.Attributes.checked (model.settings.language == English)
+                            ]
+                            []
+                        , Html.text (Localization.englishLanguage model.settings.language)
                         ]
                     ]
                 ]
             , div [ style "height" "2px", style "width" "90%", style "margin" "0 auto", style "background-color" sowingSeedsColor ] []
             , Html.br [] []
-            , Html.text "Einstellungen des Spielmodus"
+            , Html.text (Localization.gameModeSettings model.settings.language)
             , Html.form [ style "margin" "10px", style "font-size" "18px" ]
-                [ div [ style "font-size" "14px" ] [ Html.text "Hinweis: Das Spiel wird bei Änderung neu gestartet." ]
+                [ div [ style "font-size" "14px" ] [ Html.text (Localization.gameModeHint model.settings.language) ]
                 , Html.br [] []
-                , Html.label [] [ Html.text "Anzahl der Steine pro Mulde" ]
+                , Html.label [] [ Html.text (Localization.numberOfSeeds model.settings.language) ]
                 , div
                     spaceChildrenEvenly
                     [ div (onClick (SettingChanged (SeedNumber 3)) :: settingsChoiceStyle)
@@ -572,46 +612,46 @@ settingsView model =
                 , Html.br [] []
                 , div
                     []
-                    [ Html.label [] [ Html.text "Verteilung übriger Steine" ]
+                    [ Html.label [] [ Html.text (Localization.lastSeedsTitle model.settings.language) ]
                     , div (onClick (SettingChanged LastSeedsBehaviour) :: settingsChoiceStyle)
                         [ Html.input
                             [ Html.Attributes.type_ "checkbox"
                             , Html.Attributes.checked model.settings.lastSeedsForFinishingPlayer
                             ]
                             []
-                        , Html.text "Am Ende des Spieles erhält der Spieler, der keine Steine mehr in seiner Reihe hat, die übrig gebliebenen Steine."
+                        , Html.text (Localization.lastSeedsDescription model.settings.language)
                         ]
                     ]
                 , Html.br [] []
                 , div
                     []
-                    [ Html.label [] [ Html.text "Gegnerisches Kalaha" ]
+                    [ Html.label [] [ Html.text (Localization.opponentsStoreTitle model.settings.language) ]
                     , div (onClick (SettingChanged SowOpponentsStore) :: settingsChoiceStyle)
                         [ Html.input
                             [ Html.Attributes.type_ "checkbox"
                             , Html.Attributes.checked model.settings.sowInOpponentsStore
                             ]
                             []
-                        , Html.text "Steine werden auch in das gegnerische Kalaha (große Mulde) verteilt."
+                        , Html.text (Localization.opponentsStoreDescription model.settings.language)
                         ]
                     ]
                 , Html.br [] []
                 , div
                     []
-                    [ Html.label [] [ Html.text "Erster Zug" ]
+                    [ Html.label [] [ Html.text (Localization.firstTurnTitle model.settings.language) ]
                     , div (onClick (SettingChanged StartingPlayer) :: settingsChoiceStyle)
                         [ Html.input
                             [ Html.Attributes.type_ "checkbox"
                             , Html.Attributes.checked model.settings.playerTwoStarting
                             ]
                             []
-                        , Html.text "Spieler 2 beginnt mit dem ersten Zug"
+                        , Html.text (Localization.firstTurnDescription model.settings.language)
                         ]
                     ]
                 , Html.br [] []
                 , div
                     []
-                    [ Html.label [] [ Html.text "Gegenspieler & Schwierigkeitsstufe" ]
+                    [ Html.label [] [ Html.text (Localization.opponentLevelTitle model.settings.language) ]
                     , div (onClick (SettingChanged OpponentOption) :: settingsChoiceStyle)
                         [ Html.input
                             [ Html.Attributes.type_ "checkbox"
@@ -625,7 +665,7 @@ settingsView model =
                                 )
                             ]
                             []
-                        , Html.text "Gegen den Computer spielen"
+                        , Html.text (Localization.opponentDescription model.settings.language)
                         ]
                     ]
                 , case model.settings.opponent of
@@ -643,7 +683,7 @@ settingsView model =
                                     , Html.Attributes.checked (intelligence == Low)
                                     ]
                                     []
-                                , Html.text "leicht"
+                                , Html.text (Localization.easyDifficulty model.settings.language)
                                 ]
                             , div (onClick (SettingChanged (IntelligenceOption Medium)) :: settingsChoiceStyle)
                                 [ Html.input
@@ -653,7 +693,7 @@ settingsView model =
                                     , Html.Attributes.checked (intelligence == Medium)
                                     ]
                                     []
-                                , Html.text "mittel"
+                                , Html.text (Localization.mediumDifficulty model.settings.language)
                                 ]
                             , div (onClick (SettingChanged (IntelligenceOption High)) :: settingsChoiceStyle)
                                 [ Html.input
@@ -663,7 +703,7 @@ settingsView model =
                                     , Html.Attributes.checked (intelligence == High)
                                     ]
                                     []
-                                , Html.text "schwer"
+                                , Html.text (Localization.highDifficulty model.settings.language)
                                 ]
                             ]
                 ]
