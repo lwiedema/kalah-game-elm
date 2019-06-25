@@ -81,5 +81,5 @@ defaultSettings =
     , sowInOpponentsStore = False
     , opponent = Real
     , playerTwoStarting = False
-    , language = Localization.English
+    , language = Localization.German
     }
