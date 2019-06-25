@@ -1,4 +1,4 @@
-module KalahaMain exposing (main)
+module Main exposing (main)
 
 import Array
 import Browser
