@@ -3,11 +3,13 @@ module KalahaMain exposing (main)
 import Array
 import Browser
 import Color
-import Game exposing (Game, State(..), startSowingSeeds)
+import Datatypes exposing (Model, Msg(..), SettingOption(..))
+import Game exposing (State(..), startSowingSeeds)
 import GameBoard exposing (SowingState(..))
 import Html exposing (Attribute, Html, div, text)
 import Html.Attributes exposing (style)
 import Html.Events exposing (onClick)
+import KalahaAI
 import Material.Icons.Action exposing (settings)
 import Material.Icons.Navigation
 import Player exposing (Player(..), Winner(..))
@@ -17,45 +19,9 @@ import String
 import Svg
 import Svg.Attributes
 import Time
-import Utils.ListHelper as ListHelper
 
 
 
--- BEGIN datatypes
-
-
-type alias Model =
-    Game
-
-
-type Msg
-    = Click Player Int
-    | NextSowingStep
-    | Restart
-    | OpenSettings
-    | SettingChanged SettingOption
-    | ComputerHasTurn
-    | RandomMoveWeights (List Float)
-
-
-type SettingOption
-    = Speed SowingSpeed
-    | SeedNumber Int
-    | LastSeedsBehaviour
-    | UpsideDown
-    | SowOpponentsStore
-    | OpponentOption
-    | IntelligenceOption Intelligence
-    | StartingPlayer
-
-
-initalModel : Model
-initalModel =
-    restartGame Settings.defaultSettings
-
-
-
--- END datatypes
 -- BEGIN web-app
 
 
@@ -171,10 +137,10 @@ update msg model =
                     ( restartGame { oldSettings | playerTwoStarting = not oldSettings.playerTwoStarting }, Cmd.none )
 
         ComputerHasTurn ->
-            ( model, Random.generate RandomMoveWeights (weightMoves model.settings) )
+            ( model, Random.generate RandomMoveWeights (KalahaAI.weightMoves model.settings) )
 
         RandomMoveWeights weights ->
-            ( startSowingSeeds model Two (nextMove model weights), Cmd.none )
+            ( startSowingSeeds model Two (KalahaAI.nextMove model weights), Cmd.none )
 
 
 view : Model -> Html Msg
@@ -231,6 +197,11 @@ view model =
                 :: settingsView model
             )
         ]
+
+
+initalModel : Model
+initalModel =
+    restartGame Settings.defaultSettings
 
 
 restartGame : Settings -> Model
@@ -851,85 +822,3 @@ seedSizeString =
 
 
 -- END constants
--- BEGIN "artificial intelligence"
-
-
-weightMoves : Settings -> Random.Generator (List Float)
-weightMoves settings =
-    case settings.opponent of
-        Computer intelligence ->
-            Random.list settings.numberOfHouses
-                (Random.float
-                    (1 - Settings.randomnessRange intelligence)
-                    (1 + Settings.randomnessRange intelligence)
-                )
-
-        Real ->
-            -- should never get here
-            Random.list 0 (Random.float 0 0)
-
-
-nextMove : Model -> List Float -> Int
-nextMove model weights =
-    -- return position of house to empty next
-    let
-        moves =
-            List.indexedMap (\pos element -> element * moveQuality model pos) weights
-    in
-    case List.maximum moves of
-        Nothing ->
-            0
-
-        Just bestMoveQuality ->
-            ListHelper.getIndex bestMoveQuality moves
-
-
-moveQuality : Model -> Int -> Float
-moveQuality model pos =
-    let
-        row =
-            GameBoard.getRowForPlayer model.board Two
-
-        opponentsRow =
-            GameBoard.getRowForPlayer model.board One
-
-        seeds =
-            GameBoard.numberOfSeedsInHouse row pos
-    in
-    if seeds == 0 then
-        -- cannot do this move
-        0
-
-    else if model.settings.numberOfHouses - pos == seeds then
-        -- move would end in store
-        3
-
-    else if GameBoard.numberOfSeedsInHouse row (pos + seeds) == 0 then
-        -- move would end in empty house
-        -- the more seeds are in opposite house, the better it is
-        2
-            * (1
-                + 0.1
-                * toFloat
-                    (GameBoard.numberOfSeedsInHouse
-                        opponentsRow
-                        (model.settings.numberOfHouses - (pos + seeds) - 1)
-                    )
-              )
-
-    else if
-        GameBoard.numberOfSeedsInHouse
-            opponentsRow
-            (model.settings.numberOfHouses - pos - 1)
-            == 0
-    then
-        -- opposite house is empty, opponent could steal seeds
-        1 * (1 + 0.2 * toFloat seeds)
-
-    else
-        -- no "special" move, houses with more seeds are higher rated
-        1 * (1 + 0.1 * toFloat seeds)
-
-
-
--- END "artificial intelligence"
