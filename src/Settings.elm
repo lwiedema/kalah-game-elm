@@ -1,5 +1,7 @@
 module Settings exposing (Intelligence(..), Opponent(..), Settings, SowingSpeed(..), defaultSettings, randomnessRange, speedInMilliseconds, toggleOpponentOption)
 
+import Localization
+
 
 type alias Settings =
     { numberOfHouses : Int
@@ -11,6 +13,7 @@ type alias Settings =
     , sowInOpponentsStore : Bool
     , playerTwoStarting : Bool
     , opponent : Opponent
+    , language : Localization.Language
     }
 
 
@@ -78,4 +81,5 @@ defaultSettings =
     , sowInOpponentsStore = False
     , opponent = Real
     , playerTwoStarting = False
+    , language = Localization.English
     }
