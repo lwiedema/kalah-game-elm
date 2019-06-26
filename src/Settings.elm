@@ -1,4 +1,4 @@
-module Settings exposing (Intelligence(..), Opponent(..), Settings, SowingSpeed(..), defaultSettings, randomnessRange, speedInMilliseconds, toggleOpponentOption)
+module Settings exposing (Intelligence(..), Opponent(..), Settings, SowingSpeed(..), defaultSettings, speedInMilliseconds, toggleOpponentOption)
 
 import Localization
 
@@ -42,19 +42,6 @@ toggleOpponentOption settings =
 
         Computer _ ->
             { settings | opponent = Real }
-
-
-randomnessRange : Intelligence -> Float
-randomnessRange intelligence =
-    case intelligence of
-        High ->
-            0.1
-
-        Medium ->
-            0.3
-
-        Low ->
-            0.5
 
 
 speedInMilliseconds : SowingSpeed -> Float

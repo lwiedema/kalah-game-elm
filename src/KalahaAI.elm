@@ -4,8 +4,21 @@ import Datatypes exposing (Model, Msg(..), SettingOption(..))
 import GameBoard
 import Player exposing (Player(..))
 import Random
-import Settings exposing (Settings)
+import Settings exposing (Intelligence(..), Settings)
 import Utils.ListHelper as ListHelper
+
+
+randomnessRange : Intelligence -> Float
+randomnessRange intelligence =
+    case intelligence of
+        High ->
+            0.1
+
+        Medium ->
+            0.3
+
+        Low ->
+            0.5
 
 
 weightMoves : Settings -> Random.Generator (List Float)
@@ -16,8 +29,8 @@ weightMoves settings =
             -- to avoid predictability and to model different levels of "intelligence"
             Random.list settings.numberOfHouses
                 (Random.float
-                    (1 - Settings.randomnessRange intelligence)
-                    (1 + Settings.randomnessRange intelligence)
+                    (1 - randomnessRange intelligence)
+                    (1 + randomnessRange intelligence)
                 )
 
         Settings.Real ->
