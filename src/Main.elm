@@ -496,77 +496,43 @@ settingsView model =
             , Html.form [ style "margin" "10px", style "font-size" "18px" ]
                 [ div
                     []
-                    [ Html.label [] [ Html.text (Localization.tabletModeTitle model.settings.language) ]
-                    , div (onClick (SettingChanged UpsideDown) :: settingsChoiceStyle)
-                        [ Html.input
-                            [ Html.Attributes.type_ "checkbox"
-                            , Html.Attributes.checked model.settings.upsideDownEnabled
-                            ]
-                            []
-                        , Html.text (Localization.tabletModeDescription model.settings.language)
-                        ]
-                    ]
+                    (checkBox
+                        (SettingChanged UpsideDown)
+                        (Localization.tabletModeTitle model.settings.language)
+                        (Localization.tabletModeDescription model.settings.language)
+                        model.settings.upsideDownEnabled
+                    )
                 , Html.br [] []
                 , Html.label [] [ Html.text (Localization.animationSpeedTitle model.settings.language) ]
                 , Html.br [] []
                 , div
                     spaceChildrenEvenly
-                    [ div (onClick (SettingChanged (Speed Slow)) :: settingsChoiceStyle)
-                        [ Html.input
-                            [ Html.Attributes.type_ "radio"
-                            , Html.Attributes.name "sowingSpeed"
-                            , Html.Attributes.value "slow"
-                            , Html.Attributes.checked (model.settings.sowingSpeed == Slow)
-                            ]
-                            []
-                        , Html.text (Localization.slowSpeed model.settings.language)
-                        ]
-                    , div (onClick (SettingChanged (Speed Normal)) :: settingsChoiceStyle)
-                        [ Html.input
-                            [ Html.Attributes.type_ "radio"
-                            , Html.Attributes.name "sowingSpeed"
-                            , Html.Attributes.value "normal"
-                            , Html.Attributes.checked (model.settings.sowingSpeed == Normal)
-                            ]
-                            []
-                        , Html.text (Localization.normalSpeed model.settings.language)
-                        ]
-                    , div (onClick (SettingChanged (Speed Fast)) :: settingsChoiceStyle)
-                        [ Html.input
-                            [ Html.Attributes.type_ "radio"
-                            , Html.Attributes.name "sowingSpeed"
-                            , Html.Attributes.value "fast"
-                            , Html.Attributes.checked (model.settings.sowingSpeed == Fast)
-                            ]
-                            []
-                        , Html.text (Localization.fastSpeed model.settings.language)
-                        ]
+                    [ radioButton
+                        (SettingChanged (Speed Slow))
+                        (Localization.slowSpeed model.settings.language)
+                        (model.settings.sowingSpeed == Slow)
+                    , radioButton
+                        (SettingChanged (Speed Normal))
+                        (Localization.normalSpeed model.settings.language)
+                        (model.settings.sowingSpeed == Normal)
+                    , radioButton
+                        (SettingChanged (Speed Fast))
+                        (Localization.fastSpeed model.settings.language)
+                        (model.settings.sowingSpeed == Fast)
                     ]
                 , Html.br [] []
                 , Html.label [] [ Html.text (Localization.languageSetting model.settings.language) ]
                 , Html.br [] []
                 , div
                     spaceChildrenEvenly
-                    [ div (onClick (SettingChanged (LanguageSetting German)) :: settingsChoiceStyle)
-                        [ Html.input
-                            [ Html.Attributes.type_ "radio"
-                            , Html.Attributes.name "language"
-                            , Html.Attributes.value "german"
-                            , Html.Attributes.checked (model.settings.language == German)
-                            ]
-                            []
-                        , Html.text (Localization.germanLanguage model.settings.language)
-                        ]
-                    , div (onClick (SettingChanged (LanguageSetting English)) :: settingsChoiceStyle)
-                        [ Html.input
-                            [ Html.Attributes.type_ "radio"
-                            , Html.Attributes.name "language"
-                            , Html.Attributes.value "english"
-                            , Html.Attributes.checked (model.settings.language == English)
-                            ]
-                            []
-                        , Html.text (Localization.englishLanguage model.settings.language)
-                        ]
+                    [ radioButton
+                        (SettingChanged (LanguageSetting German))
+                        (Localization.germanLanguage model.settings.language)
+                        (model.settings.language == German)
+                    , radioButton
+                        (SettingChanged (LanguageSetting English))
+                        (Localization.englishLanguage model.settings.language)
+                        (model.settings.language == English)
                     ]
                 ]
             , div [ style "height" "2px", style "width" "90%", style "margin" "0 auto", style "background-color" sowingSeedsColor ] []
@@ -578,96 +544,59 @@ settingsView model =
                 , Html.label [] [ Html.text (Localization.numberOfSeeds model.settings.language) ]
                 , div
                     spaceChildrenEvenly
-                    [ div (onClick (SettingChanged (SeedNumber 3)) :: settingsChoiceStyle)
-                        [ Html.input
-                            [ Html.Attributes.type_ "radio"
-                            , Html.Attributes.name "seedNumber"
-                            , Html.Attributes.value "3"
-                            , Html.Attributes.checked (model.settings.numberOfSeeds == 3)
-                            ]
-                            []
-                        , Html.text "3"
-                        ]
-                    , div (onClick (SettingChanged (SeedNumber 4)) :: settingsChoiceStyle)
-                        [ Html.input
-                            [ Html.Attributes.type_ "radio"
-                            , Html.Attributes.name "seedNumber"
-                            , Html.Attributes.value "4"
-                            , Html.Attributes.checked (model.settings.numberOfSeeds == 4)
-                            ]
-                            []
-                        , Html.text "4"
-                        ]
-                    , div (onClick (SettingChanged (SeedNumber 6)) :: settingsChoiceStyle)
-                        [ Html.input
-                            [ Html.Attributes.type_ "radio"
-                            , Html.Attributes.name "seedNumber"
-                            , Html.Attributes.value "6"
-                            , Html.Attributes.checked (model.settings.numberOfSeeds == 6)
-                            ]
-                            []
-                        , Html.text "6"
-                        ]
+                    [ radioButton
+                        (SettingChanged (SeedNumber 3))
+                        "3"
+                        (model.settings.numberOfSeeds == 3)
+                    , radioButton
+                        (SettingChanged (SeedNumber 4))
+                        "4"
+                        (model.settings.numberOfSeeds == 4)
+                    , radioButton
+                        (SettingChanged (SeedNumber 5))
+                        "5"
+                        (model.settings.numberOfSeeds == 5)
+                    , radioButton
+                        (SettingChanged (SeedNumber 6))
+                        "6"
+                        (model.settings.numberOfSeeds == 6)
                     ]
                 , Html.br [] []
                 , div
                     []
-                    [ Html.label [] [ Html.text (Localization.lastSeedsTitle model.settings.language) ]
-                    , div (onClick (SettingChanged LastSeedsBehaviour) :: settingsChoiceStyle)
-                        [ Html.input
-                            [ Html.Attributes.type_ "checkbox"
-                            , Html.Attributes.checked model.settings.lastSeedsForFinishingPlayer
-                            ]
-                            []
-                        , Html.text (Localization.lastSeedsDescription model.settings.language)
-                        ]
-                    ]
+                    (checkBox
+                        (SettingChanged LastSeedsBehaviour)
+                        (Localization.lastSeedsTitle model.settings.language)
+                        (Localization.lastSeedsDescription model.settings.language)
+                        model.settings.lastSeedsForFinishingPlayer
+                    )
                 , Html.br [] []
                 , div
                     []
-                    [ Html.label [] [ Html.text (Localization.opponentsStoreTitle model.settings.language) ]
-                    , div (onClick (SettingChanged SowOpponentsStore) :: settingsChoiceStyle)
-                        [ Html.input
-                            [ Html.Attributes.type_ "checkbox"
-                            , Html.Attributes.checked model.settings.sowInOpponentsStore
-                            ]
-                            []
-                        , Html.text (Localization.opponentsStoreDescription model.settings.language)
-                        ]
-                    ]
+                    (checkBox
+                        (SettingChanged SowOpponentsStore)
+                        (Localization.opponentsStoreTitle model.settings.language)
+                        (Localization.opponentsStoreDescription model.settings.language)
+                        model.settings.sowInOpponentsStore
+                    )
                 , Html.br [] []
                 , div
                     []
-                    [ Html.label [] [ Html.text (Localization.firstTurnTitle model.settings.language) ]
-                    , div (onClick (SettingChanged StartingPlayer) :: settingsChoiceStyle)
-                        [ Html.input
-                            [ Html.Attributes.type_ "checkbox"
-                            , Html.Attributes.checked model.settings.playerTwoStarting
-                            ]
-                            []
-                        , Html.text (Localization.firstTurnDescription model.settings.language)
-                        ]
-                    ]
+                    (checkBox
+                        (SettingChanged StartingPlayer)
+                        (Localization.firstTurnTitle model.settings.language)
+                        (Localization.firstTurnDescription model.settings.language)
+                        model.settings.playerTwoStarting
+                    )
                 , Html.br [] []
                 , div
                     []
-                    [ Html.label [] [ Html.text (Localization.opponentLevelTitle model.settings.language) ]
-                    , div (onClick (SettingChanged OpponentOption) :: settingsChoiceStyle)
-                        [ Html.input
-                            [ Html.Attributes.type_ "checkbox"
-                            , Html.Attributes.checked
-                                (case model.settings.opponent of
-                                    Real ->
-                                        False
-
-                                    Computer _ ->
-                                        True
-                                )
-                            ]
-                            []
-                        , Html.text (Localization.opponentDescription model.settings.language)
-                        ]
-                    ]
+                    (checkBox
+                        (SettingChanged OpponentOption)
+                        (Localization.opponentLevelTitle model.settings.language)
+                        (Localization.opponentDescription model.settings.language)
+                        (not (model.settings.opponent == Real))
+                    )
                 , case model.settings.opponent of
                     Real ->
                         div [] []
@@ -675,36 +604,18 @@ settingsView model =
                     Computer intelligence ->
                         div
                             spaceChildrenEvenly
-                            [ div (onClick (SettingChanged (IntelligenceOption Low)) :: settingsChoiceStyle)
-                                [ Html.input
-                                    [ Html.Attributes.type_ "radio"
-                                    , Html.Attributes.name "computersIntelligence"
-                                    , Html.Attributes.value "low"
-                                    , Html.Attributes.checked (intelligence == Low)
-                                    ]
-                                    []
-                                , Html.text (Localization.easyDifficulty model.settings.language)
-                                ]
-                            , div (onClick (SettingChanged (IntelligenceOption Medium)) :: settingsChoiceStyle)
-                                [ Html.input
-                                    [ Html.Attributes.type_ "radio"
-                                    , Html.Attributes.name "computersIntelligence"
-                                    , Html.Attributes.value "medium"
-                                    , Html.Attributes.checked (intelligence == Medium)
-                                    ]
-                                    []
-                                , Html.text (Localization.mediumDifficulty model.settings.language)
-                                ]
-                            , div (onClick (SettingChanged (IntelligenceOption High)) :: settingsChoiceStyle)
-                                [ Html.input
-                                    [ Html.Attributes.type_ "radio"
-                                    , Html.Attributes.name "computersIntelligence"
-                                    , Html.Attributes.value "high"
-                                    , Html.Attributes.checked (intelligence == High)
-                                    ]
-                                    []
-                                , Html.text (Localization.highDifficulty model.settings.language)
-                                ]
+                            [ radioButton
+                                (SettingChanged (IntelligenceOption Low))
+                                (Localization.easyDifficulty model.settings.language)
+                                (intelligence == Low)
+                            , radioButton
+                                (SettingChanged (IntelligenceOption Medium))
+                                (Localization.mediumDifficulty model.settings.language)
+                                (intelligence == Medium)
+                            , radioButton
+                                (SettingChanged (IntelligenceOption High))
+                                (Localization.highDifficulty model.settings.language)
+                                (intelligence == High)
                             ]
                 ]
             ]
@@ -712,6 +623,32 @@ settingsView model =
 
     else
         []
+
+
+radioButton : Msg -> String -> Bool -> Html Msg
+radioButton onClickMsg label isChecked =
+    div (onClick onClickMsg :: settingsChoiceStyle)
+        [ Html.input
+            [ Html.Attributes.type_ "radio"
+            , Html.Attributes.checked isChecked
+            ]
+            []
+        , Html.text label
+        ]
+
+
+checkBox : Msg -> String -> String -> Bool -> List (Html Msg)
+checkBox onClickMsg title description isChecked =
+    [ Html.label [] [ Html.text title ]
+    , div (onClick onClickMsg :: settingsChoiceStyle)
+        [ Html.input
+            [ Html.Attributes.type_ "checkbox"
+            , Html.Attributes.checked isChecked
+            ]
+            []
+        , Html.text description
+        ]
+    ]
 
 
 
