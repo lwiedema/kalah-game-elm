@@ -178,7 +178,7 @@ numberOfSeedsInHouse row pos =
 
 isRowEmpty : Row -> Bool
 isRowEmpty row =
-    not (ArrayHelper.any (\house -> not (house.seeds == 0)) row)
+    not (List.any (\house -> not (house.seeds == 0)) (Array.toList row))
 
 
 numberOfSeedsInRow : Row -> Int
