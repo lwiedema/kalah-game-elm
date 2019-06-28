@@ -3,7 +3,6 @@ module GameBoard exposing (BoardPosition(..), GameBoard, Row, SowingState(..), b
 import Array exposing (Array)
 import Player exposing (Player(..))
 import Settings exposing (Settings)
-import Utils.ArrayHelper as ArrayHelper
 
 
 
