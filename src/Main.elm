@@ -13,6 +13,7 @@ import KalahaAI
 import Localization exposing (Language(..))
 import Material.Icons.Action
 import Material.Icons.Navigation
+import Material.Icons.Toggle
 import Player exposing (Player(..), Winner(..))
 import Random
 import Settings exposing (Intelligence(..), Opponent(..), Settings, SowingSpeed(..))
@@ -628,25 +629,39 @@ settingsView model =
 radioButton : Msg -> String -> Bool -> Html Msg
 radioButton onClickMsg label isChecked =
     div (onClick onClickMsg :: settingsChoiceStyle)
-        [ Html.input
-            [ Html.Attributes.type_ "radio"
-            , Html.Attributes.checked isChecked
+        [ Html.div
+            [ style "display" "inline-block" ]
+            [ (if isChecked then
+                Material.Icons.Toggle.radio_button_checked
+
+               else
+                Material.Icons.Toggle.radio_button_unchecked
+              )
+                sowingSeedsColorColor
+                20
             ]
-            []
         , Html.text label
         ]
 
 
 checkBox : Msg -> String -> String -> Bool -> List (Html Msg)
 checkBox onClickMsg title description isChecked =
-    [ Html.label [] [ Html.text title ]
-    , div (onClick onClickMsg :: settingsChoiceStyle)
-        [ Html.input
-            [ Html.Attributes.type_ "checkbox"
-            , Html.Attributes.checked isChecked
+    [ Html.div [] [ Html.text title ]
+    , div
+        (onClick onClickMsg :: settingsChoiceStyle)
+        [ Html.div
+            [ style "display" "inline"
             ]
-            []
-        , Html.text description
+            [ (if isChecked then
+                Material.Icons.Toggle.check_box
+
+               else
+                Material.Icons.Toggle.check_box_outline_blank
+              )
+                sowingSeedsColorColor
+                25
+            ]
+        , div [ style "display" "inline" ] [ Html.text description ]
         ]
     ]
 
@@ -765,6 +780,11 @@ settingsChoiceStyle =
 sowingSeedsColor : String
 sowingSeedsColor =
     "#db004e"
+
+
+sowingSeedsColorColor : Color.Color
+sowingSeedsColorColor =
+    Color.rgb255 219 0 78
 
 
 sowedSeedColor : String
