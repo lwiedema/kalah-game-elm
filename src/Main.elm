@@ -640,7 +640,7 @@ radioButton onClickMsg label isChecked =
                 sowingSeedsColorColor
                 20
             ]
-        , Html.text label
+        , div [ style "margin-left" "3px" ] [ Html.text label ]
         ]
 
 
@@ -661,7 +661,7 @@ checkBox onClickMsg title description isChecked =
                 sowingSeedsColorColor
                 25
             ]
-        , div [ style "display" "inline" ] [ Html.text description ]
+        , div [ style "margin-left" "3px" ] [ Html.text description ]
         ]
     ]
 
@@ -769,7 +769,13 @@ defaultTextFont =
 
 settingsChoiceStyle : List (Attribute Msg)
 settingsChoiceStyle =
-    [ pointerCursor, style "font-size" "16px", style "margin-top" "5px" ]
+    [ pointerCursor
+    , style "font-size" "16px"
+    , style "margin-top" "5px"
+    , style "display" "flex"
+    , style "justify-content" "center"
+    , style "align-items" "center"
+    ]
 
 
 
