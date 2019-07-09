@@ -4698,10 +4698,10 @@ var author$project$Main$restartGame = function (settings) {
 			settings.playerTwoStarting ? author$project$Player$Two : author$project$Player$One)
 	};
 };
-var author$project$Localization$German = {$: 'German'};
+var author$project$Localization$English = {$: 'English'};
 var author$project$Settings$Normal = {$: 'Normal'};
 var author$project$Settings$Real = {$: 'Real'};
-var author$project$Settings$defaultSettings = {language: author$project$Localization$German, lastSeedsForFinishingPlayer: false, numberOfHouses: 6, numberOfSeeds: 4, opponent: author$project$Settings$Real, playerTwoStarting: false, settingsOpen: false, sowInOpponentsStore: false, sowingSpeed: author$project$Settings$Normal, upsideDownEnabled: false};
+var author$project$Settings$defaultSettings = {language: author$project$Localization$English, lastSeedsForFinishingPlayer: false, numberOfHouses: 6, numberOfSeeds: 4, opponent: author$project$Settings$Real, playerTwoStarting: false, settingsOpen: false, sowInOpponentsStore: false, sowingSpeed: author$project$Settings$Normal, upsideDownEnabled: false};
 var author$project$Main$initalModel = author$project$Datatypes$GameOk(
 	author$project$Main$restartGame(author$project$Settings$defaultSettings));
 var author$project$Datatypes$ComputerHasTurn = {$: 'ComputerHasTurn'};
@@ -6474,7 +6474,6 @@ var author$project$Datatypes$errorToString = function (error) {
 			return 'Unexpected';
 	}
 };
-var author$project$Localization$English = {$: 'English'};
 var author$project$Localization$restart = function (language) {
 	if (language.$ === 'German') {
 		return 'Neues Spiel';
@@ -6927,6 +6926,7 @@ var author$project$Datatypes$Speed = function (a) {
 };
 var author$project$Datatypes$StartingPlayer = {$: 'StartingPlayer'};
 var author$project$Datatypes$UpsideDown = {$: 'UpsideDown'};
+var author$project$Localization$German = {$: 'German'};
 var author$project$Localization$animationSpeedTitle = function (language) {
 	if (language.$ === 'German') {
 		return 'Geschwindigkeit der Animation';
