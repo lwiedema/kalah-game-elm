@@ -1,6 +1,7 @@
 module KalahaAI exposing (nextMove, weightMoves)
 
-import Datatypes exposing (Model, Msg(..), SettingOption(..))
+import Datatypes exposing (Msg(..), SettingOption(..))
+import Game exposing (Game)
 import GameBoard
 import Player exposing (Player(..))
 import Random
@@ -38,29 +39,39 @@ weightMoves settings =
             Random.list 0 (Random.float 0 0)
 
 
-nextMove : Model -> List Float -> Int
-nextMove model weights =
+nextMove : Game -> List Float -> Maybe Int
+nextMove game weights =
     -- return position of house to empty next
     let
         moves =
-            List.indexedMap (\pos element -> element * moveQuality model pos) weights
+            List.indexedMap (\pos element -> element * moveQuality game pos) weights
     in
     case List.maximum moves of
         Just bestMoveQuality ->
-            ListHelper.getIndex bestMoveQuality moves
+            if bestMoveQuality == 0.0 then
+                -- this point should never get reached
+                -- "best" move was predicted as sowing from an empty house.
+                -- it can only be the maximum if ALL houses are empty
+                -- but game should be displayed as ended before that
+                Nothing
+
+            else
+                Just (ListHelper.getIndex bestMoveQuality moves)
 
         Nothing ->
-            0
+            -- this point should never get reached
+            -- moves-Map was empty
+            Nothing
 
 
-moveQuality : Model -> Int -> Float
-moveQuality model pos =
+moveQuality : Game -> Int -> Float
+moveQuality game pos =
     let
         row =
-            GameBoard.getRowForPlayer model.board Two
+            GameBoard.getRowForPlayer game.board Two
 
         opponentsRow =
-            GameBoard.getRowForPlayer model.board One
+            GameBoard.getRowForPlayer game.board One
 
         seeds =
             GameBoard.numberOfSeedsInHouse row pos
@@ -69,7 +80,7 @@ moveQuality model pos =
         -- cannot do this move
         0
 
-    else if model.settings.numberOfHouses - pos == seeds then
+    else if game.settings.numberOfHouses - pos == seeds then
         -- move would end in store
         3
 
@@ -82,14 +93,14 @@ moveQuality model pos =
                 * toFloat
                     (GameBoard.numberOfSeedsInHouse
                         opponentsRow
-                        (model.settings.numberOfHouses - (pos + seeds) - 1)
+                        (game.settings.numberOfHouses - (pos + seeds) - 1)
                     )
               )
 
     else if
         GameBoard.numberOfSeedsInHouse
             opponentsRow
-            (model.settings.numberOfHouses - pos - 1)
+            (game.settings.numberOfHouses - pos - 1)
             == 0
     then
         -- opposite house is empty, opponent could steal seeds at next move

@@ -3,8 +3,8 @@ module Main exposing (main)
 import Array
 import Browser
 import Color
-import Datatypes exposing (Model, Msg(..), SettingOption(..))
-import Game exposing (State(..))
+import Datatypes exposing (ErrorType(..), Model(..), Msg(..), SettingOption(..))
+import Game exposing (Game, State(..))
 import GameBoard exposing (SowingState(..))
 import Html exposing (Attribute, Html, div, text)
 import Html.Attributes exposing (style)
@@ -39,183 +39,246 @@ main =
 
 subscriptions : Model -> Sub Msg
 subscriptions model =
-    case model.board.sowingState of
-        NotSowing ->
-            case model.state of
-                Turn player ->
-                    case model.settings.opponent of
-                        Real ->
+    case model of
+        GameOk game ->
+            case game.board.sowingState of
+                NotSowing ->
+                    case game.state of
+                        Turn player ->
+                            case game.settings.opponent of
+                                Real ->
+                                    Sub.none
+
+                                Computer _ ->
+                                    if player == Two then
+                                        Time.every
+                                            (Settings.speedInMilliseconds game.settings.sowingSpeed)
+                                            (\_ -> ComputerHasTurn)
+
+                                    else
+                                        Sub.none
+
+                        End _ ->
                             Sub.none
 
-                        Computer _ ->
-                            if player == Two then
-                                Time.every
-                                    (Settings.speedInMilliseconds model.settings.sowingSpeed)
-                                    (\_ -> ComputerHasTurn)
+                _ ->
+                    Time.every
+                        (Settings.speedInMilliseconds game.settings.sowingSpeed)
+                        (\_ -> NextSowingStep)
 
-                            else
-                                Sub.none
-
-                End _ ->
-                    Sub.none
-
-        _ ->
-            Time.every
-                (Settings.speedInMilliseconds model.settings.sowingSpeed)
-                (\_ -> NextSowingStep)
+        GameError _ ->
+            Sub.none
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
-    case msg of
-        Click player pos ->
-            case model.state of
-                Turn onTurn ->
-                    -- check if click on house was legal
-                    if onTurn == player && not (GameBoard.numberOfSeedsInHouse (GameBoard.getRowForPlayer model.board player) pos == 0) then
-                        ( Game.startSowingSeeds model player pos, Cmd.none )
+    case model of
+        GameOk game ->
+            case msg of
+                Click player pos ->
+                    case game.state of
+                        Turn onTurn ->
+                            -- check if click on house was legal
+                            if onTurn == player && not (GameBoard.numberOfSeedsInHouse (GameBoard.getRowForPlayer game.board player) pos == 0) then
+                                ( case Game.startSowingSeeds game player pos of
+                                    Just g ->
+                                        GameOk g
 
-                    else
-                        ( model, Cmd.none )
+                                    Nothing ->
+                                        GameError StartSowingIllegal
+                                , Cmd.none
+                                )
 
-                _ ->
-                    ( model, Cmd.none )
+                            else
+                                ( GameOk game, Cmd.none )
 
-        NextSowingStep ->
-            ( Game.nextSowingStep model, Cmd.none )
+                        _ ->
+                            ( GameOk game, Cmd.none )
 
-        Restart ->
-            ( restartGame model.settings, Cmd.none )
+                NextSowingStep ->
+                    ( case Game.nextSowingStep game of
+                        Just g ->
+                            GameOk g
 
-        OpenSettings ->
-            let
-                oldSettings =
-                    model.settings
-            in
-            ( { model
-                | settings =
-                    { oldSettings
-                        | settingsOpen = not model.settings.settingsOpen
-                    }
-              }
-            , Cmd.none
-            )
-
-        SettingChanged option ->
-            let
-                oldSettings =
-                    model.settings
-            in
-            case option of
-                Speed speed ->
-                    ( { model | settings = { oldSettings | sowingSpeed = speed } }, Cmd.none )
-
-                LanguageSetting language ->
-                    ( { model | settings = { oldSettings | language = language } }, Cmd.none )
-
-                SeedNumber n ->
-                    ( restartGame { oldSettings | numberOfSeeds = n }, Cmd.none )
-
-                LastSeedsBehaviour ->
-                    ( restartGame { oldSettings | lastSeedsForFinishingPlayer = not oldSettings.lastSeedsForFinishingPlayer }, Cmd.none )
-
-                UpsideDown ->
-                    ( { model
-                        | settings =
-                            { oldSettings
-                                | upsideDownEnabled = not model.settings.upsideDownEnabled
-                            }
-                      }
+                        Nothing ->
+                            GameError NextSowingStepIllegal
                     , Cmd.none
                     )
 
-                SowOpponentsStore ->
-                    ( restartGame { oldSettings | sowInOpponentsStore = not oldSettings.sowInOpponentsStore }, Cmd.none )
+                Restart ->
+                    ( GameOk (restartGame game.settings), Cmd.none )
 
-                OpponentOption ->
-                    ( restartGame (Settings.toggleOpponentOption oldSettings), Cmd.none )
+                OpenSettings ->
+                    let
+                        oldSettings =
+                            game.settings
+                    in
+                    ( GameOk
+                        { game
+                            | settings =
+                                { oldSettings
+                                    | settingsOpen = not game.settings.settingsOpen
+                                }
+                        }
+                    , Cmd.none
+                    )
 
-                IntelligenceOption i ->
-                    ( restartGame { oldSettings | opponent = Computer i }, Cmd.none )
+                SettingChanged option ->
+                    let
+                        oldSettings =
+                            game.settings
+                    in
+                    ( GameOk
+                        (case option of
+                            Speed speed ->
+                                { game | settings = { oldSettings | sowingSpeed = speed } }
 
-                StartingPlayer ->
-                    ( restartGame { oldSettings | playerTwoStarting = not oldSettings.playerTwoStarting }, Cmd.none )
+                            LanguageSetting language ->
+                                { game | settings = { oldSettings | language = language } }
 
-        ComputerHasTurn ->
-            ( model, Random.generate RandomMoveWeights (KalahaAI.weightMoves model.settings) )
+                            SeedNumber n ->
+                                restartGame { oldSettings | numberOfSeeds = n }
 
-        RandomMoveWeights weights ->
-            ( Game.startSowingSeeds model Two (KalahaAI.nextMove model weights), Cmd.none )
+                            LastSeedsBehaviour ->
+                                restartGame { oldSettings | lastSeedsForFinishingPlayer = not oldSettings.lastSeedsForFinishingPlayer }
+
+                            UpsideDown ->
+                                { game
+                                    | settings =
+                                        { oldSettings
+                                            | upsideDownEnabled = not game.settings.upsideDownEnabled
+                                        }
+                                }
+
+                            SowOpponentsStore ->
+                                restartGame { oldSettings | sowInOpponentsStore = not oldSettings.sowInOpponentsStore }
+
+                            OpponentOption ->
+                                restartGame (Settings.toggleOpponentOption oldSettings)
+
+                            IntelligenceOption i ->
+                                restartGame { oldSettings | opponent = Computer i }
+
+                            StartingPlayer ->
+                                restartGame { oldSettings | playerTwoStarting = not oldSettings.playerTwoStarting }
+                        )
+                    , Cmd.none
+                    )
+
+                ComputerHasTurn ->
+                    ( GameOk game, Random.generate RandomMoveWeights (KalahaAI.weightMoves game.settings) )
+
+                RandomMoveWeights weights ->
+                    ( case KalahaAI.nextMove game weights of
+                        Just idx ->
+                            case Game.startSowingSeeds game Two idx of
+                                Just g ->
+                                    GameOk g
+
+                                Nothing ->
+                                    GameError StartSowingIllegal
+
+                        Nothing ->
+                            GameError BestMoveZero
+                    , Cmd.none
+                    )
+
+        GameError _ ->
+            ( case msg of
+                Restart ->
+                    GameOk (restartGame Settings.defaultSettings)
+
+                _ ->
+                    model
+            , Cmd.none
+            )
 
 
 view : Model -> Html Msg
 view model =
-    div []
-        [ div
-            [ style "display" "inline-block" ]
-            [ iconButton
-                (Localization.settings model.settings.language)
-                Material.Icons.Action.settings
-                OpenSettings
-            ]
-        , div [ style "height" "100%", style "width" "100%" ]
-            (div
-                [ style "width" "948px"
-                , style "margin" "0 auto"
-                ]
-                [ infoView model Two
-                , div
-                    boardStyle
-                    [ div
-                        (upsideDown model Two :: storeStyle)
-                        [ storeView model Two ]
-                    , div
-                        [ fillParentHeight
-                        , centerText
-                        , orderSiblingsHorizontally
-                        , style "width" "580px"
-                        , style "position" "relative"
-                        ]
-                        [ div
-                            [ fillParentHeight ]
-                            [ div
-                                rowStyle
-                                (rowView model Two)
-                            , div
-                                [ style "height" "60px"
-                                , style "border" "10px solid #dcdcdc"
-                                , style "border-radius" "10px"
-                                , style "background-color" "#dcdcdc"
-                                ]
-                                [ case model.state of
-                                    Turn _ ->
-                                        sowingView model
-
-                                    End _ ->
-                                        restartButton model
-                                ]
-                            , div
-                                rowStyle
-                                (rowView model One)
-                            ]
-                        ]
-                    , div
-                        storeStyle
-                        [ storeView model One ]
+    case model of
+        GameOk game ->
+            div []
+                [ div
+                    [ style "display" "inline-block" ]
+                    [ iconButton
+                        (Localization.settings game.settings.language)
+                        Material.Icons.Action.settings
+                        OpenSettings
                     ]
-                , infoView model One
+                , div [ style "height" "100%", style "width" "100%" ]
+                    (div
+                        [ style "width" "948px"
+                        , style "margin" "0 auto"
+                        ]
+                        [ infoView game Two
+                        , div
+                            boardStyle
+                            [ div
+                                (upsideDown game Two :: storeStyle)
+                                [ storeView game Two ]
+                            , div
+                                [ fillParentHeight
+                                , centerText
+                                , orderSiblingsHorizontally
+                                , style "width" "580px"
+                                , style "position" "relative"
+                                ]
+                                [ div
+                                    [ fillParentHeight ]
+                                    [ div
+                                        rowStyle
+                                        (rowView game Two)
+                                    , div
+                                        [ style "height" "60px"
+                                        , style "border" "10px solid #dcdcdc"
+                                        , style "border-radius" "10px"
+                                        , style "background-color" "#dcdcdc"
+                                        ]
+                                        [ case game.state of
+                                            Turn _ ->
+                                                sowingView game
+
+                                            End _ ->
+                                                iconButton
+                                                    (Localization.restart game.settings.language)
+                                                    Material.Icons.Navigation.refresh
+                                                    Restart
+                                        ]
+                                    , div
+                                        rowStyle
+                                        (rowView game One)
+                                    ]
+                                ]
+                            , div
+                                storeStyle
+                                [ storeView game One ]
+                            ]
+                        , infoView game One
+                        ]
+                        :: settingsView game
+                    )
                 ]
-                :: settingsView model
-            )
-        ]
+
+        GameError errorType ->
+            div []
+                [ Html.text "Sorry! An error has occurred."
+                , Html.br [] []
+                , Html.text ("ErrorCode: " ++ Datatypes.errorToString errorType)
+                , Html.br [] []
+                , Html.text "Please reload game."
+                , iconButton (Localization.restart English) Material.Icons.Navigation.refresh Restart
+                ]
 
 
 initalModel : Model
 initalModel =
-    restartGame Settings.defaultSettings
+    -- for seeing error page use this initalModel:
+    -- GameError Unexpected
+    GameOk (restartGame Settings.defaultSettings)
 
 
-restartGame : Settings -> Model
+restartGame : Settings -> Game
 restartGame settings =
     { settings = settings
     , board = GameBoard.buildBoard settings
@@ -235,8 +298,8 @@ restartGame settings =
 -- BEGIN views
 
 
-rowView : Model -> Player -> List (Html Msg)
-rowView model player =
+rowView : Game -> Player -> List (Html Msg)
+rowView game player =
     (if player == Two then
         -- mirror list of houses for player Two
         List.foldl (::) []
@@ -244,35 +307,35 @@ rowView model player =
      else
         identity
     )
-        (rowViewHelper model player model.settings.numberOfHouses)
+        (rowViewHelper game player game.settings.numberOfHouses)
 
 
-rowViewHelper : Model -> Player -> Int -> List (Html Msg)
-rowViewHelper model player housesToCreate =
+rowViewHelper : Game -> Player -> Int -> List (Html Msg)
+rowViewHelper game player housesToCreate =
     -- create houses recursively
     case housesToCreate of
         0 ->
             []
 
         _ ->
-            rowHouseView model player (model.settings.numberOfHouses - housesToCreate)
-                :: rowViewHelper model player (housesToCreate - 1)
+            rowHouseView game player (game.settings.numberOfHouses - housesToCreate)
+                :: rowViewHelper game player (housesToCreate - 1)
 
 
-rowHouseView : Model -> Player -> Int -> Html Msg
-rowHouseView model player pos =
+rowHouseView : Game -> Player -> Int -> Html Msg
+rowHouseView game player pos =
     -- create view for one house
     let
         -- get information on house from board
         h =
-            Array.get pos (GameBoard.getRowForPlayer model.board player)
+            Array.get pos (GameBoard.getRowForPlayer game.board player)
     in
     case h of
         Just house ->
             -- show seeds as number and circles
             div
-                ([ upsideDown model player
-                 , cursorStyle model player
+                ([ upsideDown game player
+                 , cursorStyle game player
                  , onClick (Click player pos)
                  , fillParentHeight
                  , orderSiblingsHorizontally
@@ -304,11 +367,11 @@ seedsInHouseView numOfSeeds numOfNewlySownSeeds =
                 ++ List.repeat numOfNewlySownSeeds (seedView sowedSeedColor)
 
 
-storeView : Model -> Player -> Html Msg
-storeView model player =
+storeView : Game -> Player -> Html Msg
+storeView game player =
     let
         store =
-            GameBoard.getStoreForPlayer model.board player
+            GameBoard.getStoreForPlayer game.board player
     in
     div
         ([ centerText
@@ -332,10 +395,10 @@ storeView model player =
         ]
 
 
-infoView : Model -> Player -> Html Msg
-infoView model player =
+infoView : Game -> Player -> Html Msg
+infoView game player =
     div
-        ([ upsideDown model player
+        ([ upsideDown game player
          , fillParentWidth
          , centerText
          , style "padding" "5px"
@@ -343,10 +406,10 @@ infoView model player =
             ++ defaultTextFont
         )
         [ Html.text
-            (Localization.player model.settings.language
+            (Localization.player game.settings.language
                 ++ " "
                 ++ Player.toString player
-                ++ (case model.settings.opponent of
+                ++ (case game.settings.opponent of
                         Real ->
                             ""
 
@@ -361,30 +424,30 @@ infoView model player =
             )
         , Html.br [] []
         , Html.text
-            (case model.state of
+            (case game.state of
                 Turn p ->
                     if p == player then
-                        Localization.yourTurn model.settings.language
+                        Localization.yourTurn game.settings.language
 
                     else
-                        Localization.opponentsTurn model.settings.language (Localization.player model.settings.language ++ " " ++ Player.toString p)
+                        Localization.opponentsTurn game.settings.language (Localization.player game.settings.language ++ " " ++ Player.toString p)
 
                 End winner ->
-                    Localization.gameOver model.settings.language
+                    Localization.gameOver game.settings.language
                         ++ " "
                         ++ (case winner of
                                 Drawn ->
-                                    Localization.drawnGame model.settings.language
+                                    Localization.drawnGame game.settings.language
 
                                 Winner w finalScore ->
                                     (if w == player then
-                                        Localization.youWin model.settings.language
+                                        Localization.youWin game.settings.language
 
                                      else
-                                        Localization.youLoose model.settings.language
+                                        Localization.youLoose game.settings.language
                                     )
                                         ++ " "
-                                        ++ Localization.finalScore model.settings.language
+                                        ++ Localization.finalScore game.settings.language
                                         ++ ": "
                                         ++ String.fromInt (Tuple.first finalScore)
                                         ++ ":"
@@ -392,11 +455,6 @@ infoView model player =
                            )
             )
         ]
-
-
-restartButton : Model -> Html Msg
-restartButton model =
-    iconButton (Localization.restart model.settings.language) Material.Icons.Navigation.refresh Restart
 
 
 iconButton : String -> (Color.Color -> Int -> Svg.Svg Msg) -> Msg -> Html Msg
@@ -430,8 +488,8 @@ iconButton text icon onClickMsg =
         ]
 
 
-sowingView : Model -> Html Msg
-sowingView model =
+sowingView : Game -> Html Msg
+sowingView game =
     -- create view showing seeds to be sown in middle of board
     div
         [ style "padding" "17px 0 15px 0"
@@ -439,7 +497,7 @@ sowingView model =
         [ div
             (fillParentWidth :: spaceChildrenEvenly)
             [ div []
-                (case model.board.sowingState of
+                (case game.board.sowingState of
                     Sowing info ->
                         List.repeat info.seedsToSow (seedView sowingSeedsColor)
 
@@ -473,9 +531,9 @@ seedView seedColor =
         ]
 
 
-settingsView : Model -> List (Html Msg)
-settingsView model =
-    if model.settings.settingsOpen then
+settingsView : Game -> List (Html Msg)
+settingsView game =
+    if game.settings.settingsOpen then
         [ div
             ([ style "background-color" "white"
              , style "width" "700px"
@@ -493,112 +551,112 @@ settingsView model =
                 ++ defaultTextFont
             )
             [ Html.br [] []
-            , Html.text (Localization.presentationSettings model.settings.language)
+            , Html.text (Localization.presentationSettings game.settings.language)
             , Html.form [ style "margin" "10px", style "font-size" "18px" ]
                 [ div
                     []
                     (checkBox
                         (SettingChanged UpsideDown)
-                        (Localization.tabletModeTitle model.settings.language)
-                        (Localization.tabletModeDescription model.settings.language)
-                        model.settings.upsideDownEnabled
+                        (Localization.tabletModeTitle game.settings.language)
+                        (Localization.tabletModeDescription game.settings.language)
+                        game.settings.upsideDownEnabled
                     )
                 , Html.br [] []
-                , Html.label [] [ Html.text (Localization.animationSpeedTitle model.settings.language) ]
+                , Html.label [] [ Html.text (Localization.animationSpeedTitle game.settings.language) ]
                 , Html.br [] []
                 , div
                     spaceChildrenEvenly
                     [ radioButton
                         (SettingChanged (Speed Slow))
-                        (Localization.slowSpeed model.settings.language)
-                        (model.settings.sowingSpeed == Slow)
+                        (Localization.slowSpeed game.settings.language)
+                        (game.settings.sowingSpeed == Slow)
                     , radioButton
                         (SettingChanged (Speed Normal))
-                        (Localization.normalSpeed model.settings.language)
-                        (model.settings.sowingSpeed == Normal)
+                        (Localization.normalSpeed game.settings.language)
+                        (game.settings.sowingSpeed == Normal)
                     , radioButton
                         (SettingChanged (Speed Fast))
-                        (Localization.fastSpeed model.settings.language)
-                        (model.settings.sowingSpeed == Fast)
+                        (Localization.fastSpeed game.settings.language)
+                        (game.settings.sowingSpeed == Fast)
                     ]
                 , Html.br [] []
-                , Html.label [] [ Html.text (Localization.languageSetting model.settings.language) ]
+                , Html.label [] [ Html.text (Localization.languageSetting game.settings.language) ]
                 , Html.br [] []
                 , div
                     spaceChildrenEvenly
                     [ radioButton
                         (SettingChanged (LanguageSetting German))
-                        (Localization.germanLanguage model.settings.language)
-                        (model.settings.language == German)
+                        (Localization.germanLanguage game.settings.language)
+                        (game.settings.language == German)
                     , radioButton
                         (SettingChanged (LanguageSetting English))
-                        (Localization.englishLanguage model.settings.language)
-                        (model.settings.language == English)
+                        (Localization.englishLanguage game.settings.language)
+                        (game.settings.language == English)
                     ]
                 ]
             , div [ style "height" "2px", style "width" "90%", style "margin" "0 auto", style "background-color" sowingSeedsColor ] []
             , Html.br [] []
-            , Html.text (Localization.gameModeSettings model.settings.language)
+            , Html.text (Localization.gameModeSettings game.settings.language)
             , Html.form [ style "margin" "10px", style "font-size" "18px" ]
-                [ div [ style "font-size" "14px" ] [ Html.text (Localization.gameModeHint model.settings.language) ]
+                [ div [ style "font-size" "14px" ] [ Html.text (Localization.gameModeHint game.settings.language) ]
                 , Html.br [] []
-                , Html.label [] [ Html.text (Localization.numberOfSeeds model.settings.language) ]
+                , Html.label [] [ Html.text (Localization.numberOfSeeds game.settings.language) ]
                 , div
                     spaceChildrenEvenly
                     [ radioButton
                         (SettingChanged (SeedNumber 3))
                         "3"
-                        (model.settings.numberOfSeeds == 3)
+                        (game.settings.numberOfSeeds == 3)
                     , radioButton
                         (SettingChanged (SeedNumber 4))
                         "4"
-                        (model.settings.numberOfSeeds == 4)
+                        (game.settings.numberOfSeeds == 4)
                     , radioButton
                         (SettingChanged (SeedNumber 5))
                         "5"
-                        (model.settings.numberOfSeeds == 5)
+                        (game.settings.numberOfSeeds == 5)
                     , radioButton
                         (SettingChanged (SeedNumber 6))
                         "6"
-                        (model.settings.numberOfSeeds == 6)
+                        (game.settings.numberOfSeeds == 6)
                     ]
                 , Html.br [] []
                 , div
                     []
                     (checkBox
                         (SettingChanged LastSeedsBehaviour)
-                        (Localization.lastSeedsTitle model.settings.language)
-                        (Localization.lastSeedsDescription model.settings.language)
-                        model.settings.lastSeedsForFinishingPlayer
+                        (Localization.lastSeedsTitle game.settings.language)
+                        (Localization.lastSeedsDescription game.settings.language)
+                        game.settings.lastSeedsForFinishingPlayer
                     )
                 , Html.br [] []
                 , div
                     []
                     (checkBox
                         (SettingChanged SowOpponentsStore)
-                        (Localization.opponentsStoreTitle model.settings.language)
-                        (Localization.opponentsStoreDescription model.settings.language)
-                        model.settings.sowInOpponentsStore
+                        (Localization.opponentsStoreTitle game.settings.language)
+                        (Localization.opponentsStoreDescription game.settings.language)
+                        game.settings.sowInOpponentsStore
                     )
                 , Html.br [] []
                 , div
                     []
                     (checkBox
                         (SettingChanged StartingPlayer)
-                        (Localization.firstTurnTitle model.settings.language)
-                        (Localization.firstTurnDescription model.settings.language)
-                        model.settings.playerTwoStarting
+                        (Localization.firstTurnTitle game.settings.language)
+                        (Localization.firstTurnDescription game.settings.language)
+                        game.settings.playerTwoStarting
                     )
                 , Html.br [] []
                 , div
                     []
                     (checkBox
                         (SettingChanged OpponentOption)
-                        (Localization.opponentLevelTitle model.settings.language)
-                        (Localization.opponentDescription model.settings.language)
-                        (not (model.settings.opponent == Real))
+                        (Localization.opponentLevelTitle game.settings.language)
+                        (Localization.opponentDescription game.settings.language)
+                        (not (game.settings.opponent == Real))
                     )
-                , case model.settings.opponent of
+                , case game.settings.opponent of
                     Real ->
                         div [] []
 
@@ -607,15 +665,15 @@ settingsView model =
                             spaceChildrenEvenly
                             [ radioButton
                                 (SettingChanged (IntelligenceOption Low))
-                                (Localization.easyDifficulty model.settings.language)
+                                (Localization.easyDifficulty game.settings.language)
                                 (intelligence == Low)
                             , radioButton
                                 (SettingChanged (IntelligenceOption Medium))
-                                (Localization.mediumDifficulty model.settings.language)
+                                (Localization.mediumDifficulty game.settings.language)
                                 (intelligence == Medium)
                             , radioButton
                                 (SettingChanged (IntelligenceOption High))
-                                (Localization.highDifficulty model.settings.language)
+                                (Localization.highDifficulty game.settings.language)
                                 (intelligence == High)
                             ]
                 ]
@@ -705,9 +763,9 @@ boardStyle =
     ]
 
 
-cursorStyle : Model -> Player -> Attribute Msg
-cursorStyle model player =
-    case model.state of
+cursorStyle : Game -> Player -> Attribute Msg
+cursorStyle game player =
+    case game.state of
         Turn p ->
             if p == player then
                 pointerCursor
@@ -724,9 +782,9 @@ pointerCursor =
     style "cursor" "pointer"
 
 
-upsideDown : Model -> Player -> Attribute Msg
-upsideDown model player =
-    if model.settings.upsideDownEnabled && player == Two then
+upsideDown : Game -> Player -> Attribute Msg
+upsideDown game player =
+    if game.settings.upsideDownEnabled && player == Two then
         style "transform" "rotate(180deg)"
 
     else
