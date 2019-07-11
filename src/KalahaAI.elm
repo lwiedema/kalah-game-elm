@@ -46,22 +46,19 @@ nextMove game weights =
         moves =
             List.indexedMap (\pos element -> element * moveQuality game pos) weights
     in
-    case List.maximum moves of
-        Just bestMoveQuality ->
-            if bestMoveQuality == 0.0 then
-                -- this point should never get reached
-                -- "best" move was predicted as sowing from an empty house.
-                -- it can only be the maximum if ALL houses are empty
-                -- but game should be displayed as ended before that
-                Nothing
+    List.maximum moves
+        |> Maybe.andThen
+            (\bestMoveQuality ->
+                if bestMoveQuality == 0.0 then
+                    -- this point should never get reached
+                    -- "best" move was predicted as sowing from an empty house.
+                    -- it can only be the maximum if ALL houses are empty
+                    -- but game should be displayed as ended before that
+                    Nothing
 
-            else
-                Just (ListHelper.getIndex bestMoveQuality moves)
-
-        Nothing ->
-            -- this point should never get reached
-            -- moves-Map was empty
-            Nothing
+                else
+                    Just (ListHelper.getIndex bestMoveQuality moves)
+            )
 
 
 moveQuality : Game -> Int -> Float
