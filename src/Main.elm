@@ -264,7 +264,7 @@ view model =
             div []
                 [ Html.text "Sorry! An error has occurred."
                 , Html.br [] []
-                , Html.text ("ErrorCode: " ++ Datatypes.errorToString errorType)
+                , Html.text (Datatypes.errorCode errorType ++ ": " ++ Datatypes.errorToString errorType)
                 , Html.br [] []
                 , Html.text "Please reload game."
                 , iconButton (Localization.restart English) Material.Icons.Navigation.refresh Restart
@@ -499,7 +499,7 @@ sowingView game =
             [ div []
                 (case game.board.sowingState of
                     Sowing info ->
-                        List.repeat info.seedsToSow (seedView sowingSeedsColor)
+                        List.repeat info.seedsToSow (seedView sowingSeedsColorString)
 
                     _ ->
                         []
@@ -594,7 +594,7 @@ settingsView game =
                         (game.settings.language == English)
                     ]
                 ]
-            , div [ style "height" "2px", style "width" "90%", style "margin" "0 auto", style "background-color" sowingSeedsColor ] []
+            , div [ style "height" "2px", style "width" "90%", style "margin" "0 auto", style "background-color" sowingSeedsColorString ] []
             , Html.br [] []
             , Html.text (Localization.gameModeSettings game.settings.language)
             , Html.form [ style "margin" "10px", style "font-size" "18px" ]
@@ -695,7 +695,7 @@ radioButton onClickMsg label isChecked =
                else
                 Material.Icons.Toggle.radio_button_unchecked
               )
-                sowingSeedsColorColor
+                sowingSeedsColor
                 20
             ]
         , div [ style "margin-left" "3px" ] [ Html.text label ]
@@ -716,7 +716,7 @@ checkBox onClickMsg title description isChecked =
                else
                 Material.Icons.Toggle.check_box_outline_blank
               )
-                sowingSeedsColorColor
+                sowingSeedsColor
                 25
             ]
         , div [ style "margin-left" "3px" ] [ Html.text description ]
@@ -841,13 +841,13 @@ settingsChoiceStyle =
 -- BEGIN constants
 
 
-sowingSeedsColor : String
-sowingSeedsColor =
+sowingSeedsColorString : String
+sowingSeedsColorString =
     "#db004e"
 
 
-sowingSeedsColorColor : Color.Color
-sowingSeedsColorColor =
+sowingSeedsColor : Color.Color
+sowingSeedsColor =
     Color.rgb255 219 0 78
 
 

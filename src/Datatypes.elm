@@ -1,4 +1,4 @@
-module Datatypes exposing (ErrorType(..), Model(..), Msg(..), SettingOption(..), errorToString)
+module Datatypes exposing (ErrorType(..), Model(..), Msg(..), SettingOption(..), errorCode, errorToString)
 
 import Game exposing (Game)
 import Localization exposing (Language(..))
@@ -18,8 +18,8 @@ type ErrorType
     | Unexpected
 
 
-errorToString : ErrorType -> String
-errorToString error =
+errorCode : ErrorType -> String
+errorCode error =
     case error of
         BestMoveZero ->
             "BestMoveZero"
@@ -28,10 +28,26 @@ errorToString error =
             "StartSowingIllegal"
 
         NextSowingStepIllegal ->
-            "StartSowingIllegal"
+            "NextSowingStepIllegal"
 
         Unexpected ->
             "Unexpected"
+
+
+errorToString : ErrorType -> String
+errorToString error =
+    case error of
+        BestMoveZero ->
+            "There was no possible move found."
+
+        StartSowingIllegal ->
+            "Starting to sow not possible with current sowing status."
+
+        NextSowingStepIllegal ->
+            "No next step possible with current sowing status."
+
+        Unexpected ->
+            "An unexpected error occurred."
 
 
 type Msg
