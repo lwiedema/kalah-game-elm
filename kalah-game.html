@@ -6459,16 +6459,28 @@ var author$project$Main$update = F2(
 	});
 var author$project$Datatypes$OpenSettings = {$: 3};
 var author$project$Datatypes$Restart = {$: 2};
-var author$project$Datatypes$errorToString = function (error) {
+var author$project$Datatypes$errorCode = function (error) {
 	switch (error) {
 		case 0:
 			return 'BestMoveZero';
 		case 1:
 			return 'StartSowingIllegal';
 		case 2:
-			return 'StartSowingIllegal';
+			return 'NextSowingStepIllegal';
 		default:
 			return 'Unexpected';
+	}
+};
+var author$project$Datatypes$errorToString = function (error) {
+	switch (error) {
+		case 0:
+			return 'There was no possible move found.';
+		case 1:
+			return 'Starting to sow not possible with current sowing status.';
+		case 2:
+			return 'No next step possible with current sowing status.';
+		default:
+			return 'An unexpected error occurred.';
 	}
 };
 var author$project$Localization$restart = function (language) {
@@ -7101,7 +7113,7 @@ var author$project$Main$settingsChoiceStyle = _List_fromArray(
 		A2(elm$html$Html$Attributes$style, 'justify-content', 'center'),
 		A2(elm$html$Html$Attributes$style, 'align-items', 'center')
 	]);
-var author$project$Main$sowingSeedsColorColor = A3(avh4$elm_color$Color$rgb255, 219, 0, 78);
+var author$project$Main$sowingSeedsColor = A3(avh4$elm_color$Color$rgb255, 219, 0, 78);
 var avh4$elm_color$Color$toRgba = function (_n0) {
 	var r = _n0.a;
 	var g = _n0.b;
@@ -7203,7 +7215,7 @@ var author$project$Main$checkBox = F4(
 							[
 								A2(
 								isChecked ? danmarcab$material_icons$Material$Icons$Toggle$check_box : danmarcab$material_icons$Material$Icons$Toggle$check_box_outline_blank,
-								author$project$Main$sowingSeedsColorColor,
+								author$project$Main$sowingSeedsColor,
 								25)
 							])),
 						A2(
@@ -7265,7 +7277,7 @@ var author$project$Main$radioButton = F3(
 						[
 							A2(
 							isChecked ? danmarcab$material_icons$Material$Icons$Toggle$radio_button_checked : danmarcab$material_icons$Material$Icons$Toggle$radio_button_unchecked,
-							author$project$Main$sowingSeedsColorColor,
+							author$project$Main$sowingSeedsColor,
 							20)
 						])),
 					A2(
@@ -7280,7 +7292,7 @@ var author$project$Main$radioButton = F3(
 						]))
 				]));
 	});
-var author$project$Main$sowingSeedsColor = '#db004e';
+var author$project$Main$sowingSeedsColorString = '#db004e';
 var author$project$Settings$Fast = 2;
 var author$project$Settings$High = 0;
 var author$project$Settings$Low = 2;
@@ -7402,7 +7414,7 @@ var author$project$Main$settingsView = function (game) {
 							A2(elm$html$Html$Attributes$style, 'height', '2px'),
 							A2(elm$html$Html$Attributes$style, 'width', '90%'),
 							A2(elm$html$Html$Attributes$style, 'margin', '0 auto'),
-							A2(elm$html$Html$Attributes$style, 'background-color', author$project$Main$sowingSeedsColor)
+							A2(elm$html$Html$Attributes$style, 'background-color', author$project$Main$sowingSeedsColorString)
 						]),
 					_List_Nil),
 					A2(elm$html$Html$br, _List_Nil, _List_Nil),
@@ -7567,7 +7579,7 @@ var author$project$Main$sowingView = function (game) {
 								return A2(
 									elm$core$List$repeat,
 									info.aa,
-									author$project$Main$seedView(author$project$Main$sowingSeedsColor));
+									author$project$Main$seedView(author$project$Main$sowingSeedsColorString));
 							} else {
 								return _List_Nil;
 							}
@@ -7771,7 +7783,7 @@ var author$project$Main$view = function (model) {
 					elm$html$Html$text('Sorry! An error has occurred.'),
 					A2(elm$html$Html$br, _List_Nil, _List_Nil),
 					elm$html$Html$text(
-					'ErrorCode: ' + author$project$Datatypes$errorToString(errorType)),
+					author$project$Datatypes$errorCode(errorType) + (': ' + author$project$Datatypes$errorToString(errorType))),
 					A2(elm$html$Html$br, _List_Nil, _List_Nil),
 					elm$html$Html$text('Please reload game.'),
 					A3(
