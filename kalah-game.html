@@ -87,14 +87,14 @@ function A9(fun, a, b, c, d, e, f, g, h, i) {
   return fun.a === 9 ? fun.f(a, b, c, d, e, f, g, h, i) : fun(a)(b)(c)(d)(e)(f)(g)(h)(i);
 }
 
+console.warn('Compiled in DEV mode. Follow the advice at https://elm-lang.org/0.19.0/optimize for better performance and smaller assets.');
 
 
+var _List_Nil_UNUSED = { $: 0 };
+var _List_Nil = { $: '[]' };
 
-var _List_Nil = { $: 0 };
-var _List_Nil_UNUSED = { $: '[]' };
-
-function _List_Cons(hd, tl) { return { $: 1, a: hd, b: tl }; }
-function _List_Cons_UNUSED(hd, tl) { return { $: '::', a: hd, b: tl }; }
+function _List_Cons_UNUSED(hd, tl) { return { $: 1, a: hd, b: tl }; }
+function _List_Cons(hd, tl) { return { $: '::', a: hd, b: tl }; }
 
 
 var _List_cons = F2(_List_Cons);
@@ -204,7 +204,7 @@ function _Utils_eqHelp(x, y, depth, stack)
 		return false;
 	}
 
-	/**_UNUSED/
+	/**/
 	if (x.$ === 'Set_elm_builtin')
 	{
 		x = elm$core$Set$toList(x);
@@ -217,7 +217,7 @@ function _Utils_eqHelp(x, y, depth, stack)
 	}
 	//*/
 
-	/**/
+	/**_UNUSED/
 	if (x.$ < 0)
 	{
 		x = elm$core$Dict$toList(x);
@@ -252,7 +252,7 @@ function _Utils_cmp(x, y, ord)
 		return x === y ? /*EQ*/ 0 : x < y ? /*LT*/ -1 : /*GT*/ 1;
 	}
 
-	/**_UNUSED/
+	/**/
 	if (x instanceof String)
 	{
 		var a = x.valueOf();
@@ -261,10 +261,10 @@ function _Utils_cmp(x, y, ord)
 	}
 	//*/
 
-	/**/
+	/**_UNUSED/
 	if (typeof x.$ === 'undefined')
 	//*/
-	/**_UNUSED/
+	/**/
 	if (x.$[0] === '#')
 	//*/
 	{
@@ -294,17 +294,17 @@ var _Utils_compare = F2(function(x, y)
 
 // COMMON VALUES
 
-var _Utils_Tuple0 = 0;
-var _Utils_Tuple0_UNUSED = { $: '#0' };
+var _Utils_Tuple0_UNUSED = 0;
+var _Utils_Tuple0 = { $: '#0' };
 
-function _Utils_Tuple2(a, b) { return { a: a, b: b }; }
-function _Utils_Tuple2_UNUSED(a, b) { return { $: '#2', a: a, b: b }; }
+function _Utils_Tuple2_UNUSED(a, b) { return { a: a, b: b }; }
+function _Utils_Tuple2(a, b) { return { $: '#2', a: a, b: b }; }
 
-function _Utils_Tuple3(a, b, c) { return { a: a, b: b, c: c }; }
-function _Utils_Tuple3_UNUSED(a, b, c) { return { $: '#3', a: a, b: b, c: c }; }
+function _Utils_Tuple3_UNUSED(a, b, c) { return { a: a, b: b, c: c }; }
+function _Utils_Tuple3(a, b, c) { return { $: '#3', a: a, b: b, c: c }; }
 
-function _Utils_chr(c) { return c; }
-function _Utils_chr_UNUSED(c) { return new String(c); }
+function _Utils_chr_UNUSED(c) { return c; }
+function _Utils_chr(c) { return new String(c); }
 
 
 // RECORDS
@@ -509,12 +509,12 @@ var _JsArray_appendN = F3(function(n, dest, source)
 
 // LOG
 
-var _Debug_log = F2(function(tag, value)
+var _Debug_log_UNUSED = F2(function(tag, value)
 {
 	return value;
 });
 
-var _Debug_log_UNUSED = F2(function(tag, value)
+var _Debug_log = F2(function(tag, value)
 {
 	console.log(tag + ': ' + _Debug_toString(value));
 	return value;
@@ -540,12 +540,12 @@ function _Debug_todoCase(moduleName, region, value)
 
 // TO STRING
 
-function _Debug_toString(value)
+function _Debug_toString_UNUSED(value)
 {
 	return '<internals>';
 }
 
-function _Debug_toString_UNUSED(value)
+function _Debug_toString(value)
 {
 	return _Debug_toAnsiString(false, value);
 }
@@ -730,13 +730,13 @@ function _Debug_toHexDigit(n)
 // CRASH
 
 
-function _Debug_crash(identifier)
+function _Debug_crash_UNUSED(identifier)
 {
 	throw new Error('https://github.com/elm/core/blob/1.0.0/hints/' + identifier + '.md');
 }
 
 
-function _Debug_crash_UNUSED(identifier, fact1, fact2, fact3, fact4)
+function _Debug_crash(identifier, fact1, fact2, fact3, fact4)
 {
 	switch(identifier)
 	{
@@ -794,11 +794,11 @@ function _Debug_crash_UNUSED(identifier, fact1, fact2, fact3, fact4)
 
 function _Debug_regionToString(region)
 {
-	if (region.ac.H === region.ai.H)
+	if (region.start.line === region.end.line)
 	{
-		return 'on line ' + region.ac.H;
+		return 'on line ' + region.start.line;
 	}
-	return 'on lines ' + region.ac.H + ' through ' + region.ai.H;
+	return 'on lines ' + region.start.line + ' through ' + region.end.line;
 }
 
 
@@ -1222,7 +1222,7 @@ function _String_fromList(chars)
 
 
 
-/**_UNUSED/
+/**/
 function _Json_errorToString(error)
 {
 	return elm$json$Json$Decode$errorToString(error);
@@ -1626,11 +1626,11 @@ var _Json_encode = F2(function(indentLevel, value)
 	return JSON.stringify(_Json_unwrap(value), null, indentLevel) + '';
 });
 
-function _Json_wrap_UNUSED(value) { return { $: 0, a: value }; }
-function _Json_unwrap_UNUSED(value) { return value.a; }
+function _Json_wrap(value) { return { $: 0, a: value }; }
+function _Json_unwrap(value) { return value.a; }
 
-function _Json_wrap(value) { return value; }
-function _Json_unwrap(value) { return value; }
+function _Json_wrap_UNUSED(value) { return value; }
+function _Json_unwrap_UNUSED(value) { return value; }
 
 function _Json_emptyArray() { return []; }
 function _Json_emptyObject() { return {}; }
@@ -1867,9 +1867,9 @@ var _Platform_worker = F4(function(impl, flagDecoder, debugMetadata, args)
 	return _Platform_initialize(
 		flagDecoder,
 		args,
-		impl.aR,
-		impl.a$,
-		impl.aZ,
+		impl.init,
+		impl.update,
+		impl.subscriptions,
 		function() { return function() {} }
 	);
 });
@@ -1882,7 +1882,7 @@ var _Platform_worker = F4(function(impl, flagDecoder, debugMetadata, args)
 function _Platform_initialize(flagDecoder, args, init, update, subscriptions, stepperBuilder)
 {
 	var result = A2(_Json_run, flagDecoder, _Json_wrap(args ? args['flags'] : undefined));
-	elm$core$Result$isOk(result) || _Debug_crash(2 /**_UNUSED/, _Json_errorToString(result.a) /**/);
+	elm$core$Result$isOk(result) || _Debug_crash(2 /**/, _Json_errorToString(result.a) /**/);
 	var managers = {};
 	result = init(result.a);
 	var model = result.a;
@@ -2281,7 +2281,7 @@ function _Platform_setupIncomingPort(name, sendToApp)
 //
 
 
-function _Platform_export(exports)
+function _Platform_export_UNUSED(exports)
 {
 	scope['Elm']
 		? _Platform_mergeExportsProd(scope['Elm'], exports)
@@ -2302,7 +2302,7 @@ function _Platform_mergeExportsProd(obj, exports)
 }
 
 
-function _Platform_export_UNUSED(exports)
+function _Platform_export(exports)
 {
 	scope['Elm']
 		? _Platform_mergeExportsDebug('Elm', scope['Elm'], exports)
@@ -2425,10 +2425,10 @@ var _VirtualDom_init = F4(function(virtualNode, flagDecoder, debugMetadata, args
 {
 	// NOTE: this function needs _Platform_export available to work
 
-	/**/
+	/**_UNUSED/
 	var node = args['node'];
 	//*/
-	/**_UNUSED/
+	/**/
 	var node = args && args['node'] ? args['node'] : _Debug_crash(0);
 	//*/
 
@@ -2683,24 +2683,24 @@ function _VirtualDom_noInnerHtmlOrFormAction(key)
 	return key == 'innerHTML' || key == 'formAction' ? 'data-' + key : key;
 }
 
-function _VirtualDom_noJavaScriptUri(value)
+function _VirtualDom_noJavaScriptUri_UNUSED(value)
 {
 	return /^javascript:/i.test(value.replace(/\s/g,'')) ? '' : value;
 }
 
-function _VirtualDom_noJavaScriptUri_UNUSED(value)
+function _VirtualDom_noJavaScriptUri(value)
 {
 	return /^javascript:/i.test(value.replace(/\s/g,''))
 		? 'javascript:alert("This is an XSS vector. Please use ports or web components instead.")'
 		: value;
 }
 
-function _VirtualDom_noJavaScriptOrHtmlUri(value)
+function _VirtualDom_noJavaScriptOrHtmlUri_UNUSED(value)
 {
 	return /^\s*(javascript:|data:text\/html)/i.test(value) ? '' : value;
 }
 
-function _VirtualDom_noJavaScriptOrHtmlUri_UNUSED(value)
+function _VirtualDom_noJavaScriptOrHtmlUri(value)
 {
 	return /^\s*(javascript:|data:text\/html)/i.test(value)
 		? 'javascript:alert("This is an XSS vector. Please use ports or web components instead.")'
@@ -2752,9 +2752,9 @@ var _VirtualDom_mapEventTuple = F2(function(func, tuple)
 var _VirtualDom_mapEventRecord = F2(function(func, record)
 {
 	return {
-		p: func(record.p),
-		ae: record.ae,
-		Z: record.Z
+		message: func(record.message),
+		stopPropagation: record.stopPropagation,
+		preventDefault: record.preventDefault
 	}
 });
 
@@ -3022,11 +3022,11 @@ function _VirtualDom_makeCallback(eventNode, initialHandler)
 		// 3 = Custom
 
 		var value = result.a;
-		var message = !tag ? value : tag < 3 ? value.a : value.p;
-		var stopPropagation = tag == 1 ? value.b : tag == 3 && value.ae;
+		var message = !tag ? value : tag < 3 ? value.a : value.message;
+		var stopPropagation = tag == 1 ? value.b : tag == 3 && value.stopPropagation;
 		var currentEventNode = (
 			stopPropagation && event.stopPropagation(),
-			(tag == 2 ? value.b : tag == 3 && value.Z) && event.preventDefault(),
+			(tag == 2 ? value.b : tag == 3 && value.preventDefault) && event.preventDefault(),
 			eventNode
 		);
 		var tagger;
@@ -3976,15 +3976,15 @@ var _Browser_element = _Debugger_element || F4(function(impl, flagDecoder, debug
 	return _Platform_initialize(
 		flagDecoder,
 		args,
-		impl.aR,
-		impl.a$,
-		impl.aZ,
+		impl.init,
+		impl.update,
+		impl.subscriptions,
 		function(sendToApp, initialModel) {
-			var view = impl.a1;
-			/**/
+			var view = impl.view;
+			/**_UNUSED/
 			var domNode = args['node'];
 			//*/
-			/**_UNUSED/
+			/**/
 			var domNode = args && args['node'] ? args['node'] : _Debug_crash(0);
 			//*/
 			var currNode = _VirtualDom_virtualize(domNode);
@@ -4012,12 +4012,12 @@ var _Browser_document = _Debugger_document || F4(function(impl, flagDecoder, deb
 	return _Platform_initialize(
 		flagDecoder,
 		args,
-		impl.aR,
-		impl.a$,
-		impl.aZ,
+		impl.init,
+		impl.update,
+		impl.subscriptions,
 		function(sendToApp, initialModel) {
-			var divertHrefToApp = impl.M && impl.M(sendToApp)
-			var view = impl.a1;
+			var divertHrefToApp = impl.setup && impl.setup(sendToApp)
+			var view = impl.view;
 			var title = _VirtualDom_doc.title;
 			var bodyNode = _VirtualDom_doc.body;
 			var currNode = _VirtualDom_virtualize(bodyNode);
@@ -4025,12 +4025,12 @@ var _Browser_document = _Debugger_document || F4(function(impl, flagDecoder, deb
 			{
 				_VirtualDom_divertHrefToApp = divertHrefToApp;
 				var doc = view(model);
-				var nextNode = _VirtualDom_node('body')(_List_Nil)(doc.aJ);
+				var nextNode = _VirtualDom_node('body')(_List_Nil)(doc.body);
 				var patches = _VirtualDom_diff(currNode, nextNode);
 				bodyNode = _VirtualDom_applyPatches(bodyNode, currNode, patches, sendToApp);
 				currNode = nextNode;
 				_VirtualDom_divertHrefToApp = 0;
-				(title !== doc.a_) && (_VirtualDom_doc.title = title = doc.a_);
+				(title !== doc.title) && (_VirtualDom_doc.title = title = doc.title);
 			});
 		}
 	);
@@ -4086,12 +4086,12 @@ function _Browser_makeAnimator(model, draw)
 
 function _Browser_application(impl)
 {
-	var onUrlChange = impl.aT;
-	var onUrlRequest = impl.aU;
+	var onUrlChange = impl.onUrlChange;
+	var onUrlRequest = impl.onUrlRequest;
 	var key = function() { key.a(onUrlChange(_Browser_getUrl())); };
 
 	return _Browser_document({
-		M: function(sendToApp)
+		setup: function(sendToApp)
 		{
 			key.a = sendToApp;
 			_Browser_window.addEventListener('popstate', key);
@@ -4107,9 +4107,9 @@ function _Browser_application(impl)
 					var next = elm$url$Url$fromString(href).a;
 					sendToApp(onUrlRequest(
 						(next
-							&& curr.ay === next.ay
-							&& curr.al === next.al
-							&& curr.av.a === next.av.a
+							&& curr.protocol === next.protocol
+							&& curr.host === next.host
+							&& curr.port_.a === next.port_.a
 						)
 							? elm$browser$Browser$Internal(next)
 							: elm$browser$Browser$External(href)
@@ -4117,13 +4117,13 @@ function _Browser_application(impl)
 				}
 			});
 		},
-		aR: function(flags)
+		init: function(flags)
 		{
-			return A3(impl.aR, flags, _Browser_getUrl(), key);
+			return A3(impl.init, flags, _Browser_getUrl(), key);
 		},
-		a1: impl.a1,
-		a$: impl.a$,
-		aZ: impl.aZ
+		view: impl.view,
+		update: impl.update,
+		subscriptions: impl.subscriptions
 	});
 }
 
@@ -4189,17 +4189,17 @@ var _Browser_decodeEvent = F2(function(decoder, event)
 function _Browser_visibilityInfo()
 {
 	return (typeof _VirtualDom_doc.hidden !== 'undefined')
-		? { aP: 'hidden', aK: 'visibilitychange' }
+		? { hidden: 'hidden', change: 'visibilitychange' }
 		:
 	(typeof _VirtualDom_doc.mozHidden !== 'undefined')
-		? { aP: 'mozHidden', aK: 'mozvisibilitychange' }
+		? { hidden: 'mozHidden', change: 'mozvisibilitychange' }
 		:
 	(typeof _VirtualDom_doc.msHidden !== 'undefined')
-		? { aP: 'msHidden', aK: 'msvisibilitychange' }
+		? { hidden: 'msHidden', change: 'msvisibilitychange' }
 		:
 	(typeof _VirtualDom_doc.webkitHidden !== 'undefined')
-		? { aP: 'webkitHidden', aK: 'webkitvisibilitychange' }
-		: { aP: 'hidden', aK: 'visibilitychange' };
+		? { hidden: 'webkitHidden', change: 'webkitvisibilitychange' }
+		: { hidden: 'hidden', change: 'visibilitychange' };
 }
 
 
@@ -4280,12 +4280,12 @@ var _Browser_call = F2(function(functionName, id)
 function _Browser_getViewport()
 {
 	return {
-		aD: _Browser_getScene(),
-		aG: {
-			T: _Browser_window.pageXOffset,
-			U: _Browser_window.pageYOffset,
-			F: _Browser_doc.documentElement.clientWidth,
-			z: _Browser_doc.documentElement.clientHeight
+		scene: _Browser_getScene(),
+		viewport: {
+			x: _Browser_window.pageXOffset,
+			y: _Browser_window.pageYOffset,
+			width: _Browser_doc.documentElement.clientWidth,
+			height: _Browser_doc.documentElement.clientHeight
 		}
 	};
 }
@@ -4295,8 +4295,8 @@ function _Browser_getScene()
 	var body = _Browser_doc.body;
 	var elem = _Browser_doc.documentElement;
 	return {
-		F: Math.max(body.scrollWidth, body.offsetWidth, elem.scrollWidth, elem.offsetWidth, elem.clientWidth),
-		z: Math.max(body.scrollHeight, body.offsetHeight, elem.scrollHeight, elem.offsetHeight, elem.clientHeight)
+		width: Math.max(body.scrollWidth, body.offsetWidth, elem.scrollWidth, elem.offsetWidth, elem.clientWidth),
+		height: Math.max(body.scrollHeight, body.offsetHeight, elem.scrollHeight, elem.offsetHeight, elem.clientHeight)
 	};
 }
 
@@ -4319,15 +4319,15 @@ function _Browser_getViewportOf(id)
 	return _Browser_withNode(id, function(node)
 	{
 		return {
-			aD: {
-				F: node.scrollWidth,
-				z: node.scrollHeight
+			scene: {
+				width: node.scrollWidth,
+				height: node.scrollHeight
 			},
-			aG: {
-				T: node.scrollLeft,
-				U: node.scrollTop,
-				F: node.clientWidth,
-				z: node.clientHeight
+			viewport: {
+				x: node.scrollLeft,
+				y: node.scrollTop,
+				width: node.clientWidth,
+				height: node.clientHeight
 			}
 		};
 	});
@@ -4357,18 +4357,18 @@ function _Browser_getElement(id)
 		var x = _Browser_window.pageXOffset;
 		var y = _Browser_window.pageYOffset;
 		return {
-			aD: _Browser_getScene(),
-			aG: {
-				T: x,
-				U: y,
-				F: _Browser_doc.documentElement.clientWidth,
-				z: _Browser_doc.documentElement.clientHeight
+			scene: _Browser_getScene(),
+			viewport: {
+				x: x,
+				y: y,
+				width: _Browser_doc.documentElement.clientWidth,
+				height: _Browser_doc.documentElement.clientHeight
 			},
-			aL: {
-				T: x + rect.left,
-				U: y + rect.top,
-				F: rect.width,
-				z: rect.height
+			element: {
+				x: x + rect.left,
+				y: y + rect.top,
+				width: rect.width,
+				height: rect.height
 			}
 		};
 	});
@@ -4404,25 +4404,25 @@ function _Browser_load(url)
 	}));
 }
 var author$project$Datatypes$GameOk = function (a) {
-	return {$: 0, a: a};
+	return {$: 'GameOk', a: a};
 };
 var author$project$Game$Turn = function (a) {
-	return {$: 0, a: a};
+	return {$: 'Turn', a: a};
 };
-var author$project$GameBoard$NotSowing = {$: 0};
+var author$project$GameBoard$NotSowing = {$: 'NotSowing'};
 var elm$core$Array$branchFactor = 32;
 var elm$core$Array$Array_elm_builtin = F4(
 	function (a, b, c, d) {
-		return {$: 0, a: a, b: b, c: c, d: d};
+		return {$: 'Array_elm_builtin', a: a, b: b, c: c, d: d};
 	});
-var elm$core$Basics$EQ = 1;
-var elm$core$Basics$GT = 2;
-var elm$core$Basics$LT = 0;
+var elm$core$Basics$EQ = {$: 'EQ'};
+var elm$core$Basics$GT = {$: 'GT'};
+var elm$core$Basics$LT = {$: 'LT'};
 var elm$core$Dict$foldr = F3(
 	function (func, acc, t) {
 		foldr:
 		while (true) {
-			if (t.$ === -2) {
+			if (t.$ === 'RBEmpty_elm_builtin') {
 				return acc;
 			} else {
 				var key = t.b;
@@ -4468,7 +4468,7 @@ var elm$core$Dict$keys = function (dict) {
 		dict);
 };
 var elm$core$Set$toList = function (_n0) {
-	var dict = _n0;
+	var dict = _n0.a;
 	return elm$core$Dict$keys(dict);
 };
 var elm$core$Elm$JsArray$foldr = _JsArray_foldr;
@@ -4478,7 +4478,7 @@ var elm$core$Array$foldr = F3(
 		var tail = _n0.d;
 		var helper = F2(
 			function (node, acc) {
-				if (!node.$) {
+				if (node.$ === 'SubTree') {
 					var subTree = node.a;
 					return A3(elm$core$Elm$JsArray$foldr, helper, acc, subTree);
 				} else {
@@ -4507,10 +4507,10 @@ var elm$core$Array$shiftStep = elm$core$Basics$ceiling(
 var elm$core$Elm$JsArray$empty = _JsArray_empty;
 var elm$core$Array$empty = A4(elm$core$Array$Array_elm_builtin, 0, elm$core$Array$shiftStep, elm$core$Elm$JsArray$empty, elm$core$Elm$JsArray$empty);
 var elm$core$Array$Leaf = function (a) {
-	return {$: 1, a: a};
+	return {$: 'Leaf', a: a};
 };
 var elm$core$Array$SubTree = function (a) {
-	return {$: 0, a: a};
+	return {$: 'SubTree', a: a};
 };
 var elm$core$Elm$JsArray$initializeFromList = _JsArray_initializeFromList;
 var elm$core$List$foldl = F3(
@@ -4598,28 +4598,28 @@ var elm$core$Basics$sub = _Basics_sub;
 var elm$core$Elm$JsArray$length = _JsArray_length;
 var elm$core$Array$builderToArray = F2(
 	function (reverseNodeList, builder) {
-		if (!builder.c) {
+		if (!builder.nodeListSize) {
 			return A4(
 				elm$core$Array$Array_elm_builtin,
-				elm$core$Elm$JsArray$length(builder.d),
+				elm$core$Elm$JsArray$length(builder.tail),
 				elm$core$Array$shiftStep,
 				elm$core$Elm$JsArray$empty,
-				builder.d);
+				builder.tail);
 		} else {
-			var treeLen = builder.c * elm$core$Array$branchFactor;
+			var treeLen = builder.nodeListSize * elm$core$Array$branchFactor;
 			var depth = elm$core$Basics$floor(
 				A2(elm$core$Basics$logBase, elm$core$Array$branchFactor, treeLen - 1));
-			var correctNodeList = reverseNodeList ? elm$core$List$reverse(builder.e) : builder.e;
-			var tree = A2(elm$core$Array$treeFromBuilder, correctNodeList, builder.c);
+			var correctNodeList = reverseNodeList ? elm$core$List$reverse(builder.nodeList) : builder.nodeList;
+			var tree = A2(elm$core$Array$treeFromBuilder, correctNodeList, builder.nodeListSize);
 			return A4(
 				elm$core$Array$Array_elm_builtin,
-				elm$core$Elm$JsArray$length(builder.d) + treeLen,
+				elm$core$Elm$JsArray$length(builder.tail) + treeLen,
 				A2(elm$core$Basics$max, 5, depth * elm$core$Array$shiftStep),
 				tree,
-				builder.d);
+				builder.tail);
 		}
 	});
-var elm$core$Basics$False = 1;
+var elm$core$Basics$False = {$: 'False'};
 var elm$core$Basics$idiv = _Basics_idiv;
 var elm$core$Basics$lt = _Utils_lt;
 var elm$core$Elm$JsArray$initialize = _JsArray_initialize;
@@ -4631,7 +4631,7 @@ var elm$core$Array$initializeHelp = F5(
 				return A2(
 					elm$core$Array$builderToArray,
 					false,
-					{e: nodeList, c: (len / elm$core$Array$branchFactor) | 0, d: tail});
+					{nodeList: nodeList, nodeListSize: (len / elm$core$Array$branchFactor) | 0, tail: tail});
 			} else {
 				var leaf = elm$core$Array$Leaf(
 					A3(elm$core$Elm$JsArray$initialize, elm$core$Array$branchFactor, fromIndex, fn));
@@ -4676,78 +4676,78 @@ var author$project$GameBoard$createRow = F2(
 		return A2(
 			elm$core$Array$repeat,
 			houses,
-			{j: 0, g: seeds});
+			{justSown: 0, seeds: seeds});
 	});
-var author$project$GameBoard$emptyStore = {j: 0, g: 0};
+var author$project$GameBoard$emptyStore = {justSown: 0, seeds: 0};
 var author$project$GameBoard$buildBoard = function (settings) {
 	return {
-		l: _Utils_Tuple2(
-			A2(author$project$GameBoard$createRow, settings.I, settings.ar),
-			A2(author$project$GameBoard$createRow, settings.I, settings.ar)),
-		r: author$project$GameBoard$NotSowing,
-		m: _Utils_Tuple2(author$project$GameBoard$emptyStore, author$project$GameBoard$emptyStore)
+		rows: _Utils_Tuple2(
+			A2(author$project$GameBoard$createRow, settings.numberOfHouses, settings.numberOfSeeds),
+			A2(author$project$GameBoard$createRow, settings.numberOfHouses, settings.numberOfSeeds)),
+		sowingState: author$project$GameBoard$NotSowing,
+		stores: _Utils_Tuple2(author$project$GameBoard$emptyStore, author$project$GameBoard$emptyStore)
 	};
 };
-var author$project$Player$One = 0;
-var author$project$Player$Two = 1;
+var author$project$Player$One = {$: 'One'};
+var author$project$Player$Two = {$: 'Two'};
 var author$project$Main$restartGame = function (settings) {
 	return {
-		b: author$project$GameBoard$buildBoard(settings),
-		L: settings,
-		ad: author$project$Game$Turn(
-			settings.R ? 1 : 0)
+		board: author$project$GameBoard$buildBoard(settings),
+		settings: settings,
+		state: author$project$Game$Turn(
+			settings.playerTwoStarting ? author$project$Player$Two : author$project$Player$One)
 	};
 };
-var author$project$Localization$English = 1;
-var author$project$Settings$Normal = 1;
-var author$project$Settings$Real = {$: 0};
-var author$project$Settings$defaultSettings = {a: 1, ao: false, I: 6, ar: 4, aW: author$project$Settings$Real, R: false, ab: false, aY: false, D: 1, S: false};
+var author$project$Localization$German = {$: 'German'};
+var author$project$Settings$Normal = {$: 'Normal'};
+var author$project$Settings$Real = {$: 'Real'};
+var author$project$Settings$defaultSettings = {language: author$project$Localization$German, lastSeedsForFinishingPlayer: false, numberOfHouses: 6, numberOfSeeds: 4, opponent: author$project$Settings$Real, playerTwoStarting: false, settingsOpen: false, sowInOpponentsStore: false, sowingSpeed: author$project$Settings$Normal, upsideDownEnabled: false};
 var author$project$Main$initalModel = author$project$Datatypes$GameOk(
 	author$project$Main$restartGame(author$project$Settings$defaultSettings));
-var author$project$Datatypes$ComputerHasTurn = {$: 5};
-var author$project$Datatypes$NextSowingStep = {$: 1};
+var author$project$Datatypes$ComputerHasTurn = {$: 'ComputerHasTurn'};
+var author$project$Datatypes$NextSowingStep = {$: 'NextSowingStep'};
 var author$project$Settings$speedInMilliseconds = function (sowingSpeed) {
-	switch (sowingSpeed) {
-		case 0:
+	switch (sowingSpeed.$) {
+		case 'Slow':
 			return 800;
-		case 1:
+		case 'Normal':
 			return 500;
 		default:
 			return 200;
 	}
 };
-var elm$core$Basics$True = 0;
+var elm$core$Basics$True = {$: 'True'};
 var elm$core$Result$isOk = function (result) {
-	if (!result.$) {
+	if (result.$ === 'Ok') {
 		return true;
 	} else {
 		return false;
 	}
 };
 var elm$core$Maybe$Just = function (a) {
-	return {$: 0, a: a};
+	return {$: 'Just', a: a};
 };
-var elm$core$Maybe$Nothing = {$: 1};
+var elm$core$Maybe$Nothing = {$: 'Nothing'};
 var elm$core$Result$Err = function (a) {
-	return {$: 1, a: a};
+	return {$: 'Err', a: a};
 };
 var elm$core$Result$Ok = function (a) {
-	return {$: 0, a: a};
+	return {$: 'Ok', a: a};
 };
 var elm$json$Json$Decode$Failure = F2(
 	function (a, b) {
-		return {$: 3, a: a, b: b};
+		return {$: 'Failure', a: a, b: b};
 	});
 var elm$json$Json$Decode$Field = F2(
 	function (a, b) {
-		return {$: 0, a: a, b: b};
+		return {$: 'Field', a: a, b: b};
 	});
 var elm$json$Json$Decode$Index = F2(
 	function (a, b) {
-		return {$: 1, a: a, b: b};
+		return {$: 'Index', a: a, b: b};
 	});
 var elm$json$Json$Decode$OneOf = function (a) {
-	return {$: 2, a: a};
+	return {$: 'OneOf', a: a};
 };
 var elm$core$Basics$and = _Basics_and;
 var elm$core$Basics$append = _Utils_append;
@@ -4849,12 +4849,12 @@ var elm$json$Json$Decode$errorToStringHelp = F2(
 		errorToStringHelp:
 		while (true) {
 			switch (error.$) {
-				case 0:
+				case 'Field':
 					var f = error.a;
 					var err = error.b;
 					var isSimple = function () {
 						var _n1 = elm$core$String$uncons(f);
-						if (_n1.$ === 1) {
+						if (_n1.$ === 'Nothing') {
 							return false;
 						} else {
 							var _n2 = _n1.a;
@@ -4869,7 +4869,7 @@ var elm$json$Json$Decode$errorToStringHelp = F2(
 					error = $temp$error;
 					context = $temp$context;
 					continue errorToStringHelp;
-				case 1:
+				case 'Index':
 					var i = error.a;
 					var err = error.b;
 					var indexName = '[' + (elm$core$String$fromInt(i) + ']');
@@ -4878,7 +4878,7 @@ var elm$json$Json$Decode$errorToStringHelp = F2(
 					error = $temp$error;
 					context = $temp$context;
 					continue errorToStringHelp;
-				case 2:
+				case 'OneOf':
 					var errors = error.a;
 					if (!errors.b) {
 						return 'Ran into a Json.Decode.oneOf with no possibilities' + function () {
@@ -4943,33 +4943,33 @@ var elm$core$Platform$Sub$batch = _Platform_batch;
 var elm$core$Platform$Sub$none = elm$core$Platform$Sub$batch(_List_Nil);
 var elm$time$Time$Every = F2(
 	function (a, b) {
-		return {$: 0, a: a, b: b};
+		return {$: 'Every', a: a, b: b};
 	});
-var elm$core$Dict$RBEmpty_elm_builtin = {$: -2};
+var elm$core$Dict$RBEmpty_elm_builtin = {$: 'RBEmpty_elm_builtin'};
 var elm$core$Dict$empty = elm$core$Dict$RBEmpty_elm_builtin;
 var elm$core$Task$succeed = _Scheduler_succeed;
 var elm$time$Time$State = F2(
 	function (taggers, processes) {
-		return {ax: processes, aF: taggers};
+		return {processes: processes, taggers: taggers};
 	});
 var elm$time$Time$init = elm$core$Task$succeed(
 	A2(elm$time$Time$State, elm$core$Dict$empty, elm$core$Dict$empty));
-var elm$core$Dict$Black = 1;
+var elm$core$Dict$Black = {$: 'Black'};
 var elm$core$Dict$RBNode_elm_builtin = F5(
 	function (a, b, c, d, e) {
-		return {$: -1, a: a, b: b, c: c, d: d, e: e};
+		return {$: 'RBNode_elm_builtin', a: a, b: b, c: c, d: d, e: e};
 	});
 var elm$core$Basics$compare = _Utils_compare;
-var elm$core$Dict$Red = 0;
+var elm$core$Dict$Red = {$: 'Red'};
 var elm$core$Dict$balance = F5(
 	function (color, key, value, left, right) {
-		if ((right.$ === -1) && (!right.a)) {
+		if ((right.$ === 'RBNode_elm_builtin') && (right.a.$ === 'Red')) {
 			var _n1 = right.a;
 			var rK = right.b;
 			var rV = right.c;
 			var rLeft = right.d;
 			var rRight = right.e;
-			if ((left.$ === -1) && (!left.a)) {
+			if ((left.$ === 'RBNode_elm_builtin') && (left.a.$ === 'Red')) {
 				var _n3 = left.a;
 				var lK = left.b;
 				var lV = left.c;
@@ -4977,22 +4977,22 @@ var elm$core$Dict$balance = F5(
 				var lRight = left.e;
 				return A5(
 					elm$core$Dict$RBNode_elm_builtin,
-					0,
+					elm$core$Dict$Red,
 					key,
 					value,
-					A5(elm$core$Dict$RBNode_elm_builtin, 1, lK, lV, lLeft, lRight),
-					A5(elm$core$Dict$RBNode_elm_builtin, 1, rK, rV, rLeft, rRight));
+					A5(elm$core$Dict$RBNode_elm_builtin, elm$core$Dict$Black, lK, lV, lLeft, lRight),
+					A5(elm$core$Dict$RBNode_elm_builtin, elm$core$Dict$Black, rK, rV, rLeft, rRight));
 			} else {
 				return A5(
 					elm$core$Dict$RBNode_elm_builtin,
 					color,
 					rK,
 					rV,
-					A5(elm$core$Dict$RBNode_elm_builtin, 0, key, value, left, rLeft),
+					A5(elm$core$Dict$RBNode_elm_builtin, elm$core$Dict$Red, key, value, left, rLeft),
 					rRight);
 			}
 		} else {
-			if ((((left.$ === -1) && (!left.a)) && (left.d.$ === -1)) && (!left.d.a)) {
+			if ((((left.$ === 'RBNode_elm_builtin') && (left.a.$ === 'Red')) && (left.d.$ === 'RBNode_elm_builtin')) && (left.d.a.$ === 'Red')) {
 				var _n5 = left.a;
 				var lK = left.b;
 				var lV = left.c;
@@ -5005,11 +5005,11 @@ var elm$core$Dict$balance = F5(
 				var lRight = left.e;
 				return A5(
 					elm$core$Dict$RBNode_elm_builtin,
-					0,
+					elm$core$Dict$Red,
 					lK,
 					lV,
-					A5(elm$core$Dict$RBNode_elm_builtin, 1, llK, llV, llLeft, llRight),
-					A5(elm$core$Dict$RBNode_elm_builtin, 1, key, value, lRight, right));
+					A5(elm$core$Dict$RBNode_elm_builtin, elm$core$Dict$Black, llK, llV, llLeft, llRight),
+					A5(elm$core$Dict$RBNode_elm_builtin, elm$core$Dict$Black, key, value, lRight, right));
 			} else {
 				return A5(elm$core$Dict$RBNode_elm_builtin, color, key, value, left, right);
 			}
@@ -5017,8 +5017,8 @@ var elm$core$Dict$balance = F5(
 	});
 var elm$core$Dict$insertHelp = F3(
 	function (key, value, dict) {
-		if (dict.$ === -2) {
-			return A5(elm$core$Dict$RBNode_elm_builtin, 0, key, value, elm$core$Dict$RBEmpty_elm_builtin, elm$core$Dict$RBEmpty_elm_builtin);
+		if (dict.$ === 'RBEmpty_elm_builtin') {
+			return A5(elm$core$Dict$RBNode_elm_builtin, elm$core$Dict$Red, key, value, elm$core$Dict$RBEmpty_elm_builtin, elm$core$Dict$RBEmpty_elm_builtin);
 		} else {
 			var nColor = dict.a;
 			var nKey = dict.b;
@@ -5026,8 +5026,8 @@ var elm$core$Dict$insertHelp = F3(
 			var nLeft = dict.d;
 			var nRight = dict.e;
 			var _n1 = A2(elm$core$Basics$compare, key, nKey);
-			switch (_n1) {
-				case 0:
+			switch (_n1.$) {
+				case 'LT':
 					return A5(
 						elm$core$Dict$balance,
 						nColor,
@@ -5035,7 +5035,7 @@ var elm$core$Dict$insertHelp = F3(
 						nValue,
 						A3(elm$core$Dict$insertHelp, key, value, nLeft),
 						nRight);
-				case 1:
+				case 'EQ':
 					return A5(elm$core$Dict$RBNode_elm_builtin, nColor, nKey, value, nLeft, nRight);
 				default:
 					return A5(
@@ -5051,13 +5051,13 @@ var elm$core$Dict$insertHelp = F3(
 var elm$core$Dict$insert = F3(
 	function (key, value, dict) {
 		var _n0 = A3(elm$core$Dict$insertHelp, key, value, dict);
-		if ((_n0.$ === -1) && (!_n0.a)) {
+		if ((_n0.$ === 'RBNode_elm_builtin') && (_n0.a.$ === 'Red')) {
 			var _n1 = _n0.a;
 			var k = _n0.b;
 			var v = _n0.c;
 			var l = _n0.d;
 			var r = _n0.e;
-			return A5(elm$core$Dict$RBNode_elm_builtin, 1, k, v, l, r);
+			return A5(elm$core$Dict$RBNode_elm_builtin, elm$core$Dict$Black, k, v, l, r);
 		} else {
 			var x = _n0;
 			return x;
@@ -5067,7 +5067,7 @@ var elm$core$Dict$foldl = F3(
 	function (func, acc, dict) {
 		foldl:
 		while (true) {
-			if (dict.$ === -2) {
+			if (dict.$ === 'RBEmpty_elm_builtin') {
 				return acc;
 			} else {
 				var key = dict.b;
@@ -5155,7 +5155,7 @@ var elm$core$Dict$get = F2(
 	function (targetKey, dict) {
 		get:
 		while (true) {
-			if (dict.$ === -2) {
+			if (dict.$ === 'RBEmpty_elm_builtin') {
 				return elm$core$Maybe$Nothing;
 			} else {
 				var key = dict.b;
@@ -5163,14 +5163,14 @@ var elm$core$Dict$get = F2(
 				var left = dict.d;
 				var right = dict.e;
 				var _n1 = A2(elm$core$Basics$compare, targetKey, key);
-				switch (_n1) {
-					case 0:
+				switch (_n1.$) {
+					case 'LT':
 						var $temp$targetKey = targetKey,
 							$temp$dict = left;
 						targetKey = $temp$targetKey;
 						dict = $temp$dict;
 						continue get;
-					case 1:
+					case 'EQ':
 						return elm$core$Maybe$Just(value);
 					default:
 						var $temp$targetKey = targetKey,
@@ -5187,7 +5187,7 @@ var elm$time$Time$addMySub = F2(
 		var interval = _n0.a;
 		var tagger = _n0.b;
 		var _n1 = A2(elm$core$Dict$get, interval, state);
-		if (_n1.$ === 1) {
+		if (_n1.$ === 'Nothing') {
 			return A3(
 				elm$core$Dict$insert,
 				interval,
@@ -5206,14 +5206,14 @@ var elm$time$Time$addMySub = F2(
 var elm$core$Platform$sendToSelf = _Platform_sendToSelf;
 var elm$core$Process$spawn = _Scheduler_spawn;
 var elm$time$Time$Name = function (a) {
-	return {$: 0, a: a};
+	return {$: 'Name', a: a};
 };
 var elm$time$Time$Offset = function (a) {
-	return {$: 1, a: a};
+	return {$: 'Offset', a: a};
 };
 var elm$time$Time$Zone = F2(
 	function (a, b) {
-		return {$: 0, a: a, b: b};
+		return {$: 'Zone', a: a, b: b};
 	});
 var elm$time$Time$customZone = elm$time$Time$Zone;
 var elm$time$Time$setInterval = _Time_setInterval;
@@ -5241,7 +5241,7 @@ var elm$time$Time$spawnHelp = F3(
 	});
 var elm$time$Time$onEffects = F3(
 	function (router, subs, _n0) {
-		var processes = _n0.ax;
+		var processes = _n0.processes;
 		var rightStep = F3(
 			function (_n6, id, _n7) {
 				var spawns = _n7.a;
@@ -5288,7 +5288,7 @@ var elm$time$Time$onEffects = F3(
 			_Utils_Tuple3(
 				_List_Nil,
 				elm$core$Dict$empty,
-				elm$core$Task$succeed(0)));
+				elm$core$Task$succeed(_Utils_Tuple0)));
 		var spawnList = _n1.a;
 		var existingDict = _n1.b;
 		var killTask = _n1.c;
@@ -5400,13 +5400,15 @@ var elm$core$Task$sequence = function (tasks) {
 var elm$core$Basics$identity = function (x) {
 	return x;
 };
-var elm$time$Time$Posix = elm$core$Basics$identity;
-var elm$time$Time$millisToPosix = elm$core$Basics$identity;
+var elm$time$Time$Posix = function (a) {
+	return {$: 'Posix', a: a};
+};
+var elm$time$Time$millisToPosix = elm$time$Time$Posix;
 var elm$time$Time$now = _Time_now(elm$time$Time$millisToPosix);
 var elm$time$Time$onSelfMsg = F3(
 	function (router, interval, state) {
-		var _n0 = A2(elm$core$Dict$get, interval, state.aF);
-		if (_n0.$ === 1) {
+		var _n0 = A2(elm$core$Dict$get, interval, state.taggers);
+		if (_n0.$ === 'Nothing') {
 			return elm$core$Task$succeed(state);
 		} else {
 			var taggers = _n0.a;
@@ -5452,20 +5454,20 @@ var elm$time$Time$every = F2(
 			A2(elm$time$Time$Every, interval, tagger));
 	});
 var author$project$Main$subscriptions = function (model) {
-	if (!model.$) {
+	if (model.$ === 'GameOk') {
 		var game = model.a;
-		var _n1 = game.b.r;
-		if (!_n1.$) {
-			var _n2 = game.ad;
-			if (!_n2.$) {
+		var _n1 = game.board.sowingState;
+		if (_n1.$ === 'NotSowing') {
+			var _n2 = game.state;
+			if (_n2.$ === 'Turn') {
 				var player = _n2.a;
-				var _n3 = game.L.aW;
-				if (!_n3.$) {
+				var _n3 = game.settings.opponent;
+				if (_n3.$ === 'Real') {
 					return elm$core$Platform$Sub$none;
 				} else {
-					return (player === 1) ? A2(
+					return _Utils_eq(player, author$project$Player$Two) ? A2(
 						elm$time$Time$every,
-						author$project$Settings$speedInMilliseconds(game.L.D),
+						author$project$Settings$speedInMilliseconds(game.settings.sowingSpeed),
 						function (_n4) {
 							return author$project$Datatypes$ComputerHasTurn;
 						}) : elm$core$Platform$Sub$none;
@@ -5476,7 +5478,7 @@ var author$project$Main$subscriptions = function (model) {
 		} else {
 			return A2(
 				elm$time$Time$every,
-				author$project$Settings$speedInMilliseconds(game.L.D),
+				author$project$Settings$speedInMilliseconds(game.settings.sowingSpeed),
 				function (_n5) {
 					return author$project$Datatypes$NextSowingStep;
 				});
@@ -5485,17 +5487,17 @@ var author$project$Main$subscriptions = function (model) {
 		return elm$core$Platform$Sub$none;
 	}
 };
-var author$project$Datatypes$BestMoveZero = 0;
+var author$project$Datatypes$BestMoveZero = {$: 'BestMoveZero'};
 var author$project$Datatypes$GameError = function (a) {
-	return {$: 1, a: a};
+	return {$: 'GameError', a: a};
 };
-var author$project$Datatypes$NextSowingStepIllegal = 2;
+var author$project$Datatypes$NextSowingStepIllegal = {$: 'NextSowingStepIllegal'};
 var author$project$Datatypes$RandomMoveWeights = function (a) {
-	return {$: 6, a: a};
+	return {$: 'RandomMoveWeights', a: a};
 };
-var author$project$Datatypes$StartSowingIllegal = 1;
+var author$project$Datatypes$StartSowingIllegal = {$: 'StartSowingIllegal'};
 var author$project$Game$End = function (a) {
-	return {$: 1, a: a};
+	return {$: 'End', a: a};
 };
 var elm$core$Tuple$second = function (_n0) {
 	var y = _n0.b;
@@ -5503,25 +5505,25 @@ var elm$core$Tuple$second = function (_n0) {
 };
 var author$project$GameBoard$getRowForPlayer = F2(
 	function (board, player) {
-		if (!player) {
-			return board.l.a;
+		if (player.$ === 'One') {
+			return board.rows.a;
 		} else {
-			return board.l.b;
+			return board.rows.b;
 		}
 	});
 var author$project$GameBoard$getStoreForPlayer = F2(
 	function (board, player) {
-		if (!player) {
-			return board.m.a;
+		if (player.$ === 'One') {
+			return board.stores.a;
 		} else {
-			return board.m.b;
+			return board.stores.b;
 		}
 	});
 var author$project$GameBoard$numberOfSeedsInRow = function (row) {
 	return A3(
 		elm$core$Array$foldr,
 		function (house) {
-			return elm$core$Basics$add(house.g);
+			return elm$core$Basics$add(house.seeds);
 		},
 		0,
 		row);
@@ -5529,52 +5531,52 @@ var author$project$GameBoard$numberOfSeedsInRow = function (row) {
 var elm$core$Basics$not = _Basics_not;
 var author$project$GameBoard$getFinalScore = F2(
 	function (board, settings) {
-		var seedsInStoreTwo = A2(author$project$GameBoard$getStoreForPlayer, board, 1).g;
-		var seedsInStoreOne = A2(author$project$GameBoard$getStoreForPlayer, board, 0).g;
+		var seedsInStoreTwo = A2(author$project$GameBoard$getStoreForPlayer, board, author$project$Player$Two).seeds;
+		var seedsInStoreOne = A2(author$project$GameBoard$getStoreForPlayer, board, author$project$Player$One).seeds;
 		var seedsInRowTwo = author$project$GameBoard$numberOfSeedsInRow(
-			A2(author$project$GameBoard$getRowForPlayer, board, 1));
+			A2(author$project$GameBoard$getRowForPlayer, board, author$project$Player$Two));
 		var seedsInRowOne = author$project$GameBoard$numberOfSeedsInRow(
-			A2(author$project$GameBoard$getRowForPlayer, board, 0));
-		var playerGettingSeeds = (((!seedsInRowOne) && settings.ao) || ((!seedsInRowTwo) && (!settings.ao))) ? 0 : 1;
-		if (!playerGettingSeeds) {
+			A2(author$project$GameBoard$getRowForPlayer, board, author$project$Player$One));
+		var playerGettingSeeds = (((!seedsInRowOne) && settings.lastSeedsForFinishingPlayer) || ((!seedsInRowTwo) && (!settings.lastSeedsForFinishingPlayer))) ? author$project$Player$One : author$project$Player$Two;
+		if (playerGettingSeeds.$ === 'One') {
 			return _Utils_Tuple2((seedsInStoreOne + seedsInRowOne) + seedsInRowTwo, seedsInStoreTwo);
 		} else {
 			return _Utils_Tuple2(seedsInStoreOne, (seedsInStoreTwo + seedsInRowOne) + seedsInRowTwo);
 		}
 	});
-var author$project$Player$Drawn = {$: 1};
+var author$project$Player$Drawn = {$: 'Drawn'};
 var author$project$Player$Winner = F2(
 	function (a, b) {
-		return {$: 0, a: a, b: b};
+		return {$: 'Winner', a: a, b: b};
 	});
 var author$project$Game$findWinner = function (game) {
-	var finalScore = A2(author$project$GameBoard$getFinalScore, game.b, game.L);
-	return _Utils_eq(finalScore.a, finalScore.b) ? author$project$Player$Drawn : ((_Utils_cmp(finalScore.a, finalScore.b) > 0) ? A2(author$project$Player$Winner, 0, finalScore) : A2(author$project$Player$Winner, 1, finalScore));
+	var finalScore = A2(author$project$GameBoard$getFinalScore, game.board, game.settings);
+	return _Utils_eq(finalScore.a, finalScore.b) ? author$project$Player$Drawn : ((_Utils_cmp(finalScore.a, finalScore.b) > 0) ? A2(author$project$Player$Winner, author$project$Player$One, finalScore) : A2(author$project$Player$Winner, author$project$Player$Two, finalScore));
 };
 var author$project$GameBoard$HandleLastSeedInEmptyHouse = F2(
 	function (a, b) {
-		return {$: 3, a: a, b: b};
+		return {$: 'HandleLastSeedInEmptyHouse', a: a, b: b};
 	});
 var author$project$GameBoard$Sowing = function (a) {
-	return {$: 1, a: a};
+	return {$: 'Sowing', a: a};
 };
 var author$project$GameBoard$SowingFinished = F2(
 	function (a, b) {
-		return {$: 2, a: a, b: b};
+		return {$: 'SowingFinished', a: a, b: b};
 	});
 var author$project$GameBoard$setStoreForPlayer = F3(
 	function (player, store, board) {
-		if (!player) {
+		if (player.$ === 'One') {
 			return _Utils_update(
 				board,
 				{
-					m: _Utils_Tuple2(store, board.m.b)
+					stores: _Utils_Tuple2(store, board.stores.b)
 				});
 		} else {
 			return _Utils_update(
 				board,
 				{
-					m: _Utils_Tuple2(board.m.a, store)
+					stores: _Utils_Tuple2(board.stores.a, store)
 				});
 		}
 	});
@@ -5584,7 +5586,7 @@ var author$project$GameBoard$addSeedsToStore = F3(
 		return A3(
 			author$project$GameBoard$setStoreForPlayer,
 			player,
-			{j: store.j + numOfSeeds, g: store.g + numOfSeeds},
+			{justSown: store.justSown + numOfSeeds, seeds: store.seeds + numOfSeeds},
 			board);
 	});
 var elm$core$Bitwise$shiftRightZfBy = _Bitwise_shiftRightZfBy;
@@ -5597,7 +5599,7 @@ var elm$core$Array$getHelp = F3(
 		while (true) {
 			var pos = elm$core$Array$bitMask & (index >>> shift);
 			var _n0 = A2(elm$core$Elm$JsArray$unsafeGet, pos, tree);
-			if (!_n0.$) {
+			if (_n0.$ === 'SubTree') {
 				var subTree = _n0.a;
 				var $temp$shift = shift - elm$core$Array$shiftStep,
 					$temp$index = index,
@@ -5635,26 +5637,26 @@ var elm$core$Basics$negate = function (n) {
 var author$project$GameBoard$numberOfSeedsInHouse = F2(
 	function (row, pos) {
 		var _n0 = A2(elm$core$Array$get, pos, row);
-		if (!_n0.$) {
+		if (_n0.$ === 'Just') {
 			var house = _n0.a;
-			return house.g;
+			return house.seeds;
 		} else {
 			return -1;
 		}
 	});
 var author$project$GameBoard$setRowForPlayer = F3(
 	function (player, row, board) {
-		if (!player) {
+		if (player.$ === 'One') {
 			return _Utils_update(
 				board,
 				{
-					l: _Utils_Tuple2(row, board.l.b)
+					rows: _Utils_Tuple2(row, board.rows.b)
 				});
 		} else {
 			return _Utils_update(
 				board,
 				{
-					l: _Utils_Tuple2(board.l.a, row)
+					rows: _Utils_Tuple2(board.rows.a, row)
 				});
 		}
 	});
@@ -5663,7 +5665,7 @@ var elm$core$Array$setHelp = F4(
 	function (shift, index, value, tree) {
 		var pos = elm$core$Array$bitMask & (index >>> shift);
 		var _n0 = A2(elm$core$Elm$JsArray$unsafeGet, pos, tree);
-		if (!_n0.$) {
+		if (_n0.$ === 'SubTree') {
 			var subTree = _n0.a;
 			var newSub = A4(elm$core$Array$setHelp, shift - elm$core$Array$shiftStep, index, value, subTree);
 			return A3(
@@ -5707,7 +5709,7 @@ var author$project$GameBoard$pickSeeds = F3(
 			elm$core$Array$get,
 			pos,
 			A2(author$project$GameBoard$getRowForPlayer, board, player));
-		if (!_n0.$) {
+		if (_n0.$ === 'Just') {
 			var house = _n0.a;
 			return A3(
 				author$project$GameBoard$setRowForPlayer,
@@ -5717,7 +5719,7 @@ var author$project$GameBoard$pickSeeds = F3(
 					pos,
 					_Utils_update(
 						house,
-						{g: 0}),
+						{seeds: 0}),
 					A2(author$project$GameBoard$getRowForPlayer, board, player)),
 				board);
 		} else {
@@ -5725,10 +5727,10 @@ var author$project$GameBoard$pickSeeds = F3(
 		}
 	});
 var author$project$Player$togglePlayer = function (player) {
-	if (!player) {
-		return 1;
+	if (player.$ === 'One') {
+		return author$project$Player$Two;
 	} else {
-		return 0;
+		return author$project$Player$One;
 	}
 };
 var author$project$GameBoard$handleSeedInEmptyHouse = F4(
@@ -5740,11 +5742,11 @@ var author$project$GameBoard$handleSeedInEmptyHouse = F4(
 		return A3(
 			author$project$GameBoard$pickSeeds,
 			author$project$Player$togglePlayer(playerOnTurn),
-			(settings.I - 1) - seedingPos,
+			(settings.numberOfHouses - 1) - seedingPos,
 			A3(
 				author$project$GameBoard$addSeedsToStore,
 				playerOnTurn,
-				A2(author$project$GameBoard$numberOfSeedsInHouse, otherPlayersRow, (settings.I - 1) - seedingPos),
+				A2(author$project$GameBoard$numberOfSeedsInHouse, otherPlayersRow, (settings.numberOfHouses - 1) - seedingPos),
 				A3(
 					author$project$GameBoard$addSeedsToStore,
 					playerOnTurn,
@@ -5776,23 +5778,23 @@ var author$project$GameBoard$isRowEmpty = function (row) {
 	return !A2(
 		elm$core$List$any,
 		function (house) {
-			return !(!house.g);
+			return !(!house.seeds);
 		},
 		elm$core$Array$toList(row));
 };
 var author$project$GameBoard$RowPos = F2(
 	function (a, b) {
-		return {$: 0, a: a, b: b};
+		return {$: 'RowPos', a: a, b: b};
 	});
 var author$project$GameBoard$StorePos = function (a) {
-	return {$: 1, a: a};
+	return {$: 'StorePos', a: a};
 };
 var author$project$GameBoard$nextPosition = F3(
 	function (settings, playerOnTurn, position) {
-		if (!position.$) {
+		if (position.$ === 'RowPos') {
 			var player = position.a;
 			var posInRow = position.b;
-			return (_Utils_cmp(posInRow + 1, settings.I) > -1) ? (_Utils_eq(playerOnTurn, player) ? author$project$GameBoard$StorePos(playerOnTurn) : (settings.aY ? author$project$GameBoard$StorePos(player) : A2(author$project$GameBoard$RowPos, playerOnTurn, 0))) : A2(author$project$GameBoard$RowPos, player, posInRow + 1);
+			return (_Utils_cmp(posInRow + 1, settings.numberOfHouses) > -1) ? (_Utils_eq(playerOnTurn, player) ? author$project$GameBoard$StorePos(playerOnTurn) : (settings.sowInOpponentsStore ? author$project$GameBoard$StorePos(player) : A2(author$project$GameBoard$RowPos, playerOnTurn, 0))) : A2(author$project$GameBoard$RowPos, player, posInRow + 1);
 		} else {
 			var player = position.a;
 			return A2(
@@ -5809,7 +5811,7 @@ var elm$core$Array$map = F2(
 		var tree = _n0.c;
 		var tail = _n0.d;
 		var helper = function (node) {
-			if (!node.$) {
+			if (node.$ === 'SubTree') {
 				var subTree = node.a;
 				return elm$core$Array$SubTree(
 					A2(elm$core$Elm$JsArray$map, helper, subTree));
@@ -5832,41 +5834,41 @@ var author$project$GameBoard$resetSownStateInRow = function (row) {
 		function (house) {
 			return _Utils_update(
 				house,
-				{j: 0});
+				{justSown: 0});
 		},
 		row);
 };
 var author$project$GameBoard$resetSownStateInStore = function (store) {
 	return _Utils_update(
 		store,
-		{j: 0});
+		{justSown: 0});
 };
 var author$project$GameBoard$resetSowingStates = function (board) {
 	return _Utils_update(
 		board,
 		{
-			l: _Utils_Tuple2(
+			rows: _Utils_Tuple2(
 				author$project$GameBoard$resetSownStateInRow(
-					A2(author$project$GameBoard$getRowForPlayer, board, 0)),
+					A2(author$project$GameBoard$getRowForPlayer, board, author$project$Player$One)),
 				author$project$GameBoard$resetSownStateInRow(
-					A2(author$project$GameBoard$getRowForPlayer, board, 1))),
-			r: author$project$GameBoard$NotSowing,
-			m: _Utils_Tuple2(
+					A2(author$project$GameBoard$getRowForPlayer, board, author$project$Player$Two))),
+			sowingState: author$project$GameBoard$NotSowing,
+			stores: _Utils_Tuple2(
 				author$project$GameBoard$resetSownStateInStore(
-					A2(author$project$GameBoard$getStoreForPlayer, board, 0)),
+					A2(author$project$GameBoard$getStoreForPlayer, board, author$project$Player$One)),
 				author$project$GameBoard$resetSownStateInStore(
-					A2(author$project$GameBoard$getStoreForPlayer, board, 1)))
+					A2(author$project$GameBoard$getStoreForPlayer, board, author$project$Player$Two)))
 		});
 };
 var author$project$GameBoard$sowSeedToHouse = F2(
 	function (pos, row) {
 		var _n0 = A2(elm$core$Array$get, pos, row);
-		if (!_n0.$) {
+		if (_n0.$ === 'Just') {
 			var house = _n0.a;
 			return A3(
 				elm$core$Array$set,
 				pos,
-				{j: house.j + 1, g: house.g + 1},
+				{justSown: house.justSown + 1, seeds: house.seeds + 1},
 				row);
 		} else {
 			return row;
@@ -5874,7 +5876,7 @@ var author$project$GameBoard$sowSeedToHouse = F2(
 	});
 var author$project$GameBoard$sowAtPosition = F2(
 	function (board, position) {
-		if (!position.$) {
+		if (position.$ === 'RowPos') {
 			var player = position.a;
 			var pos = position.b;
 			return A3(
@@ -5891,47 +5893,47 @@ var author$project$GameBoard$sowAtPosition = F2(
 		}
 	});
 var author$project$Game$nextSowingStep = function (game) {
-	var _n0 = game.b.r;
+	var _n0 = game.board.sowingState;
 	switch (_n0.$) {
-		case 1:
+		case 'Sowing':
 			var sowingInfo = _n0.a;
-			var seedsToSowNext = sowingInfo.aa - 1;
-			var boardAfterSowing = A2(author$project$GameBoard$sowAtPosition, game.b, sowingInfo.K);
+			var seedsToSowNext = sowingInfo.seedsToSow - 1;
+			var boardAfterSowing = A2(author$project$GameBoard$sowAtPosition, game.board, sowingInfo.position);
 			return elm$core$Maybe$Just(
 				function () {
 					if (!seedsToSowNext) {
-						var _n1 = sowingInfo.K;
-						if (!_n1.$) {
+						var _n1 = sowingInfo.position;
+						if (_n1.$ === 'RowPos') {
 							var player = _n1.a;
 							var posInRow = _n1.b;
-							return (_Utils_eq(player, sowingInfo.J) && (A2(
+							return (_Utils_eq(player, sowingInfo.playerSowing) && (A2(
 								author$project$GameBoard$numberOfSeedsInHouse,
 								A2(author$project$GameBoard$getRowForPlayer, boardAfterSowing, player),
 								posInRow) === 1)) ? _Utils_update(
 								game,
 								{
-									b: _Utils_update(
+									board: _Utils_update(
 										boardAfterSowing,
 										{
-											r: A2(author$project$GameBoard$HandleLastSeedInEmptyHouse, player, posInRow)
+											sowingState: A2(author$project$GameBoard$HandleLastSeedInEmptyHouse, player, posInRow)
 										})
 								}) : _Utils_update(
 								game,
 								{
-									b: _Utils_update(
+									board: _Utils_update(
 										boardAfterSowing,
 										{
-											r: A2(author$project$GameBoard$SowingFinished, sowingInfo.J, false)
+											sowingState: A2(author$project$GameBoard$SowingFinished, sowingInfo.playerSowing, false)
 										})
 								});
 						} else {
 							return _Utils_update(
 								game,
 								{
-									b: _Utils_update(
+									board: _Utils_update(
 										boardAfterSowing,
 										{
-											r: A2(author$project$GameBoard$SowingFinished, sowingInfo.J, true)
+											sowingState: A2(author$project$GameBoard$SowingFinished, sowingInfo.playerSowing, true)
 										})
 								});
 						}
@@ -5939,58 +5941,58 @@ var author$project$Game$nextSowingStep = function (game) {
 						return _Utils_update(
 							game,
 							{
-								b: _Utils_update(
+								board: _Utils_update(
 									boardAfterSowing,
 									{
-										r: author$project$GameBoard$Sowing(
+										sowingState: author$project$GameBoard$Sowing(
 											_Utils_update(
 												sowingInfo,
 												{
-													K: A3(author$project$GameBoard$nextPosition, game.L, sowingInfo.J, sowingInfo.K),
-													aa: seedsToSowNext
+													position: A3(author$project$GameBoard$nextPosition, game.settings, sowingInfo.playerSowing, sowingInfo.position),
+													seedsToSow: seedsToSowNext
 												}))
 									})
 							});
 					}
 				}());
-		case 2:
+		case 'SowingFinished':
 			var player = _n0.a;
 			var oneMoreTurn = _n0.b;
 			var otherPlayersRow = A2(
 				author$project$GameBoard$getRowForPlayer,
-				game.b,
+				game.board,
 				author$project$Player$togglePlayer(player));
-			var lastSowingPlayersRow = A2(author$project$GameBoard$getRowForPlayer, game.b, player);
+			var lastSowingPlayersRow = A2(author$project$GameBoard$getRowForPlayer, game.board, player);
 			return elm$core$Maybe$Just(
 				(author$project$GameBoard$isRowEmpty(lastSowingPlayersRow) || author$project$GameBoard$isRowEmpty(otherPlayersRow)) ? _Utils_update(
 					game,
 					{
-						b: author$project$GameBoard$resetSowingStates(game.b),
-						ad: author$project$Game$End(
+						board: author$project$GameBoard$resetSowingStates(game.board),
+						state: author$project$Game$End(
 							author$project$Game$findWinner(game))
 					}) : (oneMoreTurn ? _Utils_update(
 					game,
 					{
-						b: author$project$GameBoard$resetSowingStates(game.b)
+						board: author$project$GameBoard$resetSowingStates(game.board)
 					}) : _Utils_update(
 					game,
 					{
-						b: author$project$GameBoard$resetSowingStates(game.b),
-						ad: author$project$Game$Turn(
+						board: author$project$GameBoard$resetSowingStates(game.board),
+						state: author$project$Game$Turn(
 							author$project$Player$togglePlayer(player))
 					})));
-		case 3:
+		case 'HandleLastSeedInEmptyHouse':
 			var player = _n0.a;
 			var pos = _n0.b;
-			var boardAfter = A4(author$project$GameBoard$handleSeedInEmptyHouse, game.b, game.L, player, pos);
+			var boardAfter = A4(author$project$GameBoard$handleSeedInEmptyHouse, game.board, game.settings, player, pos);
 			return elm$core$Maybe$Just(
 				_Utils_update(
 					game,
 					{
-						b: _Utils_update(
+						board: _Utils_update(
 							boardAfter,
 							{
-								r: A2(author$project$GameBoard$SowingFinished, player, false)
+								sowingState: A2(author$project$GameBoard$SowingFinished, player, false)
 							})
 					}));
 		default:
@@ -5999,29 +6001,29 @@ var author$project$Game$nextSowingStep = function (game) {
 };
 var author$project$Game$startSowingSeeds = F3(
 	function (game, player, position) {
-		var _n0 = game.b.r;
-		if (!_n0.$) {
-			var newBoard = A3(author$project$GameBoard$pickSeeds, player, position, game.b);
+		var _n0 = game.board.sowingState;
+		if (_n0.$ === 'NotSowing') {
+			var newBoard = A3(author$project$GameBoard$pickSeeds, player, position, game.board);
 			var firstSowingState = author$project$GameBoard$Sowing(
 				{
-					J: player,
-					K: A3(
+					playerSowing: player,
+					position: A3(
 						author$project$GameBoard$nextPosition,
-						game.L,
+						game.settings,
 						player,
 						A2(author$project$GameBoard$RowPos, player, position)),
-					aa: A2(
+					seedsToSow: A2(
 						author$project$GameBoard$numberOfSeedsInHouse,
-						A2(author$project$GameBoard$getRowForPlayer, game.b, player),
+						A2(author$project$GameBoard$getRowForPlayer, game.board, player),
 						position)
 				});
 			return elm$core$Maybe$Just(
 				_Utils_update(
 					game,
 					{
-						b: _Utils_update(
+						board: _Utils_update(
 							newBoard,
-							{r: firstSowingState})
+							{sowingState: firstSowingState})
 					}));
 		} else {
 			return elm$core$Maybe$Nothing;
@@ -6029,10 +6031,10 @@ var author$project$Game$startSowingSeeds = F3(
 	});
 var author$project$KalahaAI$moveQuality = F2(
 	function (game, pos) {
-		var row = A2(author$project$GameBoard$getRowForPlayer, game.b, 1);
+		var row = A2(author$project$GameBoard$getRowForPlayer, game.board, author$project$Player$Two);
 		var seeds = A2(author$project$GameBoard$numberOfSeedsInHouse, row, pos);
-		var opponentsRow = A2(author$project$GameBoard$getRowForPlayer, game.b, 0);
-		return (!seeds) ? 0 : (_Utils_eq(game.L.I - pos, seeds) ? 3 : ((!A2(author$project$GameBoard$numberOfSeedsInHouse, row, pos + seeds)) ? (2 * (1 + (0.1 * A2(author$project$GameBoard$numberOfSeedsInHouse, opponentsRow, (game.L.I - (pos + seeds)) - 1)))) : ((!A2(author$project$GameBoard$numberOfSeedsInHouse, opponentsRow, (game.L.I - pos) - 1)) ? (1 * (1 + (0.2 * seeds))) : (1 * (1 + (0.1 * seeds))))));
+		var opponentsRow = A2(author$project$GameBoard$getRowForPlayer, game.board, author$project$Player$One);
+		return (!seeds) ? 0 : (_Utils_eq(game.settings.numberOfHouses - pos, seeds) ? 3 : ((!A2(author$project$GameBoard$numberOfSeedsInHouse, row, pos + seeds)) ? (2 * (1 + (0.1 * A2(author$project$GameBoard$numberOfSeedsInHouse, opponentsRow, (game.settings.numberOfHouses - (pos + seeds)) - 1)))) : ((!A2(author$project$GameBoard$numberOfSeedsInHouse, opponentsRow, (game.settings.numberOfHouses - pos) - 1)) ? (1 * (1 + (0.2 * seeds))) : (1 * (1 + (0.1 * seeds))))));
 	});
 var author$project$Utils$ListHelper$getIndexHelper = F3(
 	function (element, list, tmpIndex) {
@@ -6060,7 +6062,7 @@ var author$project$Utils$ListHelper$getIndexHelper = F3(
 var author$project$Utils$ListHelper$getIndex = F2(
 	function (element, list) {
 		var _n0 = A3(author$project$Utils$ListHelper$getIndexHelper, element, list, 0);
-		if (!_n0.$) {
+		if (_n0.$ === 'Just') {
 			var index = _n0.a;
 			return index;
 		} else {
@@ -6079,7 +6081,7 @@ var elm$core$List$maximum = function (list) {
 };
 var elm$core$Maybe$andThen = F2(
 	function (callback, maybeValue) {
-		if (!maybeValue.$) {
+		if (maybeValue.$ === 'Just') {
 			var value = maybeValue.a;
 			return callback(value);
 		} else {
@@ -6104,10 +6106,10 @@ var author$project$KalahaAI$nextMove = F2(
 			elm$core$List$maximum(moves));
 	});
 var author$project$KalahaAI$randomnessRange = function (intelligence) {
-	switch (intelligence) {
-		case 0:
+	switch (intelligence.$) {
+		case 'High':
 			return 0.1;
-		case 1:
+		case 'Medium':
 			return 0.3;
 		default:
 			return 0.5;
@@ -6116,10 +6118,12 @@ var author$project$KalahaAI$randomnessRange = function (intelligence) {
 var elm$core$Basics$abs = function (n) {
 	return (n < 0) ? (-n) : n;
 };
-var elm$random$Random$Generator = elm$core$Basics$identity;
+var elm$random$Random$Generator = function (a) {
+	return {$: 'Generator', a: a};
+};
 var elm$random$Random$Seed = F2(
 	function (a, b) {
-		return {$: 0, a: a, b: b};
+		return {$: 'Seed', a: a, b: b};
 	});
 var elm$random$Random$next = function (_n0) {
 	var state0 = _n0.a;
@@ -6134,19 +6138,20 @@ var elm$random$Random$peel = function (_n0) {
 };
 var elm$random$Random$float = F2(
 	function (a, b) {
-		return function (seed0) {
-			var seed1 = elm$random$Random$next(seed0);
-			var range = elm$core$Basics$abs(b - a);
-			var n1 = elm$random$Random$peel(seed1);
-			var n0 = elm$random$Random$peel(seed0);
-			var lo = (134217727 & n1) * 1.0;
-			var hi = (67108863 & n0) * 1.0;
-			var val = ((hi * 1.34217728e8) + lo) / 9.007199254740992e15;
-			var scaled = (val * range) + a;
-			return _Utils_Tuple2(
-				scaled,
-				elm$random$Random$next(seed1));
-		};
+		return elm$random$Random$Generator(
+			function (seed0) {
+				var seed1 = elm$random$Random$next(seed0);
+				var range = elm$core$Basics$abs(b - a);
+				var n1 = elm$random$Random$peel(seed1);
+				var n0 = elm$random$Random$peel(seed0);
+				var lo = (134217727 & n1) * 1.0;
+				var hi = (67108863 & n0) * 1.0;
+				var val = ((hi * 1.34217728e8) + lo) / 9.007199254740992e15;
+				var scaled = (val * range) + a;
+				return _Utils_Tuple2(
+					scaled,
+					elm$random$Random$next(seed1));
+			});
 	});
 var elm$random$Random$listHelp = F4(
 	function (revList, n, gen, seed) {
@@ -6172,18 +6177,19 @@ var elm$random$Random$listHelp = F4(
 	});
 var elm$random$Random$list = F2(
 	function (n, _n0) {
-		var gen = _n0;
-		return function (seed) {
-			return A4(elm$random$Random$listHelp, _List_Nil, n, gen, seed);
-		};
+		var gen = _n0.a;
+		return elm$random$Random$Generator(
+			function (seed) {
+				return A4(elm$random$Random$listHelp, _List_Nil, n, gen, seed);
+			});
 	});
 var author$project$KalahaAI$weightMoves = function (settings) {
-	var _n0 = settings.aW;
-	if (_n0.$ === 1) {
+	var _n0 = settings.opponent;
+	if (_n0.$ === 'Computer') {
 		var intelligence = _n0.a;
 		return A2(
 			elm$random$Random$list,
-			settings.I,
+			settings.numberOfHouses,
 			A2(
 				elm$random$Random$float,
 				1 - author$project$KalahaAI$randomnessRange(intelligence),
@@ -6196,26 +6202,28 @@ var author$project$KalahaAI$weightMoves = function (settings) {
 	}
 };
 var author$project$Settings$Computer = function (a) {
-	return {$: 1, a: a};
+	return {$: 'Computer', a: a};
 };
-var author$project$Settings$Medium = 1;
+var author$project$Settings$Medium = {$: 'Medium'};
 var author$project$Settings$toggleOpponentOption = function (settings) {
-	var _n0 = settings.aW;
-	if (!_n0.$) {
+	var _n0 = settings.opponent;
+	if (_n0.$ === 'Real') {
 		return _Utils_update(
 			settings,
 			{
-				aW: author$project$Settings$Computer(1)
+				opponent: author$project$Settings$Computer(author$project$Settings$Medium)
 			});
 	} else {
 		return _Utils_update(
 			settings,
-			{aW: author$project$Settings$Real});
+			{opponent: author$project$Settings$Real});
 	}
 };
 var elm$core$Platform$Cmd$batch = _Platform_batch;
 var elm$core$Platform$Cmd$none = elm$core$Platform$Cmd$batch(_List_Nil);
-var elm$random$Random$Generate = elm$core$Basics$identity;
+var elm$random$Random$Generate = function (a) {
+	return {$: 'Generate', a: a};
+};
 var elm$random$Random$initialSeed = function (x) {
 	var _n0 = elm$random$Random$next(
 		A2(elm$random$Random$Seed, 0, 1013904223));
@@ -6226,7 +6234,7 @@ var elm$random$Random$initialSeed = function (x) {
 		A2(elm$random$Random$Seed, state2, incr));
 };
 var elm$time$Time$posixToMillis = function (_n0) {
-	var millis = _n0;
+	var millis = _n0.a;
 	return millis;
 };
 var elm$random$Random$init = A2(
@@ -6239,7 +6247,7 @@ var elm$random$Random$init = A2(
 	elm$time$Time$now);
 var elm$random$Random$step = F2(
 	function (_n0, seed) {
-		var generator = _n0;
+		var generator = _n0.a;
 		return generator(seed);
 	});
 var elm$random$Random$onEffects = F3(
@@ -6247,7 +6255,7 @@ var elm$random$Random$onEffects = F3(
 		if (!commands.b) {
 			return elm$core$Task$succeed(seed);
 		} else {
-			var generator = commands.a;
+			var generator = commands.a.a;
 			var rest = commands.b;
 			var _n1 = A2(elm$random$Random$step, generator, seed);
 			var value = _n1.a;
@@ -6266,50 +6274,53 @@ var elm$random$Random$onSelfMsg = F3(
 	});
 var elm$random$Random$map = F2(
 	function (func, _n0) {
-		var genA = _n0;
-		return function (seed0) {
-			var _n1 = genA(seed0);
-			var a = _n1.a;
-			var seed1 = _n1.b;
-			return _Utils_Tuple2(
-				func(a),
-				seed1);
-		};
+		var genA = _n0.a;
+		return elm$random$Random$Generator(
+			function (seed0) {
+				var _n1 = genA(seed0);
+				var a = _n1.a;
+				var seed1 = _n1.b;
+				return _Utils_Tuple2(
+					func(a),
+					seed1);
+			});
 	});
 var elm$random$Random$cmdMap = F2(
 	function (func, _n0) {
-		var generator = _n0;
-		return A2(elm$random$Random$map, func, generator);
+		var generator = _n0.a;
+		return elm$random$Random$Generate(
+			A2(elm$random$Random$map, func, generator));
 	});
 _Platform_effectManagers['Random'] = _Platform_createManager(elm$random$Random$init, elm$random$Random$onEffects, elm$random$Random$onSelfMsg, elm$random$Random$cmdMap);
 var elm$random$Random$command = _Platform_leaf('Random');
 var elm$random$Random$generate = F2(
 	function (tagger, generator) {
 		return elm$random$Random$command(
-			A2(elm$random$Random$map, tagger, generator));
+			elm$random$Random$Generate(
+				A2(elm$random$Random$map, tagger, generator)));
 	});
 var author$project$Main$update = F2(
 	function (msg, model) {
-		if (!model.$) {
+		if (model.$ === 'GameOk') {
 			var game = model.a;
 			switch (msg.$) {
-				case 0:
+				case 'Click':
 					var player = msg.a;
 					var pos = msg.b;
-					var _n2 = game.ad;
-					if (!_n2.$) {
+					var _n2 = game.state;
+					if (_n2.$ === 'Turn') {
 						var onTurn = _n2.a;
 						return (_Utils_eq(onTurn, player) && (!(!A2(
 							author$project$GameBoard$numberOfSeedsInHouse,
-							A2(author$project$GameBoard$getRowForPlayer, game.b, player),
+							A2(author$project$GameBoard$getRowForPlayer, game.board, player),
 							pos)))) ? _Utils_Tuple2(
 							function () {
 								var _n3 = A3(author$project$Game$startSowingSeeds, game, player, pos);
-								if (!_n3.$) {
+								if (_n3.$ === 'Just') {
 									var g = _n3.a;
 									return author$project$Datatypes$GameOk(g);
 								} else {
-									return author$project$Datatypes$GameError(1);
+									return author$project$Datatypes$GameError(author$project$Datatypes$StartSowingIllegal);
 								}
 							}(),
 							elm$core$Platform$Cmd$none) : _Utils_Tuple2(
@@ -6320,126 +6331,126 @@ var author$project$Main$update = F2(
 							author$project$Datatypes$GameOk(game),
 							elm$core$Platform$Cmd$none);
 					}
-				case 1:
+				case 'NextSowingStep':
 					return _Utils_Tuple2(
 						function () {
 							var _n4 = author$project$Game$nextSowingStep(game);
-							if (!_n4.$) {
+							if (_n4.$ === 'Just') {
 								var g = _n4.a;
 								return author$project$Datatypes$GameOk(g);
 							} else {
-								return author$project$Datatypes$GameError(2);
+								return author$project$Datatypes$GameError(author$project$Datatypes$NextSowingStepIllegal);
 							}
 						}(),
 						elm$core$Platform$Cmd$none);
-				case 2:
+				case 'Restart':
 					return _Utils_Tuple2(
 						author$project$Datatypes$GameOk(
-							author$project$Main$restartGame(game.L)),
+							author$project$Main$restartGame(game.settings)),
 						elm$core$Platform$Cmd$none);
-				case 3:
-					var oldSettings = game.L;
+				case 'OpenSettings':
+					var oldSettings = game.settings;
 					return _Utils_Tuple2(
 						author$project$Datatypes$GameOk(
 							_Utils_update(
 								game,
 								{
-									L: _Utils_update(
+									settings: _Utils_update(
 										oldSettings,
-										{ab: !game.L.ab})
+										{settingsOpen: !game.settings.settingsOpen})
 								})),
 						elm$core$Platform$Cmd$none);
-				case 4:
+				case 'SettingChanged':
 					var option = msg.a;
-					var oldSettings = game.L;
+					var oldSettings = game.settings;
 					return _Utils_Tuple2(
 						author$project$Datatypes$GameOk(
 							function () {
 								switch (option.$) {
-									case 0:
+									case 'Speed':
 										var speed = option.a;
 										return _Utils_update(
 											game,
 											{
-												L: _Utils_update(
+												settings: _Utils_update(
 													oldSettings,
-													{D: speed})
+													{sowingSpeed: speed})
 											});
-									case 8:
+									case 'LanguageSetting':
 										var language = option.a;
 										return _Utils_update(
 											game,
 											{
-												L: _Utils_update(
+												settings: _Utils_update(
 													oldSettings,
-													{a: language})
+													{language: language})
 											});
-									case 1:
+									case 'SeedNumber':
 										var n = option.a;
 										return author$project$Main$restartGame(
 											_Utils_update(
 												oldSettings,
-												{ar: n}));
-									case 2:
+												{numberOfSeeds: n}));
+									case 'LastSeedsBehaviour':
 										return author$project$Main$restartGame(
 											_Utils_update(
 												oldSettings,
-												{ao: !oldSettings.ao}));
-									case 3:
+												{lastSeedsForFinishingPlayer: !oldSettings.lastSeedsForFinishingPlayer}));
+									case 'UpsideDown':
 										return _Utils_update(
 											game,
 											{
-												L: _Utils_update(
+												settings: _Utils_update(
 													oldSettings,
-													{S: !game.L.S})
+													{upsideDownEnabled: !game.settings.upsideDownEnabled})
 											});
-									case 4:
+									case 'SowOpponentsStore':
 										return author$project$Main$restartGame(
 											_Utils_update(
 												oldSettings,
-												{aY: !oldSettings.aY}));
-									case 5:
+												{sowInOpponentsStore: !oldSettings.sowInOpponentsStore}));
+									case 'OpponentOption':
 										return author$project$Main$restartGame(
 											author$project$Settings$toggleOpponentOption(oldSettings));
-									case 6:
+									case 'IntelligenceOption':
 										var i = option.a;
 										return author$project$Main$restartGame(
 											_Utils_update(
 												oldSettings,
 												{
-													aW: author$project$Settings$Computer(i)
+													opponent: author$project$Settings$Computer(i)
 												}));
 									default:
 										return author$project$Main$restartGame(
 											_Utils_update(
 												oldSettings,
-												{R: !oldSettings.R}));
+												{playerTwoStarting: !oldSettings.playerTwoStarting}));
 								}
 							}()),
 						elm$core$Platform$Cmd$none);
-				case 5:
+				case 'ComputerHasTurn':
 					return _Utils_Tuple2(
 						author$project$Datatypes$GameOk(game),
 						A2(
 							elm$random$Random$generate,
 							author$project$Datatypes$RandomMoveWeights,
-							author$project$KalahaAI$weightMoves(game.L)));
+							author$project$KalahaAI$weightMoves(game.settings)));
 				default:
 					var weights = msg.a;
 					return _Utils_Tuple2(
 						function () {
 							var _n6 = A2(author$project$KalahaAI$nextMove, game, weights);
-							if (!_n6.$) {
+							if (_n6.$ === 'Just') {
 								var idx = _n6.a;
-								var _n7 = A3(author$project$Game$startSowingSeeds, game, 1, idx);
-								if (!_n7.$) {
+								var _n7 = A3(author$project$Game$startSowingSeeds, game, author$project$Player$Two, idx);
+								if (_n7.$ === 'Just') {
 									var g = _n7.a;
 									return author$project$Datatypes$GameOk(g);
 								} else {
-									return author$project$Datatypes$GameError(1);
+									return author$project$Datatypes$GameError(author$project$Datatypes$StartSowingIllegal);
 								}
 							} else {
-								return author$project$Datatypes$GameError(0);
+								return author$project$Datatypes$GameError(author$project$Datatypes$BestMoveZero);
 							}
 						}(),
 						elm$core$Platform$Cmd$none);
@@ -6447,7 +6458,7 @@ var author$project$Main$update = F2(
 		} else {
 			return _Utils_Tuple2(
 				function () {
-					if (msg.$ === 2) {
+					if (msg.$ === 'Restart') {
 						return author$project$Datatypes$GameOk(
 							author$project$Main$restartGame(author$project$Settings$defaultSettings));
 					} else {
@@ -6457,41 +6468,42 @@ var author$project$Main$update = F2(
 				elm$core$Platform$Cmd$none);
 		}
 	});
-var author$project$Datatypes$OpenSettings = {$: 3};
-var author$project$Datatypes$Restart = {$: 2};
+var author$project$Datatypes$OpenSettings = {$: 'OpenSettings'};
+var author$project$Datatypes$Restart = {$: 'Restart'};
 var author$project$Datatypes$errorCode = function (error) {
-	switch (error) {
-		case 0:
+	switch (error.$) {
+		case 'BestMoveZero':
 			return 'BestMoveZero';
-		case 1:
+		case 'StartSowingIllegal':
 			return 'StartSowingIllegal';
-		case 2:
+		case 'NextSowingStepIllegal':
 			return 'NextSowingStepIllegal';
 		default:
 			return 'Unexpected';
 	}
 };
 var author$project$Datatypes$errorToString = function (error) {
-	switch (error) {
-		case 0:
+	switch (error.$) {
+		case 'BestMoveZero':
 			return 'There was no possible move found.';
-		case 1:
+		case 'StartSowingIllegal':
 			return 'Starting to sow not possible with current sowing status.';
-		case 2:
+		case 'NextSowingStepIllegal':
 			return 'No next step possible with current sowing status.';
 		default:
 			return 'An unexpected error occurred.';
 	}
 };
+var author$project$Localization$English = {$: 'English'};
 var author$project$Localization$restart = function (language) {
-	if (!language) {
+	if (language.$ === 'German') {
 		return 'Neues Spiel';
 	} else {
 		return 'Restart';
 	}
 };
 var author$project$Localization$settings = function (language) {
-	if (!language) {
+	if (language.$ === 'German') {
 		return 'Einstellungen';
 	} else {
 		return 'Settings';
@@ -6503,11 +6515,11 @@ var elm$json$Json$Decode$map2 = _Json_map2;
 var elm$json$Json$Decode$succeed = _Json_succeed;
 var elm$virtual_dom$VirtualDom$toHandlerInt = function (handler) {
 	switch (handler.$) {
-		case 0:
+		case 'Normal':
 			return 0;
-		case 1:
+		case 'MayStopPropagation':
 			return 1;
-		case 2:
+		case 'MayPreventDefault':
 			return 2;
 		default:
 			return 3;
@@ -6534,7 +6546,7 @@ var author$project$Main$pointerCursor = A2(elm$html$Html$Attributes$style, 'curs
 var author$project$Main$sowedSeedColor = '#00db8d';
 var avh4$elm_color$Color$RgbaSpace = F4(
 	function (a, b, c, d) {
-		return {$: 0, a: a, b: b, c: c, d: d};
+		return {$: 'RgbaSpace', a: a, b: b, c: c, d: d};
 	});
 var avh4$elm_color$Color$scaleFrom255 = function (c) {
 	return c / 255;
@@ -6552,7 +6564,7 @@ var elm$html$Html$div = _VirtualDom_node('div');
 var elm$virtual_dom$VirtualDom$text = _VirtualDom_text;
 var elm$html$Html$text = elm$virtual_dom$VirtualDom$text;
 var elm$virtual_dom$VirtualDom$Normal = function (a) {
-	return {$: 0, a: a};
+	return {$: 'Normal', a: a};
 };
 var elm$virtual_dom$VirtualDom$on = _VirtualDom_on;
 var elm$html$Html$Events$on = F2(
@@ -6631,21 +6643,21 @@ var author$project$Main$iconButton = F3(
 				]));
 	});
 var author$project$Localization$drawnGame = function (language) {
-	if (!language) {
+	if (language.$ === 'German') {
 		return 'Es ist unentschieden.';
 	} else {
 		return 'It\'s a draw.';
 	}
 };
 var author$project$Localization$finalScore = function (language) {
-	if (!language) {
+	if (language.$ === 'German') {
 		return 'Endstand';
 	} else {
 		return 'Final Score';
 	}
 };
 var author$project$Localization$gameOver = function (language) {
-	if (!language) {
+	if (language.$ === 'German') {
 		return 'Spiel beendet.';
 	} else {
 		return 'Game over.';
@@ -6653,35 +6665,35 @@ var author$project$Localization$gameOver = function (language) {
 };
 var author$project$Localization$opponentsTurn = F2(
 	function (language, opponent) {
-		if (!language) {
+		if (language.$ === 'German') {
 			return opponent + ' ist am Zug.';
 		} else {
 			return 'It\'s ' + (opponent + '\'s turn.');
 		}
 	});
 var author$project$Localization$player = function (language) {
-	if (!language) {
+	if (language.$ === 'German') {
 		return 'Spieler';
 	} else {
 		return 'Player';
 	}
 };
 var author$project$Localization$youLoose = function (language) {
-	if (!language) {
+	if (language.$ === 'German') {
 		return 'Leider verloren.';
 	} else {
 		return 'You have lost.';
 	}
 };
 var author$project$Localization$youWin = function (language) {
-	if (!language) {
+	if (language.$ === 'German') {
 		return 'Du hast gewonnen.';
 	} else {
 		return 'You have won.';
 	}
 };
 var author$project$Localization$yourTurn = function (language) {
-	if (!language) {
+	if (language.$ === 'German') {
 		return 'Du bist am Zug.';
 	} else {
 		return 'It\'s your turn.';
@@ -6690,10 +6702,10 @@ var author$project$Localization$yourTurn = function (language) {
 var author$project$Main$fillParentWidth = A2(elm$html$Html$Attributes$style, 'width', '100%');
 var author$project$Main$upsideDown = F2(
 	function (game, player) {
-		return (game.L.S && (player === 1)) ? A2(elm$html$Html$Attributes$style, 'transform', 'rotate(180deg)') : A2(elm$html$Html$Attributes$style, '', '');
+		return (game.settings.upsideDownEnabled && _Utils_eq(player, author$project$Player$Two)) ? A2(elm$html$Html$Attributes$style, 'transform', 'rotate(180deg)') : A2(elm$html$Html$Attributes$style, '', '');
 	});
 var author$project$Player$toString = function (player) {
-	if (!player) {
+	if (player.$ === 'One') {
 		return '1';
 	} else {
 		return '2';
@@ -6716,33 +6728,33 @@ var author$project$Main$infoView = F2(
 			_List_fromArray(
 				[
 					elm$html$Html$text(
-					author$project$Localization$player(game.L.a) + (' ' + (author$project$Player$toString(player) + (function () {
-						var _n0 = game.L.aW;
-						if (!_n0.$) {
+					author$project$Localization$player(game.settings.language) + (' ' + (author$project$Player$toString(player) + (function () {
+						var _n0 = game.settings.opponent;
+						if (_n0.$ === 'Real') {
 							return '';
 						} else {
-							return (player === 1) ? ' (Computer)' : '';
+							return _Utils_eq(player, author$project$Player$Two) ? ' (Computer)' : '';
 						}
 					}() + ': ')))),
 					A2(elm$html$Html$br, _List_Nil, _List_Nil),
 					elm$html$Html$text(
 					function () {
-						var _n1 = game.ad;
-						if (!_n1.$) {
+						var _n1 = game.state;
+						if (_n1.$ === 'Turn') {
 							var p = _n1.a;
-							return _Utils_eq(p, player) ? author$project$Localization$yourTurn(game.L.a) : A2(
+							return _Utils_eq(p, player) ? author$project$Localization$yourTurn(game.settings.language) : A2(
 								author$project$Localization$opponentsTurn,
-								game.L.a,
-								author$project$Localization$player(game.L.a) + (' ' + author$project$Player$toString(p)));
+								game.settings.language,
+								author$project$Localization$player(game.settings.language) + (' ' + author$project$Player$toString(p)));
 						} else {
 							var winner = _n1.a;
-							return author$project$Localization$gameOver(game.L.a) + (' ' + function () {
-								if (winner.$ === 1) {
-									return author$project$Localization$drawnGame(game.L.a);
+							return author$project$Localization$gameOver(game.settings.language) + (' ' + function () {
+								if (winner.$ === 'Drawn') {
+									return author$project$Localization$drawnGame(game.settings.language);
 								} else {
 									var w = winner.a;
 									var finalScore = winner.b;
-									return (_Utils_eq(w, player) ? author$project$Localization$youWin(game.L.a) : author$project$Localization$youLoose(game.L.a)) + (' ' + (author$project$Localization$finalScore(game.L.a) + (': ' + (elm$core$String$fromInt(finalScore.a) + (':' + elm$core$String$fromInt(finalScore.b))))));
+									return (_Utils_eq(w, player) ? author$project$Localization$youWin(game.settings.language) : author$project$Localization$youLoose(game.settings.language)) + (' ' + (author$project$Localization$finalScore(game.settings.language) + (': ' + (elm$core$String$fromInt(finalScore.a) + (':' + elm$core$String$fromInt(finalScore.b))))));
 								}
 							}());
 						}
@@ -6765,12 +6777,12 @@ var author$project$Main$rowStyle = _Utils_ap(
 		]));
 var author$project$Datatypes$Click = F2(
 	function (a, b) {
-		return {$: 0, a: a, b: b};
+		return {$: 'Click', a: a, b: b};
 	});
 var author$project$Main$cursorStyle = F2(
 	function (game, player) {
-		var _n0 = game.ad;
-		if (!_n0.$) {
+		var _n0 = game.state;
+		if (_n0.$ === 'Turn') {
 			var p = _n0.a;
 			return _Utils_eq(p, player) ? author$project$Main$pointerCursor : A2(elm$html$Html$Attributes$style, 'cursor', 'default');
 		} else {
@@ -6867,8 +6879,8 @@ var author$project$Main$rowHouseView = F3(
 		var h = A2(
 			elm$core$Array$get,
 			pos,
-			A2(author$project$GameBoard$getRowForPlayer, game.b, player));
-		if (!h.$) {
+			A2(author$project$GameBoard$getRowForPlayer, game.board, player));
+		if (h.$ === 'Just') {
 			var house = h.a;
 			return A2(
 				elm$html$Html$div,
@@ -6877,23 +6889,36 @@ var author$project$Main$rowHouseView = F3(
 						[
 							A2(author$project$Main$upsideDown, game, player),
 							A2(author$project$Main$cursorStyle, game, player),
-							elm$html$Html$Events$onClick(
-							A2(author$project$Datatypes$Click, player, pos)),
 							author$project$Main$fillParentHeight,
 							author$project$Main$orderSiblingsHorizontally,
 							A2(elm$html$Html$Attributes$style, 'width', '72px'),
 							A2(elm$html$Html$Attributes$style, 'padding', '0 5px')
 						]),
-					_Utils_ap(author$project$Main$defaultTextFont, author$project$Main$houseStyle)),
+					_Utils_ap(
+						author$project$Main$defaultTextFont,
+						_Utils_ap(
+							author$project$Main$houseStyle,
+							function () {
+								var _n1 = game.board.sowingState;
+								if (_n1.$ === 'NotSowing') {
+									return _List_fromArray(
+										[
+											elm$html$Html$Events$onClick(
+											A2(author$project$Datatypes$Click, player, pos))
+										]);
+								} else {
+									return _List_Nil;
+								}
+							}()))),
 				_List_fromArray(
 					[
 						elm$html$Html$text(
-						elm$core$String$fromInt(house.g)),
+						elm$core$String$fromInt(house.seeds)),
 						A2(
 						elm$html$Html$div,
 						_List_fromArray(
 							[author$project$Main$fillParentWidth]),
-						A2(author$project$Main$seedsInHouseView, house.g, house.j))
+						A2(author$project$Main$seedsInHouseView, house.seeds, house.justSown))
 					]));
 		} else {
 			return A2(elm$html$Html$div, _List_Nil, _List_Nil);
@@ -6906,199 +6931,198 @@ var author$project$Main$rowViewHelper = F3(
 		} else {
 			return A2(
 				elm$core$List$cons,
-				A3(author$project$Main$rowHouseView, game, player, game.L.I - housesToCreate),
+				A3(author$project$Main$rowHouseView, game, player, game.settings.numberOfHouses - housesToCreate),
 				A3(author$project$Main$rowViewHelper, game, player, housesToCreate - 1));
 		}
 	});
 var author$project$Main$rowView = F2(
 	function (game, player) {
-		return ((player === 1) ? A2(elm$core$List$foldl, elm$core$List$cons, _List_Nil) : elm$core$Basics$identity)(
-			A3(author$project$Main$rowViewHelper, game, player, game.L.I));
+		return (_Utils_eq(player, author$project$Player$Two) ? A2(elm$core$List$foldl, elm$core$List$cons, _List_Nil) : elm$core$Basics$identity)(
+			A3(author$project$Main$rowViewHelper, game, player, game.settings.numberOfHouses));
 	});
 var author$project$Datatypes$IntelligenceOption = function (a) {
-	return {$: 6, a: a};
+	return {$: 'IntelligenceOption', a: a};
 };
 var author$project$Datatypes$LanguageSetting = function (a) {
-	return {$: 8, a: a};
+	return {$: 'LanguageSetting', a: a};
 };
-var author$project$Datatypes$LastSeedsBehaviour = {$: 2};
-var author$project$Datatypes$OpponentOption = {$: 5};
+var author$project$Datatypes$LastSeedsBehaviour = {$: 'LastSeedsBehaviour'};
+var author$project$Datatypes$OpponentOption = {$: 'OpponentOption'};
 var author$project$Datatypes$SeedNumber = function (a) {
-	return {$: 1, a: a};
+	return {$: 'SeedNumber', a: a};
 };
 var author$project$Datatypes$SettingChanged = function (a) {
-	return {$: 4, a: a};
+	return {$: 'SettingChanged', a: a};
 };
-var author$project$Datatypes$SowOpponentsStore = {$: 4};
+var author$project$Datatypes$SowOpponentsStore = {$: 'SowOpponentsStore'};
 var author$project$Datatypes$Speed = function (a) {
-	return {$: 0, a: a};
+	return {$: 'Speed', a: a};
 };
-var author$project$Datatypes$StartingPlayer = {$: 7};
-var author$project$Datatypes$UpsideDown = {$: 3};
-var author$project$Localization$German = 0;
+var author$project$Datatypes$StartingPlayer = {$: 'StartingPlayer'};
+var author$project$Datatypes$UpsideDown = {$: 'UpsideDown'};
 var author$project$Localization$animationSpeedTitle = function (language) {
-	if (!language) {
+	if (language.$ === 'German') {
 		return 'Geschwindigkeit der Animation';
 	} else {
 		return 'Animation Speed';
 	}
 };
 var author$project$Localization$easyDifficulty = function (language) {
-	if (!language) {
+	if (language.$ === 'German') {
 		return 'Leicht';
 	} else {
 		return 'Easy';
 	}
 };
 var author$project$Localization$englishLanguage = function (language) {
-	if (!language) {
+	if (language.$ === 'German') {
 		return 'englisch';
 	} else {
 		return 'english';
 	}
 };
 var author$project$Localization$fastSpeed = function (language) {
-	if (!language) {
+	if (language.$ === 'German') {
 		return 'Schnell';
 	} else {
 		return 'Fast';
 	}
 };
 var author$project$Localization$firstTurnDescription = function (language) {
-	if (!language) {
+	if (language.$ === 'German') {
 		return 'Spieler 2 beginnt mit dem ersten Zug';
 	} else {
 		return 'Player 2 makes the first turn.';
 	}
 };
 var author$project$Localization$firstTurnTitle = function (language) {
-	if (!language) {
+	if (language.$ === 'German') {
 		return 'Erster Zug';
 	} else {
 		return 'First Turn';
 	}
 };
 var author$project$Localization$gameModeHint = function (language) {
-	if (!language) {
+	if (language.$ === 'German') {
 		return 'Hinweis: Das Spiel wird bei Änderung neu gestartet.';
 	} else {
 		return 'Hint: Game will be restarted when settings change.';
 	}
 };
 var author$project$Localization$gameModeSettings = function (language) {
-	if (!language) {
+	if (language.$ === 'German') {
 		return 'Einstellungen des Spielmodus';
 	} else {
 		return 'Settings of Game Mode';
 	}
 };
 var author$project$Localization$germanLanguage = function (language) {
-	if (!language) {
+	if (language.$ === 'German') {
 		return 'deutsch';
 	} else {
 		return 'german';
 	}
 };
 var author$project$Localization$highDifficulty = function (language) {
-	if (!language) {
+	if (language.$ === 'German') {
 		return 'Schwer';
 	} else {
 		return 'Difficult';
 	}
 };
 var author$project$Localization$languageSetting = function (language) {
-	if (!language) {
+	if (language.$ === 'German') {
 		return 'Sprache';
 	} else {
 		return 'Language';
 	}
 };
 var author$project$Localization$lastSeedsDescription = function (language) {
-	if (!language) {
+	if (language.$ === 'German') {
 		return 'Am Ende des Spieles erhält der Spieler, der keine Steine mehr in seiner Reihe hat, die übrig gebliebenen Steine.';
 	} else {
 		return 'At the end of the game, the first player running out of seeds gets the remaining ones.';
 	}
 };
 var author$project$Localization$lastSeedsTitle = function (language) {
-	if (!language) {
+	if (language.$ === 'German') {
 		return 'Verteilung übriger Steine';
 	} else {
 		return 'Last seeds';
 	}
 };
 var author$project$Localization$mediumDifficulty = function (language) {
-	if (!language) {
+	if (language.$ === 'German') {
 		return 'Mittel';
 	} else {
 		return 'Medium';
 	}
 };
 var author$project$Localization$normalSpeed = function (language) {
-	if (!language) {
+	if (language.$ === 'German') {
 		return 'Normal';
 	} else {
 		return 'Normal';
 	}
 };
 var author$project$Localization$numberOfSeeds = function (language) {
-	if (!language) {
+	if (language.$ === 'German') {
 		return 'Anzahl der Steine pro Mulde';
 	} else {
 		return 'Number of seeds per house';
 	}
 };
 var author$project$Localization$opponentDescription = function (language) {
-	if (!language) {
+	if (language.$ === 'German') {
 		return 'Gegen den Computer spielen';
 	} else {
 		return 'Play against the computer';
 	}
 };
 var author$project$Localization$opponentLevelTitle = function (language) {
-	if (!language) {
+	if (language.$ === 'German') {
 		return 'Gegenspieler & Schwierigkeitsstufe';
 	} else {
 		return 'Opponent & Difficulty';
 	}
 };
 var author$project$Localization$opponentsStoreDescription = function (language) {
-	if (!language) {
+	if (language.$ === 'German') {
 		return 'Steine werden auch in das gegnerische Kalaha (große Mulde) verteilt.';
 	} else {
 		return 'Seeds are also sown to opponent\'s store.';
 	}
 };
 var author$project$Localization$opponentsStoreTitle = function (language) {
-	if (!language) {
+	if (language.$ === 'German') {
 		return 'Gegnerisches Kalaha';
 	} else {
 		return 'Opponent\'s Store';
 	}
 };
 var author$project$Localization$presentationSettings = function (language) {
-	if (!language) {
+	if (language.$ === 'German') {
 		return 'Einstellungen zur Darstellung';
 	} else {
 		return 'Presentation Settings';
 	}
 };
 var author$project$Localization$slowSpeed = function (language) {
-	if (!language) {
+	if (language.$ === 'German') {
 		return 'Langsam';
 	} else {
 		return 'Slow';
 	}
 };
 var author$project$Localization$tabletModeDescription = function (language) {
-	if (!language) {
+	if (language.$ === 'German') {
 		return 'Die Spielelemente für Spieler 2 werden kopfüber dargestellt.';
 	} else {
 		return 'The elements for Player 2 are displayed upside down.';
 	}
 };
 var author$project$Localization$tabletModeTitle = function (language) {
-	if (!language) {
+	if (language.$ === 'German') {
 		return 'Tablet-Modus';
 	} else {
 		return 'Tablet-Mode';
@@ -7119,16 +7143,16 @@ var avh4$elm_color$Color$toRgba = function (_n0) {
 	var g = _n0.b;
 	var b = _n0.c;
 	var a = _n0.d;
-	return {x: a, V: b, W: g, _: r};
+	return {alpha: a, blue: b, green: g, red: r};
 };
 var elm$core$Basics$round = _Basics_round;
 var elm$core$String$fromFloat = _String_fromNumber;
 var danmarcab$material_icons$Material$Icons$Internal$toRgbaString = function (color) {
 	var _n0 = avh4$elm_color$Color$toRgba(color);
-	var red = _n0._;
-	var green = _n0.W;
-	var blue = _n0.V;
-	var alpha = _n0.x;
+	var red = _n0.red;
+	var green = _n0.green;
+	var blue = _n0.blue;
+	var alpha = _n0.alpha;
 	return 'rgba(' + (elm$core$String$fromInt(
 		elm$core$Basics$round(255 * red)) + (',' + (elm$core$String$fromInt(
 		elm$core$Basics$round(255 * green)) + (',' + (elm$core$String$fromInt(
@@ -7293,14 +7317,14 @@ var author$project$Main$radioButton = F3(
 				]));
 	});
 var author$project$Main$sowingSeedsColorString = '#db004e';
-var author$project$Settings$Fast = 2;
-var author$project$Settings$High = 0;
-var author$project$Settings$Low = 2;
-var author$project$Settings$Slow = 0;
+var author$project$Settings$Fast = {$: 'Fast'};
+var author$project$Settings$High = {$: 'High'};
+var author$project$Settings$Low = {$: 'Low'};
+var author$project$Settings$Slow = {$: 'Slow'};
 var elm$html$Html$form = _VirtualDom_node('form');
 var elm$html$Html$label = _VirtualDom_node('label');
 var author$project$Main$settingsView = function (game) {
-	return game.L.ab ? _List_fromArray(
+	return game.settings.settingsOpen ? _List_fromArray(
 		[
 			A2(
 			elm$html$Html$div,
@@ -7325,7 +7349,7 @@ var author$project$Main$settingsView = function (game) {
 				[
 					A2(elm$html$Html$br, _List_Nil, _List_Nil),
 					elm$html$Html$text(
-					author$project$Localization$presentationSettings(game.L.a)),
+					author$project$Localization$presentationSettings(game.settings.language)),
 					A2(
 					elm$html$Html$form,
 					_List_fromArray(
@@ -7341,9 +7365,9 @@ var author$project$Main$settingsView = function (game) {
 							A4(
 								author$project$Main$checkBox,
 								author$project$Datatypes$SettingChanged(author$project$Datatypes$UpsideDown),
-								author$project$Localization$tabletModeTitle(game.L.a),
-								author$project$Localization$tabletModeDescription(game.L.a),
-								game.L.S)),
+								author$project$Localization$tabletModeTitle(game.settings.language),
+								author$project$Localization$tabletModeDescription(game.settings.language),
+								game.settings.upsideDownEnabled)),
 							A2(elm$html$Html$br, _List_Nil, _List_Nil),
 							A2(
 							elm$html$Html$label,
@@ -7351,7 +7375,7 @@ var author$project$Main$settingsView = function (game) {
 							_List_fromArray(
 								[
 									elm$html$Html$text(
-									author$project$Localization$animationSpeedTitle(game.L.a))
+									author$project$Localization$animationSpeedTitle(game.settings.language))
 								])),
 							A2(elm$html$Html$br, _List_Nil, _List_Nil),
 							A2(
@@ -7362,21 +7386,21 @@ var author$project$Main$settingsView = function (game) {
 									A3(
 									author$project$Main$radioButton,
 									author$project$Datatypes$SettingChanged(
-										author$project$Datatypes$Speed(0)),
-									author$project$Localization$slowSpeed(game.L.a),
-									!game.L.D),
+										author$project$Datatypes$Speed(author$project$Settings$Slow)),
+									author$project$Localization$slowSpeed(game.settings.language),
+									_Utils_eq(game.settings.sowingSpeed, author$project$Settings$Slow)),
 									A3(
 									author$project$Main$radioButton,
 									author$project$Datatypes$SettingChanged(
-										author$project$Datatypes$Speed(1)),
-									author$project$Localization$normalSpeed(game.L.a),
-									game.L.D === 1),
+										author$project$Datatypes$Speed(author$project$Settings$Normal)),
+									author$project$Localization$normalSpeed(game.settings.language),
+									_Utils_eq(game.settings.sowingSpeed, author$project$Settings$Normal)),
 									A3(
 									author$project$Main$radioButton,
 									author$project$Datatypes$SettingChanged(
-										author$project$Datatypes$Speed(2)),
-									author$project$Localization$fastSpeed(game.L.a),
-									game.L.D === 2)
+										author$project$Datatypes$Speed(author$project$Settings$Fast)),
+									author$project$Localization$fastSpeed(game.settings.language),
+									_Utils_eq(game.settings.sowingSpeed, author$project$Settings$Fast))
 								])),
 							A2(elm$html$Html$br, _List_Nil, _List_Nil),
 							A2(
@@ -7385,7 +7409,7 @@ var author$project$Main$settingsView = function (game) {
 							_List_fromArray(
 								[
 									elm$html$Html$text(
-									author$project$Localization$languageSetting(game.L.a))
+									author$project$Localization$languageSetting(game.settings.language))
 								])),
 							A2(elm$html$Html$br, _List_Nil, _List_Nil),
 							A2(
@@ -7396,15 +7420,15 @@ var author$project$Main$settingsView = function (game) {
 									A3(
 									author$project$Main$radioButton,
 									author$project$Datatypes$SettingChanged(
-										author$project$Datatypes$LanguageSetting(0)),
-									author$project$Localization$germanLanguage(game.L.a),
-									!game.L.a),
+										author$project$Datatypes$LanguageSetting(author$project$Localization$German)),
+									author$project$Localization$germanLanguage(game.settings.language),
+									_Utils_eq(game.settings.language, author$project$Localization$German)),
 									A3(
 									author$project$Main$radioButton,
 									author$project$Datatypes$SettingChanged(
-										author$project$Datatypes$LanguageSetting(1)),
-									author$project$Localization$englishLanguage(game.L.a),
-									game.L.a === 1)
+										author$project$Datatypes$LanguageSetting(author$project$Localization$English)),
+									author$project$Localization$englishLanguage(game.settings.language),
+									_Utils_eq(game.settings.language, author$project$Localization$English))
 								]))
 						])),
 					A2(
@@ -7419,7 +7443,7 @@ var author$project$Main$settingsView = function (game) {
 					_List_Nil),
 					A2(elm$html$Html$br, _List_Nil, _List_Nil),
 					elm$html$Html$text(
-					author$project$Localization$gameModeSettings(game.L.a)),
+					author$project$Localization$gameModeSettings(game.settings.language)),
 					A2(
 					elm$html$Html$form,
 					_List_fromArray(
@@ -7438,7 +7462,7 @@ var author$project$Main$settingsView = function (game) {
 							_List_fromArray(
 								[
 									elm$html$Html$text(
-									author$project$Localization$gameModeHint(game.L.a))
+									author$project$Localization$gameModeHint(game.settings.language))
 								])),
 							A2(elm$html$Html$br, _List_Nil, _List_Nil),
 							A2(
@@ -7447,7 +7471,7 @@ var author$project$Main$settingsView = function (game) {
 							_List_fromArray(
 								[
 									elm$html$Html$text(
-									author$project$Localization$numberOfSeeds(game.L.a))
+									author$project$Localization$numberOfSeeds(game.settings.language))
 								])),
 							A2(
 							elm$html$Html$div,
@@ -7459,25 +7483,25 @@ var author$project$Main$settingsView = function (game) {
 									author$project$Datatypes$SettingChanged(
 										author$project$Datatypes$SeedNumber(3)),
 									'3',
-									game.L.ar === 3),
+									game.settings.numberOfSeeds === 3),
 									A3(
 									author$project$Main$radioButton,
 									author$project$Datatypes$SettingChanged(
 										author$project$Datatypes$SeedNumber(4)),
 									'4',
-									game.L.ar === 4),
+									game.settings.numberOfSeeds === 4),
 									A3(
 									author$project$Main$radioButton,
 									author$project$Datatypes$SettingChanged(
 										author$project$Datatypes$SeedNumber(5)),
 									'5',
-									game.L.ar === 5),
+									game.settings.numberOfSeeds === 5),
 									A3(
 									author$project$Main$radioButton,
 									author$project$Datatypes$SettingChanged(
 										author$project$Datatypes$SeedNumber(6)),
 									'6',
-									game.L.ar === 6)
+									game.settings.numberOfSeeds === 6)
 								])),
 							A2(elm$html$Html$br, _List_Nil, _List_Nil),
 							A2(
@@ -7486,9 +7510,9 @@ var author$project$Main$settingsView = function (game) {
 							A4(
 								author$project$Main$checkBox,
 								author$project$Datatypes$SettingChanged(author$project$Datatypes$LastSeedsBehaviour),
-								author$project$Localization$lastSeedsTitle(game.L.a),
-								author$project$Localization$lastSeedsDescription(game.L.a),
-								game.L.ao)),
+								author$project$Localization$lastSeedsTitle(game.settings.language),
+								author$project$Localization$lastSeedsDescription(game.settings.language),
+								game.settings.lastSeedsForFinishingPlayer)),
 							A2(elm$html$Html$br, _List_Nil, _List_Nil),
 							A2(
 							elm$html$Html$div,
@@ -7496,9 +7520,9 @@ var author$project$Main$settingsView = function (game) {
 							A4(
 								author$project$Main$checkBox,
 								author$project$Datatypes$SettingChanged(author$project$Datatypes$SowOpponentsStore),
-								author$project$Localization$opponentsStoreTitle(game.L.a),
-								author$project$Localization$opponentsStoreDescription(game.L.a),
-								game.L.aY)),
+								author$project$Localization$opponentsStoreTitle(game.settings.language),
+								author$project$Localization$opponentsStoreDescription(game.settings.language),
+								game.settings.sowInOpponentsStore)),
 							A2(elm$html$Html$br, _List_Nil, _List_Nil),
 							A2(
 							elm$html$Html$div,
@@ -7506,9 +7530,9 @@ var author$project$Main$settingsView = function (game) {
 							A4(
 								author$project$Main$checkBox,
 								author$project$Datatypes$SettingChanged(author$project$Datatypes$StartingPlayer),
-								author$project$Localization$firstTurnTitle(game.L.a),
-								author$project$Localization$firstTurnDescription(game.L.a),
-								game.L.R)),
+								author$project$Localization$firstTurnTitle(game.settings.language),
+								author$project$Localization$firstTurnDescription(game.settings.language),
+								game.settings.playerTwoStarting)),
 							A2(elm$html$Html$br, _List_Nil, _List_Nil),
 							A2(
 							elm$html$Html$div,
@@ -7516,12 +7540,12 @@ var author$project$Main$settingsView = function (game) {
 							A4(
 								author$project$Main$checkBox,
 								author$project$Datatypes$SettingChanged(author$project$Datatypes$OpponentOption),
-								author$project$Localization$opponentLevelTitle(game.L.a),
-								author$project$Localization$opponentDescription(game.L.a),
-								!_Utils_eq(game.L.aW, author$project$Settings$Real))),
+								author$project$Localization$opponentLevelTitle(game.settings.language),
+								author$project$Localization$opponentDescription(game.settings.language),
+								!_Utils_eq(game.settings.opponent, author$project$Settings$Real))),
 							function () {
-							var _n0 = game.L.aW;
-							if (!_n0.$) {
+							var _n0 = game.settings.opponent;
+							if (_n0.$ === 'Real') {
 								return A2(elm$html$Html$div, _List_Nil, _List_Nil);
 							} else {
 								var intelligence = _n0.a;
@@ -7533,21 +7557,21 @@ var author$project$Main$settingsView = function (game) {
 											A3(
 											author$project$Main$radioButton,
 											author$project$Datatypes$SettingChanged(
-												author$project$Datatypes$IntelligenceOption(2)),
-											author$project$Localization$easyDifficulty(game.L.a),
-											intelligence === 2),
+												author$project$Datatypes$IntelligenceOption(author$project$Settings$Low)),
+											author$project$Localization$easyDifficulty(game.settings.language),
+											_Utils_eq(intelligence, author$project$Settings$Low)),
 											A3(
 											author$project$Main$radioButton,
 											author$project$Datatypes$SettingChanged(
-												author$project$Datatypes$IntelligenceOption(1)),
-											author$project$Localization$mediumDifficulty(game.L.a),
-											intelligence === 1),
+												author$project$Datatypes$IntelligenceOption(author$project$Settings$Medium)),
+											author$project$Localization$mediumDifficulty(game.settings.language),
+											_Utils_eq(intelligence, author$project$Settings$Medium)),
 											A3(
 											author$project$Main$radioButton,
 											author$project$Datatypes$SettingChanged(
-												author$project$Datatypes$IntelligenceOption(0)),
-											author$project$Localization$highDifficulty(game.L.a),
-											!intelligence)
+												author$project$Datatypes$IntelligenceOption(author$project$Settings$High)),
+											author$project$Localization$highDifficulty(game.settings.language),
+											_Utils_eq(intelligence, author$project$Settings$High))
 										]));
 							}
 						}()
@@ -7573,12 +7597,12 @@ var author$project$Main$sowingView = function (game) {
 						elm$html$Html$div,
 						_List_Nil,
 						function () {
-							var _n0 = game.b.r;
-							if (_n0.$ === 1) {
+							var _n0 = game.board.sowingState;
+							if (_n0.$ === 'Sowing') {
 								var info = _n0.a;
 								return A2(
 									elm$core$List$repeat,
-									info.aa,
+									info.seedsToSow,
 									author$project$Main$seedView(author$project$Main$sowingSeedsColorString));
 							} else {
 								return _List_Nil;
@@ -7591,7 +7615,7 @@ var author$project$Main$storeStyle = _List_fromArray(
 	[author$project$Main$fillParentHeight, author$project$Main$orderSiblingsHorizontally]);
 var author$project$Main$storeView = F2(
 	function (game, player) {
-		var store = A2(author$project$GameBoard$getStoreForPlayer, game.b, player);
+		var store = A2(author$project$GameBoard$getStoreForPlayer, game.board, player);
 		return A2(
 			elm$html$Html$div,
 			_Utils_ap(
@@ -7615,7 +7639,7 @@ var author$project$Main$storeView = F2(
 					_List_fromArray(
 						[
 							elm$html$Html$text(
-							elm$core$String$fromInt(store.g))
+							elm$core$String$fromInt(store.seeds))
 						])),
 					A2(
 					elm$html$Html$div,
@@ -7624,7 +7648,7 @@ var author$project$Main$storeView = F2(
 							A2(elm$html$Html$Attributes$style, 'padding', '10px'),
 							author$project$Main$fillParentWidth
 						]),
-					A2(author$project$Main$seedsInHouseView, store.g, store.j))
+					A2(author$project$Main$seedsInHouseView, store.seeds, store.justSown))
 				]));
 	});
 var danmarcab$material_icons$Material$Icons$Action$settings = A2(
@@ -7654,7 +7678,7 @@ var danmarcab$material_icons$Material$Icons$Navigation$refresh = A2(
 			_List_Nil)
 		]));
 var author$project$Main$view = function (model) {
-	if (!model.$) {
+	if (model.$ === 'GameOk') {
 		var game = model.a;
 		return A2(
 			elm$html$Html$div,
@@ -7671,7 +7695,7 @@ var author$project$Main$view = function (model) {
 						[
 							A3(
 							author$project$Main$iconButton,
-							author$project$Localization$settings(game.L.a),
+							author$project$Localization$settings(game.settings.language),
 							danmarcab$material_icons$Material$Icons$Action$settings,
 							author$project$Datatypes$OpenSettings)
 						])),
@@ -7693,7 +7717,7 @@ var author$project$Main$view = function (model) {
 								]),
 							_List_fromArray(
 								[
-									A2(author$project$Main$infoView, game, 1),
+									A2(author$project$Main$infoView, game, author$project$Player$Two),
 									A2(
 									elm$html$Html$div,
 									author$project$Main$boardStyle,
@@ -7703,11 +7727,11 @@ var author$project$Main$view = function (model) {
 											elm$html$Html$div,
 											A2(
 												elm$core$List$cons,
-												A2(author$project$Main$upsideDown, game, 1),
+												A2(author$project$Main$upsideDown, game, author$project$Player$Two),
 												author$project$Main$storeStyle),
 											_List_fromArray(
 												[
-													A2(author$project$Main$storeView, game, 1)
+													A2(author$project$Main$storeView, game, author$project$Player$Two)
 												])),
 											A2(
 											elm$html$Html$div,
@@ -7730,7 +7754,7 @@ var author$project$Main$view = function (model) {
 															A2(
 															elm$html$Html$div,
 															author$project$Main$rowStyle,
-															A2(author$project$Main$rowView, game, 1)),
+															A2(author$project$Main$rowView, game, author$project$Player$Two)),
 															A2(
 															elm$html$Html$div,
 															_List_fromArray(
@@ -7743,13 +7767,13 @@ var author$project$Main$view = function (model) {
 															_List_fromArray(
 																[
 																	function () {
-																	var _n1 = game.ad;
-																	if (!_n1.$) {
+																	var _n1 = game.state;
+																	if (_n1.$ === 'Turn') {
 																		return author$project$Main$sowingView(game);
 																	} else {
 																		return A3(
 																			author$project$Main$iconButton,
-																			author$project$Localization$restart(game.L.a),
+																			author$project$Localization$restart(game.settings.language),
 																			danmarcab$material_icons$Material$Icons$Navigation$refresh,
 																			author$project$Datatypes$Restart);
 																	}
@@ -7758,7 +7782,7 @@ var author$project$Main$view = function (model) {
 															A2(
 															elm$html$Html$div,
 															author$project$Main$rowStyle,
-															A2(author$project$Main$rowView, game, 0))
+															A2(author$project$Main$rowView, game, author$project$Player$One))
 														]))
 												])),
 											A2(
@@ -7766,10 +7790,10 @@ var author$project$Main$view = function (model) {
 											author$project$Main$storeStyle,
 											_List_fromArray(
 												[
-													A2(author$project$Main$storeView, game, 0)
+													A2(author$project$Main$storeView, game, author$project$Player$One)
 												]))
 										])),
-									A2(author$project$Main$infoView, game, 0)
+									A2(author$project$Main$infoView, game, author$project$Player$One)
 								])),
 						author$project$Main$settingsView(game)))
 				]));
@@ -7788,30 +7812,34 @@ var author$project$Main$view = function (model) {
 					elm$html$Html$text('Please reload game.'),
 					A3(
 					author$project$Main$iconButton,
-					author$project$Localization$restart(1),
+					author$project$Localization$restart(author$project$Localization$English),
 					danmarcab$material_icons$Material$Icons$Navigation$refresh,
 					author$project$Datatypes$Restart)
 				]));
 	}
 };
 var elm$browser$Browser$External = function (a) {
-	return {$: 1, a: a};
+	return {$: 'External', a: a};
 };
 var elm$browser$Browser$Internal = function (a) {
-	return {$: 0, a: a};
+	return {$: 'Internal', a: a};
 };
-var elm$browser$Browser$Dom$NotFound = elm$core$Basics$identity;
+var elm$browser$Browser$Dom$NotFound = function (a) {
+	return {$: 'NotFound', a: a};
+};
 var elm$core$Basics$never = function (_n0) {
 	never:
 	while (true) {
-		var nvr = _n0;
+		var nvr = _n0.a;
 		var $temp$_n0 = nvr;
 		_n0 = $temp$_n0;
 		continue never;
 	}
 };
-var elm$core$Task$Perform = elm$core$Basics$identity;
-var elm$core$Task$init = elm$core$Task$succeed(0);
+var elm$core$Task$Perform = function (a) {
+	return {$: 'Perform', a: a};
+};
+var elm$core$Task$init = elm$core$Task$succeed(_Utils_Tuple0);
 var elm$core$Task$map = F2(
 	function (func, taskA) {
 		return A2(
@@ -7824,7 +7852,7 @@ var elm$core$Task$map = F2(
 	});
 var elm$core$Task$spawnCmd = F2(
 	function (router, _n0) {
-		var task = _n0;
+		var task = _n0.a;
 		return _Scheduler_spawn(
 			A2(
 				elm$core$Task$andThen,
@@ -7836,7 +7864,7 @@ var elm$core$Task$onEffects = F3(
 		return A2(
 			elm$core$Task$map,
 			function (_n0) {
-				return 0;
+				return _Utils_Tuple0;
 			},
 			elm$core$Task$sequence(
 				A2(
@@ -7846,19 +7874,21 @@ var elm$core$Task$onEffects = F3(
 	});
 var elm$core$Task$onSelfMsg = F3(
 	function (_n0, _n1, _n2) {
-		return elm$core$Task$succeed(0);
+		return elm$core$Task$succeed(_Utils_Tuple0);
 	});
 var elm$core$Task$cmdMap = F2(
 	function (tagger, _n0) {
-		var task = _n0;
-		return A2(elm$core$Task$map, tagger, task);
+		var task = _n0.a;
+		return elm$core$Task$Perform(
+			A2(elm$core$Task$map, tagger, task));
 	});
 _Platform_effectManagers['Task'] = _Platform_createManager(elm$core$Task$init, elm$core$Task$onEffects, elm$core$Task$onSelfMsg, elm$core$Task$cmdMap);
 var elm$core$Task$command = _Platform_leaf('Task');
 var elm$core$Task$perform = F2(
 	function (toMessage, task) {
 		return elm$core$Task$command(
-			A2(elm$core$Task$map, toMessage, task));
+			elm$core$Task$Perform(
+				A2(elm$core$Task$map, toMessage, task)));
 	});
 var elm$core$String$length = _String_length;
 var elm$core$String$slice = _String_slice;
@@ -7871,8 +7901,8 @@ var elm$core$String$dropLeft = F2(
 			string);
 	});
 var elm$core$String$startsWith = _String_startsWith;
-var elm$url$Url$Http = 0;
-var elm$url$Url$Https = 1;
+var elm$url$Url$Http = {$: 'Http'};
+var elm$url$Url$Https = {$: 'Https'};
 var elm$core$String$indexes = _String_indexes;
 var elm$core$String$isEmpty = function (string) {
 	return string === '';
@@ -7885,7 +7915,7 @@ var elm$core$String$contains = _String_contains;
 var elm$core$String$toInt = _String_toInt;
 var elm$url$Url$Url = F6(
 	function (protocol, host, port_, path, query, fragment) {
-		return {ak: fragment, al: host, at: path, av: port_, ay: protocol, az: query};
+		return {fragment: fragment, host: host, path: path, port_: port_, protocol: protocol, query: query};
 	});
 var elm$url$Url$chompBeforePath = F5(
 	function (protocol, path, params, frag, str) {
@@ -7901,7 +7931,7 @@ var elm$url$Url$chompBeforePath = F5(
 					var i = _n0.a;
 					var _n1 = elm$core$String$toInt(
 						A2(elm$core$String$dropLeft, i + 1, str));
-					if (_n1.$ === 1) {
+					if (_n1.$ === 'Nothing') {
 						return elm$core$Maybe$Nothing;
 					} else {
 						var port_ = _n1;
@@ -7983,24 +8013,24 @@ var elm$url$Url$chompAfterProtocol = F2(
 var elm$url$Url$fromString = function (str) {
 	return A2(elm$core$String$startsWith, 'http://', str) ? A2(
 		elm$url$Url$chompAfterProtocol,
-		0,
+		elm$url$Url$Http,
 		A2(elm$core$String$dropLeft, 7, str)) : (A2(elm$core$String$startsWith, 'https://', str) ? A2(
 		elm$url$Url$chompAfterProtocol,
-		1,
+		elm$url$Url$Https,
 		A2(elm$core$String$dropLeft, 8, str)) : elm$core$Maybe$Nothing);
 };
 var elm$browser$Browser$element = _Browser_element;
 var author$project$Main$main = elm$browser$Browser$element(
 	{
-		aR: function (_n0) {
+		init: function (_n0) {
 			return _Utils_Tuple2(author$project$Main$initalModel, elm$core$Platform$Cmd$none);
 		},
-		aZ: author$project$Main$subscriptions,
-		a$: author$project$Main$update,
-		a1: author$project$Main$view
+		subscriptions: author$project$Main$subscriptions,
+		update: author$project$Main$update,
+		view: author$project$Main$view
 	});
 _Platform_export({'Main':{'init':author$project$Main$main(
-	elm$json$Json$Decode$succeed(0))(0)}});}(this));
+	elm$json$Json$Decode$succeed(_Utils_Tuple0))(0)}});}(this));
 
 var app = Elm.Main.init({ node: document.getElementById("elm-f0111bc4e658d0f98db96260c16f7e49") });
 if (document.getElementById("elm-f0111bc4e658d0f98db96260c16f7e49"))
