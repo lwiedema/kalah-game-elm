@@ -79,7 +79,12 @@ update msg model =
                     case game.state of
                         Turn onTurn ->
                             -- check if click on house was legal
-                            if onTurn == player && not (GameBoard.numberOfSeedsInHouse (GameBoard.getRowForPlayer game.board player) pos == 0) then
+                            if
+                                (onTurn
+                                    == player
+                                )
+                                    && not (GameBoard.numberOfSeedsInHouse (GameBoard.getRowForPlayer game.board player) pos == 0)
+                            then
                                 ( case Game.startSowingSeeds game player pos of
                                     Just g ->
                                         GameOk g
@@ -336,7 +341,6 @@ rowHouseView game player pos =
             div
                 ([ upsideDown game player
                  , cursorStyle game player
-                 , onClick (Click player pos)
                  , fillParentHeight
                  , orderSiblingsHorizontally
                  , style "width" "72px"
@@ -344,6 +348,13 @@ rowHouseView game player pos =
                  ]
                     ++ defaultTextFont
                     ++ houseStyle
+                    ++ (case game.board.sowingState of
+                            NotSowing ->
+                                [ onClick (Click player pos) ]
+
+                            _ ->
+                                []
+                       )
                 )
                 [ Html.text (String.fromInt house.seeds)
                 , div
