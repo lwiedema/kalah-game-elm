@@ -1,4 +1,4 @@
-module Localization exposing (Language(..), animationSpeedTitle, drawnGame, easyDifficulty, englishLanguage, fastSpeed, finalScore, firstTurnDescription, firstTurnTitle, gameModeHint, gameModeSettings, gameOver, germanLanguage, highDifficulty, languageSetting, lastSeedsDescription, lastSeedsTitle, mediumDifficulty, normalSpeed, numberOfSeeds, opponentDescription, opponentLevelTitle, opponentsStoreDescription, opponentsStoreTitle, opponentsTurn, player, presentationSettings, restart, settings, slowSpeed, tabletModeDescription, tabletModeTitle, youLoose, youWin, yourTurn)
+module Localization exposing (Language(..), animationSpeedTitle, drawnGame, easyDifficulty, englishLanguage, fastSpeed, finalScore, firstTurnDescription, firstTurnTitle, gameModeHint, gameModeSettings, gameOver, germanLanguage, highDifficulty, languageSetting, lastSeedsDescription, lastSeedsTitle, mediumDifficulty, moreInfo, normalSpeed, numberOfSeeds, opponentDescription, opponentLevelTitle, opponentsStoreDescription, opponentsStoreTitle, opponentsTurn, player, presentationSettings, restart, settings, slowSpeed, tabletModeDescription, tabletModeTitle, youLoose, youWin, yourTurn)
 
 
 type Language
@@ -14,6 +14,16 @@ settings language =
 
         English ->
             "Settings"
+
+
+moreInfo : Language -> String
+moreInfo language =
+    case language of
+        German ->
+            "Mehr Infos"
+
+        English ->
+            "About"
 
 
 player : Language -> String

@@ -58,6 +58,7 @@ type Msg
     | SettingChanged SettingOption
     | ComputerHasTurn
     | RandomMoveWeights (List Float)
+    | DoNothing
 
 
 type SettingOption

@@ -6,8 +6,8 @@ import Color
 import Datatypes exposing (ErrorType(..), Model(..), Msg(..), SettingOption(..))
 import Game exposing (Game, State(..))
 import GameBoard exposing (SowingState(..))
-import Html exposing (Attribute, Html, div, text)
-import Html.Attributes exposing (style)
+import Html exposing (Attribute, Html, a, div, text)
+import Html.Attributes exposing (href, style, target)
 import Html.Events exposing (onClick)
 import KalahaAI
 import Localization exposing (Language(..))
@@ -188,6 +188,9 @@ update msg model =
                     , Cmd.none
                     )
 
+                DoNothing ->
+                    ( model, Cmd.none )
+
         GameError _ ->
             ( case msg of
                 Restart ->
@@ -206,10 +209,25 @@ view model =
             div []
                 [ div
                     [ style "display" "inline-block" ]
-                    [ iconButton
-                        (Localization.settings game.settings.language)
-                        Material.Icons.Action.settings
-                        OpenSettings
+                    [ div []
+                        [ div [ style "float" "left" ]
+                            [ iconButton
+                                (Localization.settings game.settings.language)
+                                Material.Icons.Action.settings
+                                OpenSettings
+                            ]
+                        , a
+                            [ href "https://github.com/lwiedema/kalah-game-elm"
+                            , target "_blank"
+                            , style "float" "right"
+                            , style "margin-left" "10px"
+                            ]
+                            [ iconButton
+                                (Localization.moreInfo game.settings.language)
+                                Material.Icons.Action.info
+                                DoNothing
+                            ]
+                        ]
                     ]
                 , div [ style "height" "100%", style "width" "100%" ]
                     (div
