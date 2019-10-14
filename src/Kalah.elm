@@ -1,4 +1,4 @@
-module Main exposing (main)
+module Kalah exposing (main)
 
 import Array
 import Browser
